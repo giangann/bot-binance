@@ -1,4 +1,4 @@
-import { TCreateRecord } from "generic.type";
+import { TCreateRecord, TUpdateRecord } from "generic.type";
 
 export interface ICoinPrice1AM {
   id: number;
@@ -7,4 +7,8 @@ export interface ICoinPrice1AM {
   createdAt: string;
   updatedAt: string;
 }
-export interface ICoinPrice1AMCreate extends TCreateRecord<ICoinPrice1AM> {}
+export interface ICoinPrice1AMCreate {
+  symbol: string;
+  price: string;
+}
+export interface ICoinPrice1AMUpdate extends TUpdateRecord<ICoinPrice1AM> {}

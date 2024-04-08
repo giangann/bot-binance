@@ -12,6 +12,7 @@ export class CreateCoinPrice1AMTable1712595729219
             name: "id",
             type: "int",
             isPrimary: true,
+            isGenerated: true,
             generationStrategy: "increment",
           },
           {
