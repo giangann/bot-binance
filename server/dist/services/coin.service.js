@@ -11,6 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const coin_price_1am_entity_1 = require("../entities/coin-price-1am.entity");
 const typeorm_1 = require("typeorm");
+const list = () => __awaiter(void 0, void 0, void 0, function* () {
+    const coinRepo = (0, typeorm_1.getRepository)(coin_price_1am_entity_1.CoinPrice1AM).createQueryBuilder("coin_price_1am");
+    const listCoinPrice = yield coinRepo.getMany();
+    return listCoinPrice;
+});
 const create = (params) => __awaiter(void 0, void 0, void 0, function* () {
     const createdCoin = yield (0, typeorm_1.getRepository)(coin_price_1am_entity_1.CoinPrice1AM).save(params);
     return createdCoin;
@@ -19,4 +24,4 @@ const update = (params) => __awaiter(void 0, void 0, void 0, function* () {
     const updatedCoin = yield (0, typeorm_1.getRepository)(coin_price_1am_entity_1.CoinPrice1AM).update({ symbol: params.symbol }, { price: params.price });
     return updatedCoin;
 });
-exports.default = { create, update };
+exports.default = { create, update, list };

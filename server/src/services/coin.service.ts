@@ -5,6 +5,14 @@ import {
 } from "coin-price-1am.interface";
 import { getRepository } from "typeorm";
 
+const list = async () => {
+  const coinRepo =
+    getRepository(CoinPrice1AM).createQueryBuilder("coin_price_1am");
+  const listCoinPrice = await coinRepo.getMany();
+
+  return listCoinPrice;
+};
+
 const create = async (params: ICoinPrice1AMCreate) => {
   const createdCoin = await getRepository(CoinPrice1AM).save(params);
   return createdCoin;
@@ -18,4 +26,4 @@ const update = async (params: ICoinPrice1AMUpdate) => {
   return updatedCoin;
 };
 
-export default { create, update };
+export default { create, update, list };

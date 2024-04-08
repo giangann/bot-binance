@@ -1,7 +1,7 @@
-import binanceController from "../controllers/binance.controller";
+import coinPrice1amController from "../controllers/coin-price-1am.controller";
 import express from "express";
 
-const binanceRoute = express.Router();
-// binanceRoute.get("/", notiController.create);
-binanceRoute.get('/ohlcv', binanceController.getOHLCV)
-export default binanceRoute;
+const coinPrice1amRoute = express.Router();
+coinPrice1amRoute.get("/", coinPrice1amController.list);
+
+export default coinPrice1amRoute;

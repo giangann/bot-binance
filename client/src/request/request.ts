@@ -1,4 +1,4 @@
-export const baseURL = "http://localhost:5000";
+export const baseURL = import.meta.env.VITE_BASE_URL;
 
 export type TMeta = {
   total: number;
@@ -19,23 +19,18 @@ export type TResponse<T> = TResponseSuccess<T> | TResponseFailure;
 
 export const getApi = async <T>(
   endpoint: string,
-  searchParams?: Record<string, string>,
-  override?: string
+  searchParams?: Record<string, string>
 ): Promise<TResponse<T>> => {
   const queryParams = searchParams
     ? "?" + new URLSearchParams(searchParams)
     : "";
-  const fullUrl = override ? override : baseURL + "/" + endpoint + queryParams;
+  const fullUrl = baseURL + "/" + endpoint + queryParams;
   const respond = await fetch(fullUrl, {
-    // method: "GET",
+    method: "GET",
     headers: {
-      // "Content-Type": "application/json",
-      // apiKey:
-      //   "1A0eAdDSYP6mamVZRCmc0cSt4qm4K7pwaONb55yTlIdfuHMUYmyztBZnSbZ3hPBb",
-      // secret:
-      //   "4wTgPjsyA9z1FIyUug81SOuTzCP5pZNyD3wHoIHpkjQ8yzoKUXgLaiV5izztl5qp",
+      "Content-Type": "application/json",
     },
-    // credentials: "include",
+    credentials: "include",
   });
 
   return respond.json();
