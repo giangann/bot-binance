@@ -9,9 +9,9 @@ export const createWebSocket = (httpServer: http.Server) => {
   io.on("connection", (socket) => {
     console.log("new client connect");
 
-    socket.on("parseUser", (user) => {
-      socket.data.user = user;
-    });
+    // socket.on("parseUser", (user) => {
+    //   socket.data.user = user;
+    // });
   });
 
   return io;
