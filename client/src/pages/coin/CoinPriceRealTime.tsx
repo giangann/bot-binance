@@ -17,7 +17,7 @@ export const CoinPriceRealTime = () => {
 
   const fields: StrictField<ICoinPriceChange>[] = [
     {
-      header: "Coin",
+      header: "Coin_USD",
       fieldKey: "symbol",
       width: 300,
     },

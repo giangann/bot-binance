@@ -11,7 +11,7 @@ export const CoinPriceFixedTime = () => {
   let [coinPrices, setCoinPrices] = useState([]);
   const fields: StrictField<TCoinPrice>[] = [
     {
-      header: "Coin",
+      header: "Coin_USD",
       fieldKey: "symbol",
       width: 300,
     },
