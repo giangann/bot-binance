@@ -8,7 +8,8 @@
     "dev": "nodemon --files src/index.ts",
     "migration:generate": "typeorm migration:create -n",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run",
-    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert"
+    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
