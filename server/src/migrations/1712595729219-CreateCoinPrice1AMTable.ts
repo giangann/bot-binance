@@ -1,10 +1,12 @@
 import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
-export class CreateUserTable1707912792822 implements MigrationInterface {
+export class CreateCoinPrice1AMTable1712595729219
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: "user",
+        name: "coin_price_1am",
         columns: [
           {
             name: "id",
@@ -13,14 +15,24 @@ export class CreateUserTable1707912792822 implements MigrationInterface {
             generationStrategy: "increment",
           },
           {
-            name: "username",
+            name: "symbol",
             type: "varchar",
-            isNullable: false,
+            isNullable: true,
           },
           {
-            name: "password",
+            name: "price",
             type: "varchar",
-            isNullable: false,
+            isNullable: true,
+          },
+          {
+            name: "createdAt",
+            type: "datetime",
+            default: "CURRENT_TIMESTAMP",
+          },
+          {
+            name: "updatedAt",
+            type: "datetime",
+            default: "CURRENT_TIMESTAMP",
           },
         ],
       })
@@ -28,6 +40,6 @@ export class CreateUserTable1707912792822 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable("user");
+    await queryRunner.dropTable("coin_price_1am");
   }
 }
