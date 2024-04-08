@@ -11,10 +11,9 @@ import { CoinContext } from "./Coin";
 export const CoinPriceRealTime = () => {
   const [coinPrices, setCoinPrices] = useState<ICoinPriceChange[]>([]);
   const coinPricesFilterd = coinPrices.filter(
-    (coin) => parseFloat(coin.percentChange) >= 0.01
+    (coin) => parseFloat(coin.percentChange) >= 5
   );
   const { coinPricesMap } = useContext(CoinContext);
-
   const fields: StrictField<ICoinPriceChange>[] = [
     {
       header: "Coin_USD",
@@ -35,7 +34,7 @@ export const CoinPriceRealTime = () => {
         let isUp = percentFloat >= 0;
         return (
           <Typography color={isUp ? "green" : "red"}>
-            {percentChange}
+            {`${percentChange} %`}
           </Typography>
         );
       },
@@ -46,7 +45,9 @@ export const CoinPriceRealTime = () => {
       const endpoint = "https://fapi.binance.com/fapi/v2/ticker/price";
       const response = await fetch(endpoint);
       const data: ICoinPrice[] = await response.json();
-      setCoinPrices(coinWithPercentChange(data, coinPricesMap));
+      setCoinPrices(
+        sortCoinByPercentChange(coinWithPercentChange(data, coinPricesMap))
+      );
     }
     fetchCoinPrices();
 
@@ -81,7 +82,9 @@ const CoinPriceRealTimeFilter = ({ fields, data }: Props) => {
   return (
     <Grid item xs={12} sm={7}>
       <Box>
-        <Typography variant="h5">Coin Price Real Time greater than 5%</Typography>
+        <Typography variant="h5">
+          Coin Price Real Time greater than 5%
+        </Typography>
         <CustomTable data={data} fields={fields} />
       </Box>
     </Grid>
@@ -92,16 +95,16 @@ function coinWithPercentChange(coinArr: ICoinPrice[], coinMap: TCoinPriceMap) {
   return coinArr.map((coin) => {
     let currCoinPrice = parseFloat(coin.price);
     let coinKey: string = coin.symbol;
-    let originCoinPrice = parseFloat(coinMap[coinKey].price);
+    let originCoinPrice = parseFloat(coinMap[coinKey]?.price);
     return {
       ...coin,
-      percentChange: floatToString(currCoinPrice / originCoinPrice - 1),
+      percentChange: ((currCoinPrice / originCoinPrice - 1) * 100).toFixed(2),
     };
   });
 }
 
-function floatToString(number: number) {
-  let targetNumber = (number * 100).toFixed(2);
-  if (number < 0) return `- ${-targetNumber} %`;
-  else return `${targetNumber}`;
+function sortCoinByPercentChange(coinArr: ICoinPriceChange[]) {
+  return coinArr.sort(
+    (a, b) => parseFloat(b.percentChange) - parseFloat(a.percentChange)
+  );
 }

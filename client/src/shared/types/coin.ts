@@ -1,7 +1,7 @@
 export interface ICoinPrice {
   symbol: string;
   price: string;
-  time: number;
+  time?: number;
 }
 
 export interface ICoinPriceChange extends ICoinPrice {
