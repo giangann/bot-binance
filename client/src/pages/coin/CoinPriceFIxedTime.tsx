@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { CustomTable, StrictField } from "../../components/Table/Customtable";
 
@@ -13,12 +13,12 @@ export const CoinPriceFixedTime = () => {
     {
       header: "Coin",
       fieldKey: "symbol",
-      width: 150,
+      width: 300,
     },
     {
       header: "Price",
       fieldKey: "price",
-      width: 250,
+      width: 300,
     },
   ];
   useEffect(() => {
@@ -32,9 +32,11 @@ export const CoinPriceFixedTime = () => {
   }, []);
 
   return (
-    <Box>
-      <Typography variant="h5">Coin Price in 1:00 AM</Typography>
-      <CustomTable data={coinPrices} fields={fields} />
-    </Box>
+    <Grid item xs={12} sm={5}>
+      <Box>
+        <Typography variant="h5">Coin Price in 1:00 AM</Typography>
+        <CustomTable data={coinPrices} fields={fields} />
+      </Box>
+    </Grid>
   );
 };

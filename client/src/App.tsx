@@ -1,16 +1,13 @@
 import "./App.css";
-import { CoinPriceFixedTime } from "./pages/coin/CoinPriceFIxedTime";
-import { CoinPriceRealTime } from "./pages/coin/CoinPriceRealTime";
+import { Coin } from "./pages/coin/Coin";
 import { Setting } from "./pages/setting/Setting";
-
 
 function App() {
   return (
     <>
-      <div>
+      <div style={{maxWidth:1500, margin:'auto'}}>
         <Setting />
-        <CoinPriceFixedTime/>
-        <CoinPriceRealTime/>
+        <Coin />
       </div>
     </>
   );
