@@ -11,7 +11,7 @@ import { CoinContext } from "./Coin";
 export const CoinPriceRealTime = () => {
   const [coinPrices, setCoinPrices] = useState<ICoinPriceChange[]>([]);
   const coinPricesFilterd = coinPrices.filter(
-    (coin) => parseFloat(coin.percentChange) >= 0.01
+    (coin) => parseFloat(coin.percentChange) >= 5
   );
   const { coinPricesMap } = useContext(CoinContext);
 
@@ -81,7 +81,9 @@ const CoinPriceRealTimeFilter = ({ fields, data }: Props) => {
   return (
     <Grid item xs={12} sm={7}>
       <Box>
-        <Typography variant="h5">Coin Price Real Time greater than 5%</Typography>
+        <Typography variant="h5">
+          Coin Price Real Time greater than 5%
+        </Typography>
         <CustomTable data={data} fields={fields} />
       </Box>
     </Grid>

@@ -3,6 +3,8 @@ import { ICoinPrice, TCoinPriceMap } from "../../shared/types/coin";
 import { CoinPriceFixedTime } from "./CoinPriceFIxedTime";
 import { CoinPriceRealTime } from "./CoinPriceRealTime";
 import { Grid } from "@mui/material";
+import data from "./data.json";
+import { getApi } from "../../request/request";
 
 export const CoinContext = createContext<{
   coinPricesArr: ICoinPrice[];
@@ -16,10 +18,13 @@ export const Coin = () => {
 
   useEffect(() => {
     async function fetchCoinPrices() {
-      const endpoint = "https://fapi.binance.com/fapi/v2/ticker/price";
-      const response = await fetch(endpoint);
-      const data = await response.json();
-      setCoinPrices(data);
+      try {
+        const response = await getApi<ICoinPrice[]>("coin-price-1am");
+        if (response.success) setCoinPrices(response.data);
+        else setCoinPrices(data.data);
+      } catch (err) {
+        console.log(err), setCoinPrices(data.data);
+      }
     }
     fetchCoinPrices();
   }, []);
