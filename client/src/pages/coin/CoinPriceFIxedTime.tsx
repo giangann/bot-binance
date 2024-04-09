@@ -24,7 +24,6 @@ export const CoinPriceFixedTime = () => {
       <Box>
         <Typography variant="h5">Coin Price in 1:00 AM</Typography>
         <CustomTable data={coinPricesArr} fields={fields} />
-        <CustomTable data={coinPricesArr} fields={fields} />
       </Box>
     </Grid>
   );
