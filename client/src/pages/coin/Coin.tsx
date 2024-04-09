@@ -1,10 +1,10 @@
+import { Grid } from "@mui/material";
 import { createContext, useEffect, useState } from "react";
+import { getApi } from "../../request/request";
 import { ICoinPrice, TCoinPriceMap } from "../../shared/types/coin";
 import { CoinPriceFixedTime } from "./CoinPriceFIxedTime";
 import { CoinPriceRealTime } from "./CoinPriceRealTime";
-import { Grid } from "@mui/material";
 import data from "./data.json";
-import { getApi } from "../../request/request";
 
 export const CoinContext = createContext<{
   coinPricesArr: ICoinPrice[];
