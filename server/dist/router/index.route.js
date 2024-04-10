@@ -10,5 +10,5 @@ const indexRoute = express_1.default.Router();
 indexRoute.use("/binance", binance_route_1.default);
 indexRoute.use("/coin-price-1am", coin_route_1.default);
 // default route
-indexRoute.use("/", (req, res) => res.json("this is express app bot api"));
+indexRoute.use("/", (req, res) => res.json("this is express app bot api test cpanel git repo deploy"));
 exports.default = indexRoute;
