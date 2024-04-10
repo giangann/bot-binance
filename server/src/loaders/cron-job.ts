@@ -6,7 +6,7 @@ import coinService from "../services/coin.service";
 export const cronJobSchedule = async () => {
   console.log("cron job file");
   const task = cron.schedule(
-    "0 5 1 * * *",
+    "0 20 1 * * *",
     () => {
       console.log("task run");
       updateCoinTable();
