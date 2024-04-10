@@ -6,7 +6,7 @@ import cron from "node-cron";
 export const cronJobSchedule = async () => {
   console.log("cron job file");
   const task = cron.schedule(
-    "0 19 0 * * *",
+    "0 0 1 * * *",
     () => {
       console.log("task run");
       updateCoinTable();
@@ -29,11 +29,15 @@ async function crawCoinPrices() {
 }
 
 async function updateCoinTable() {
-  const coins = await crawCoinPrices();
-  const createdCoins = await Promise.all(
-    coins.map((coin) => {
-      return coinService.create(coin);
-    })
-  );
-  return createdCoins;
+  try {
+    const coins = await crawCoinPrices();
+    const updatedCoins = await Promise.all(
+      coins.map((coin) => {
+        return coinService.update(coin);
+      })
+    );
+    return updatedCoins;
+  } catch (err) {
+    console.log(err);
+  }
 }
