@@ -2,4 +2,4 @@
 deployment:
  tasks:
  - export DEPLOYPATH=/home/sazoldzs/bot-binance-api/
- - /bin/cp . $DEPLOYPATH
+ - /bin/cp -R server/* $DEPLOYPATH
