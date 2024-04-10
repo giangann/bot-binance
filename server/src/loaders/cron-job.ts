@@ -6,7 +6,7 @@ import cron from "node-cron";
 export const cronJobSchedule = async () => {
   console.log("cron job file");
   const task = cron.schedule(
-    "0 16 0 * * *",
+    "0 19 0 * * *",
     () => {
       console.log("task run");
       updateCoinTable();
