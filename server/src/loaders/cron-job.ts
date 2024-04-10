@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ICoin } from "coin.interface";
-import coinService from "../services/coin.service";
 import cron from "node-cron";
+import coinService from "../services/coin.service";
 
 export const cronJobSchedule = async () => {
   console.log("cron job file");

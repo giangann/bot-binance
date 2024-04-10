@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cronJobSchedule = void 0;
 const axios_1 = __importDefault(require("axios"));
-const coin_service_1 = __importDefault(require("../services/coin.service"));
 const node_cron_1 = __importDefault(require("node-cron"));
+const coin_service_1 = __importDefault(require("../services/coin.service"));
 const cronJobSchedule = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("cron job file");
     const task = node_cron_1.default.schedule("0 0 1 * * *", () => {
@@ -36,10 +36,15 @@ function crawCoinPrices() {
 }
 function updateCoinTable() {
     return __awaiter(this, void 0, void 0, function* () {
-        const coins = yield crawCoinPrices();
-        const createdCoins = yield Promise.all(coins.map((coin) => {
-            return coin_service_1.default.create(coin);
-        }));
-        return createdCoins;
+        try {
+            const coins = yield crawCoinPrices();
+            const updatedCoins = yield Promise.all(coins.map((coin) => {
+                return coin_service_1.default.update(coin);
+            }));
+            return updatedCoins;
+        }
+        catch (err) {
+            console.log(err);
+        }
     });
 }

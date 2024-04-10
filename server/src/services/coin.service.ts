@@ -3,6 +3,7 @@ import {
   ICoinPrice1AMCreate,
   ICoinPrice1AMUpdate,
 } from "coin-price-1am.interface";
+import moment from "moment";
 import { getRepository } from "typeorm";
 
 const list = async () => {
@@ -19,9 +20,10 @@ const create = async (params: ICoinPrice1AMCreate) => {
 };
 
 const update = async (params: ICoinPrice1AMUpdate) => {
+  const updatedAt = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
   const updatedCoin = await getRepository(CoinPrice1AM).update(
     { symbol: params.symbol },
-    { price: params.price }
+    { price: params.price, updatedAt }
   );
   return updatedCoin;
 };
