@@ -6,13 +6,14 @@ import coinService from "../services/coin.service";
 export const cronJobSchedule = async () => {
   console.log("cron job file");
   const task = cron.schedule(
-    "0 53 14 * * *",
+    "0 0 1 * * *",
     () => {
       console.log("task run");
       updateCoinTable();
     },
     {
       scheduled: false,
+      timezone: "Asia/Ho_Chi_Minh",
     }
   );
 
