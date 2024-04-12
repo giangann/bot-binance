@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import "./App.css";
 import { Balance } from "./pages/account/Balance";
 import { OrderHistory } from "./pages/account/OrderHistory";
@@ -7,15 +8,13 @@ import { Setting } from "./pages/setting/Setting";
 
 function App() {
   return (
-    <>
-      <div style={{ maxWidth: 1500, margin: "auto" }}>
-        <Setting />
-        <Coin />
-        <Balance />
-        <OrderHistory />
-        <TradeHistory/>
-      </div>
-    </>
+    <Box sx={{ maxWidth: 1500, margin: "auto", padding: { xs: 1, sm: 2 } }}>
+      <Setting />
+      <Coin />
+      <Balance />
+      <OrderHistory />
+      <TradeHistory />
+    </Box>
   );
 }
 
