@@ -122,17 +122,10 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "paths": {
-      "*": [
-        "node_modules/*",
-        "src/interfaces/*",
-        "src/entities/*",
-        "src/services/*",
-        "src/controllers/*",
-        "src/middlewares/*"
-      ]
+      "*": ["node_modules/*", "src/interfaces/*"]
     },
     "lib": ["es2015", "es5", "es6", "dom"],
-    "typeRoots": ["./node_modules/@types","./src/types"]
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": ["src/**/*"]
 }

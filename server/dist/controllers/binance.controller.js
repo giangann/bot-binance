@@ -25,9 +25,7 @@ const binance = new ccxt_1.default.binance({
 const getOHLCV = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let allCurrencies = yield binance.fetchCurrencies(); //why undefined?
-        // let fetchMarkets = await binance.fetchMarkets() // not ok
         let tickers = yield binance.fetchTickers();
-        // let btcOHLCV = await binance.fetchOHLCV("BTC/USDT", "1m", undefined, 10);
         let gAllCurrencies = yield getAllCurrencies();
         let data = { allCurrencies, gAllCurrencies };
         console.log("data", data);
