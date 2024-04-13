@@ -1,8 +1,5 @@
 import IController from "IController";
-import axios from "axios";
-import ccxt from "ccxt";
-import { Balances } from "ccxt";
-import crypto from "node:crypto";
+import ccxt, { Balances } from "ccxt";
 import { ServerResponse } from "../ultils/server-response.ultil";
 // import crypto
 
@@ -15,7 +12,9 @@ const binance = new ccxt.binance({ apiKey, secret });
 binance.setSandboxMode(true);
 
 // constant
-const TRADE_SIZE_BY_USDT = 0.01;
+const TRADE_SIZE_BY_USDT = 100;
+const DOUBLE_PERCENT = 5 / 100;
+const STOP_PERCENT = 2.5 / 100;
 
 const getBalance: IController = async (req, res) => {
   try {
@@ -51,14 +50,7 @@ async function calculateTotalToUSDTFake(balance: Balances) {
 const getOrderHistory: IController = async (req, res) => {
   try {
     // get list order id from order service in database
-    let listOrderId = await orderIdsFromTradeList();
-    // promise.all list order to get list promise of api banance all fetchOrder(orderId)
-
-    let orders = await Promise.all(
-      listOrderId.map(async (order_id) => {
-        return await binance.fetchOrder(order_id, "BTCUSDT");
-      })
-    );
+    const orders = await binance.fetchOrders("BTCUSDT");
 
     ServerResponse.response(res, orders);
   } catch (err) {
@@ -69,14 +61,6 @@ const getOrderHistory: IController = async (req, res) => {
 const getTradeHistory: IController = async (req, res) => {
   try {
     const tradeList = await binance.fetchMyTrades("BTCUSDT");
-    // const tradeList = response.map((trade) => {
-    //   return {
-    //     order_id: trade.order,
-    //     amount: trade.amount,
-    //     price: trade.price,
-    //     datetime: trade.datetime,
-    //   };
-    // });
     ServerResponse.response(res, tradeList);
   } catch (err) {
     ServerResponse.error(res, err.message);
@@ -102,4 +86,54 @@ async function orderIdsFromTradeList() {
   return orderIds;
 }
 
-export default { getBalance, getOrderHistory, getTradeHistory };
+// create new order with tradesize
+const newOrder: IController = async (req, res) => {
+  try {
+    const { price: btcPrice } = await binance.fapiPublicV2GetTickerPrice({
+      symbol: "BTCUSDT",
+    });
+
+    // const DOUBLE_PERCENT =
+    const createdOrder = await binance.createLimitSellOrder(
+      "BTCUSDT",
+      TRADE_SIZE_BY_USDT / btcPrice,
+      btcPrice - 5000
+    );
+
+    console.log("created order", createdOrder);
+  } catch (err) {
+    ServerResponse.error(res, err.message);
+  }
+};
+
+// check condition to decide update order
+async function updateOrder(orderId: string) {
+  try {
+    let updatedOrder = await binance.editLimitBuyOrder(
+      orderId,
+      "BTCUSDT",
+      0.005,
+      59000
+    );
+    console.log("updatedOrder", updatedOrder);
+  } catch (err) {
+    console.log("err", err);
+  }
+}
+// updateOrder("782912");
+async function calculateOrderValue(orderId: string) {}
+
+async function makeLimitOrder() {
+  const { price: btcPrice } = await binance.fapiPublicV2GetTickerPrice({
+    symbol: "BTCUSDT",
+  });
+  const newOrder = await binance.createLimitBuyOrder(
+    "BTCUSDT",
+    TRADE_SIZE_BY_USDT / btcPrice,
+    59000 //if down 500$ then buy
+  );
+  console.log("newOrder: ", newOrder);
+}
+// makeLimitOrder();
+
+export default { getBalance, getOrderHistory, getTradeHistory, newOrder };
