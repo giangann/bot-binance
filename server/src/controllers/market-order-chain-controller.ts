@@ -5,8 +5,17 @@ import moment from "moment";
 import binanceService from "../services/binance.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import marketOrderPieceService from "../services/market-order-piece.service";
+import { compareDate, priceToPercent } from "../ultils/helper.ultil";
 import { ServerResponse } from "../ultils/server-response.ultil";
 
+const list: IController = async (req, res) => {
+  try {
+    const listChain = await marketOrderChainService.list();
+    ServerResponse.response(res, listChain);
+  } catch (err) {
+    ServerResponse.error(res, err.message);
+  }
+};
 const create: IController = async (req, res) => {
   try {
     // create new record of order chain in db
@@ -22,27 +31,59 @@ const create: IController = async (req, res) => {
     };
     let amountMulti = parseInt(req.body.amount_multi);
 
-    const newChain = await marketOrderChainService.create({ status: "open" });
+    const totalBalanceNow = (
+      await binanceService.getMyBalance()
+    ).total.toString();
+    const newChain = await marketOrderChainService.create({
+      status: "open",
+      total_balance_start: totalBalanceNow,
+    });
 
-    // first run 1 marketOrder
-    await action(params, newChain.id);
+    let count = 0;
 
     const interval = setInterval(async () => {
-      const isExecute = await isContinue(percentDiff.down);
+      // check can excute
+      let prev_total = count
+        ? (await getLastOrder()).total_balance
+        : newChain.total_balance_start;
+      let percentChange = await totalBalancePercentChange(prev_total);
+      const isExecute = await isContinue(prev_total, percentDiff.down);
+      //
       if (isExecute) {
         try {
-          // make binance order as orderPiece and save to db
-          if ((await totalBalancePercentChange()) >= percentDiff.up) {
-            params = { ...params, amount: params.amount * amountMulti };
+          if (percentChange > percentDiff.up) {
+            params = { ...params, amount: params.amount * amountMulti }; //multi amount
           }
-          await action(params, newChain.id);
+          // create binance order - call piece order
+          const newBinanceOrder = await makeOrderAndNoti(params);
+          // save this piece order with correspond order chain
+          await saveOrderPiece(newBinanceOrder.id, newChain.id, percentChange);
+          count += 1;
         } catch (err) {
           console.log("err", err);
-          updateOrderChainStatus(newChain.id, "closed");
+          const total_balance_end = (await getLastOrder()).total_balance;
+          const percent_change =
+            parseFloat(total_balance_end) /
+            parseFloat(newChain.total_balance_start);
+          updateOrderChainStatus(
+            newChain.id,
+            "closed",
+            total_balance_end,
+            percent_change
+          );
           clearInterval(interval);
         }
       } else {
-        updateOrderChainStatus(newChain.id, "closed");
+        const total_balance_end = (await getLastOrder()).total_balance;
+        const percent_change =
+          parseFloat(total_balance_end) /
+          parseFloat(newChain.total_balance_start);
+        updateOrderChainStatus(
+          newChain.id,
+          "closed",
+          total_balance_end,
+          percent_change
+        );
         clearInterval(interval);
       }
     }, intervalTime * 1000);
@@ -60,13 +101,26 @@ type TMOrderParams = {
   amount: number;
 };
 
-async function action(orderBinanceParams: TMOrderParams, orderChainId: number) {
-  // one time from start
+type TOrderPieceParmas = {
+  orderChainId: number;
+  percentChange: number;
+};
+
+async function action(
+  orderBinanceParams: TMOrderParams,
+  orderPieceParams: TOrderPieceParmas
+) {
+  // make binance order as orderPiece and save to db
   const newBinanceOrder = await makeOrderAndNoti(orderBinanceParams);
   console.log(newBinanceOrder.id);
 
   // save order piece correspond with order chain
-  const orderPiece = await saveOrderPiece(newBinanceOrder.id, orderChainId);
+  const { orderChainId, percentChange } = orderPieceParams;
+  const orderPiece = await saveOrderPiece(
+    newBinanceOrder.id,
+    orderChainId,
+    percentChange
+  );
 }
 
 async function makeOrderAndNoti(params: TMOrderParams) {
@@ -82,13 +136,18 @@ async function makeOrderAndNoti(params: TMOrderParams) {
   return newBinanceOrder;
 }
 
-async function saveOrderPiece(id: string, market_order_chains_id: number) {
+async function saveOrderPiece(
+  id: string,
+  market_order_chains_id: number,
+  percent_change: number
+) {
   let total_balance = (await binanceService.getMyBalance()).total;
   // create new record of order piece to db
   let pieceParams: IMarketOrderPieceCreate = {
     id,
     market_order_chains_id,
     total_balance: total_balance.toString(),
+    percent_change: percent_change.toString(),
   };
   const savedOrder = await marketOrderPieceService.create(pieceParams);
 
@@ -97,46 +156,40 @@ async function saveOrderPiece(id: string, market_order_chains_id: number) {
 
 async function updateOrderChainStatus(
   chainId: number,
-  status: TOrderChainStatus
+  status: TOrderChainStatus,
+  total_balance_end: string,
+  percent_change: number
 ) {
   const updatedAt = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
   const updatedOrderChain = await marketOrderChainService.update({
     id: chainId,
     status: status,
     updatedAt,
+    percent_change: percent_change.toString(),
+    total_balance_end,
   });
   console.log("chain ", chainId, " closed");
 
   return updatedOrderChain;
 }
 
-async function isContinue(down: number): Promise<boolean> {
-  const currTotalBalance = (await binanceService.getMyBalance()).total;
-  const lastestTotalBalance = (await getLastOrder()).total_balance;
-  const diff = await totalBalancePercentChange();
+// calculate percent_change prev_total with curr_total
+// percent_change >=down then return true, else is false
+async function isContinue(
+  prev_total: number | string,
+  down: number
+): Promise<boolean> {
+  const percent_change = await totalBalancePercentChange(prev_total);
 
-  // log
-  console.log(
-    "time now, now, last, diff",
-    Date.now(),
-    currTotalBalance,
-    lastestTotalBalance,
-    diff
-  );
-  //
-  if (diff >= down) return true;
+  if (percent_change >= down) return true;
   return false;
 }
-async function totalBalancePercentChange() {
-  const currTotalBalance = (await binanceService.getMyBalance()).total;
-  const lastestTotalBalance = (await getLastOrder()).total_balance;
-
-  return priceToPercent(currTotalBalance, parseFloat(lastestTotalBalance));
-}
-
-function priceToPercent(p1: number, p2: number) {
-  if (p1 < p2) return (p2 / p1 - 1) * 100;
-  else return -(p1 / p2 - 1) * 100;
+async function totalBalancePercentChange(prev_total: string | number) {
+  const curr_total = (await binanceService.getMyBalance()).total;
+  return priceToPercent(
+    typeof prev_total === "string" ? parseFloat(prev_total) : prev_total,
+    curr_total
+  );
 }
 
 async function getLastOrder() {
@@ -149,8 +202,4 @@ async function getLastOrder() {
   return sortedListOrder[0];
 }
 
-function compareDate(date1: string, date2: string) {
-  if (date1 >= date2) return -1;
-  else return 1;
-}
-export default { create };
+export default { create, list };

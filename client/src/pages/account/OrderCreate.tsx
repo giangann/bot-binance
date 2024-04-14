@@ -1,6 +1,7 @@
-import { Box, Button, Dialog, Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Dialog, Grid, Stack } from "@mui/material";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { BaseInput } from "../../components/Input";
 
 type TNewOrder = {
@@ -19,7 +20,7 @@ export const OrderCreate = () => {
   const { register, handleSubmit } = useForm<TNewOrder>({
     defaultValues: defaultValue,
   });
-
+  const navigate = useNavigate();
   const onCreate = async (values: TNewOrder) => {
     console.log("values ", values);
     setOpen(false);
@@ -27,8 +28,8 @@ export const OrderCreate = () => {
 
   return (
     <Box>
-      <Button variant="contained" onClick={() => setOpen(true)}>
-        + Tạo lệnh
+      <Button variant="contained" onClick={() => navigate("/chuoi-lenh")}>
+        + Đặt chuỗi lệnh
       </Button>
 
       <Dialog
@@ -62,7 +63,9 @@ export const OrderCreate = () => {
             </Grid>
           </Grid>
           <Stack direction="row" spacing={1}>
-            <Button variant="outlined" onClick={()=>setOpen(false)}>Đóng </Button>
+            <Button variant="outlined" onClick={() => setOpen(false)}>
+              Đóng{" "}
+            </Button>
             <Button variant="contained" type="submit">
               Submit
             </Button>

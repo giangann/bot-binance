@@ -3,4 +3,6 @@ import marketOrderChainController from "../controllers/market-order-chain-contro
 const orderChainRoute = Router();
 
 orderChainRoute.post("/", marketOrderChainController.create);
+orderChainRoute.get("/", marketOrderChainController.list);
+
 export default orderChainRoute;

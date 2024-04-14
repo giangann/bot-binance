@@ -12,6 +12,9 @@ export class MarketOrderPiece extends BaseEntity {
   @Column()
   total_balance: string;
 
+  @Column({ nullable: false })
+  percent_change: string;
+
   @Column()
   timestamp: string;
 
