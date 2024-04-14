@@ -2,12 +2,14 @@ import express from "express";
 import binanceRoute from "./binance.route";
 import coinPrice1amRoute from "./coin.route";
 import userRoute from "./user.route";
+import orderChainRoute from "./order-chain.route";
 
 const indexRoute = express.Router();
 
 indexRoute.use("/binance", binanceRoute);
 indexRoute.use("/coin-price-1am", coinPrice1amRoute);
 indexRoute.use("/user", userRoute);
+indexRoute.use('/order-chain', orderChainRoute)
 // default route
 indexRoute.use("/", (req, res) =>
   res.json("this is express app bot api test cpanel git repo deploy")
