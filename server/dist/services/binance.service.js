@@ -30,10 +30,8 @@ const getMyBalance = () => __awaiter(void 0, void 0, void 0, function* () {
 // assume that just have bitcoin and usdt in balance
 function calTotalToUsdt(balance) {
     return __awaiter(this, void 0, void 0, function* () {
-        let params = {
-            symbol: "BTCUSDT",
-        };
-        let tickerBTCUSDT = yield getTickerPrice(params);
+        const symbol = "BTCUSDT";
+        let tickerBTCUSDT = yield getTickerPrice(symbol);
         let totalBitcoin = balance.BTC.total * parseFloat(tickerBTCUSDT.price);
         let btc = balance.BTC.total;
         let usdt = balance.USDT.total;
@@ -45,9 +43,19 @@ function calTotalToUsdt(balance) {
         return totalByUSDT;
     });
 }
-const getTickerPrice = (params) => __awaiter(void 0, void 0, void 0, function* () {
-    const tickerPrice = yield binance.fapiPublicV2GetTickerPrice(params);
+const getTickerPrice = (symbol) => __awaiter(void 0, void 0, void 0, function* () {
+    const tickerPrice = yield binance.fapiPublicV2GetTickerPrice({
+        symbol,
+    });
     return tickerPrice;
+});
+const getSymbolPriceNow = (symbol) => __awaiter(void 0, void 0, void 0, function* () {
+    const symbolPrice = yield binance.fapiPublicV2GetTickerPrice({
+        symbol,
+    });
+    if ("price" in symbolPrice) {
+        return parseFloat(symbolPrice.price);
+    }
 });
 const getOrderHistory = (symbol) => __awaiter(void 0, void 0, void 0, function* () {
     const orders = yield binance.fetchOrders(symbol);
@@ -67,4 +75,5 @@ exports.default = {
     getOrderHistory,
     getTradeHistory,
     createMarketOrder,
+    getSymbolPriceNow,
 };

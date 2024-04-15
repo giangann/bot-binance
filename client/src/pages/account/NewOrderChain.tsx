@@ -1,54 +1,77 @@
-import { Box, Button, Dialog, Grid, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  Grid,
+  Stack,
+} from "@mui/material";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { BaseInput } from "../../components/Input";
-import { postApi } from "../../request/request";
+import { getApi, postApi } from "../../request/request";
+import { toast } from "react-toastify";
 
 type TNewOrderChain = {
-  amount: number;
-  side: "buy" | "sell";
   symbol: string;
-  interval_time: number; // seconds
-  percent_diff_down: number; // %
-  percent_diff_up: number; // %
-  amount_multi: number;
+  transaction_size: string;
+  transaction_increase: string;
+  percent_to_buy: string;
+  percent_to_sell: string;
 };
 
 const defaultValue: TNewOrderChain = {
-  amount: 0.01,
-  side: "buy",
   symbol: "BTCUSDT",
-  interval_time: 5,
-  percent_diff_down: -2.5,
-  percent_diff_up: 5,
-  amount_multi: 2,
+  transaction_size: "100",
+  transaction_increase: "100",
+  percent_to_buy: "5",
+  percent_to_sell: "-2.5",
 };
 
 export const NewOrderChain = () => {
   const [open, setOpen] = useState(false);
-  const { register, handleSubmit } = useForm<TNewOrderChain>({
+  const [disabled, setDisabled] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<TNewOrderChain>({
     defaultValues: defaultValue,
   });
   const onCreate = async (values: TNewOrderChain) => {
     console.log("values ", values);
     try {
-      const response = await postApi<TNewOrderChain>("order-chain", values);
-      if (response.success)
-        alert(
-          "Đặt chuỗi lệnh thành công, đang chạy logic auto binance market order"
-        );
-      else alert(`Lỗi: ${JSON.stringify(response.error)}`);
+      const response = await postApi<TNewOrderChain>("bot/active", values);
+      if (response.success) toast.success("Bot kích hoạt thành công");
+      else toast.error(response.error.message);
     } catch (err) {
       console.log(err);
     } finally {
       setOpen(false);
+      setDisabled(true);
     }
+  };
+
+  const onQuit = async () => {
+    const response = await getApi("bot/quit");
+    if (response.success)
+      toast.info("Bot đã được dừng lại và thoát, hãy load lại trang");
+    else toast.error(response.error.message);
   };
 
   return (
     <Box>
-      <Button variant="contained" onClick={() => setOpen(true)}>
-        + Đặt chuỗi lệnh
+      <Button
+        variant="contained"
+        onClick={() => setOpen(true)}
+        disabled={disabled}
+        endIcon={disabled && <CircularProgress color="inherit" size={14} />}
+      >
+        + Kích hoạt BOT
+      </Button>
+
+      <Button variant="outlined" color="error" onClick={onQuit}>
+        x Quit
       </Button>
 
       <Dialog
@@ -59,27 +82,6 @@ export const NewOrderChain = () => {
       >
         <Box p={4}>
           <Grid container spacing={2} mb={2}>
-            {/* <Grid item xs={12} sm={6}>
-              <BaseInput
-                {...register("trade_size")}
-                label="Giá trị lệnh (USD)"
-                placeholder="Nhập số"
-              />
-            </Grid> */}
-            <Grid item xs={12} sm={6}>
-              <BaseInput
-                {...register("amount")}
-                label="Nhập số lượng tài sản"
-                placeholder="vd: 0.01, 0.05, 1 ..."
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <BaseInput
-                {...register("side")}
-                label="Mua hay bán? (buy/sell)"
-                placeholder="buy/sell"
-              />
-            </Grid>
             <Grid item xs={12} sm={6}>
               <BaseInput
                 {...register("symbol")}
@@ -87,32 +89,36 @@ export const NewOrderChain = () => {
                 placeholder="vd BTCUSDT"
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
               <BaseInput
-                {...register("percent_diff_up")}
-                label="Đặt 1 lệnh mới khi lãi lớn hơn: (%)"
+                {...register("transaction_size")}
+                label="Giá trị lệnh (USD)"
+                placeholder="Nhập số"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <BaseInput
+                {...register("transaction_increase")}
+                label="Giá trị tăng khi lãi"
+                placeholder="Nhập số"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <BaseInput
+                {...register("percent_to_buy")}
+                label="Mua khi lãi lớn hơn: (%)"
                 placeholder="vd: 5 hoặc 10 hoặc 15 ..."
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
               <BaseInput
-                {...register("amount_multi")}
-                label="Số lượng gấp ? lần:"
-                placeholder="vd: 1, 2.5, 2, ..."
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <BaseInput
-                {...register("percent_diff_down")}
-                label="Dừng lệnh khi lãi thấp hơn: (%)"
-                placeholder="vd: -2.5 hoặc -5 hoặc -7.5 ..."
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <BaseInput
-                {...register("interval_time")}
-                label="Quy trình chạy sau mỗi ? giây"
-                placeholder="vd: 60, 120, 30..."
+                {...register("percent_to_sell")}
+                label="Bán khi lỗ thấp hơn: (%)"
+                placeholder="vd: -5 ... (nhỏ hơn 0)"
               />
             </Grid>
           </Grid>
@@ -120,7 +126,14 @@ export const NewOrderChain = () => {
             <Button variant="outlined" onClick={() => setOpen(false)}>
               Đóng{" "}
             </Button>
-            <Button variant="contained" type="submit">
+            <Button
+              variant="contained"
+              type="submit"
+              disabled={isSubmitting}
+              endIcon={
+                isSubmitting && <CircularProgress color="inherit" size={14} />
+              }
+            >
               Submit
             </Button>
           </Stack>

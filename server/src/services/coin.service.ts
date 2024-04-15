@@ -1,10 +1,11 @@
-import { CoinPrice1AM } from "../entities/coin-price-1am.entity";
 import {
   ICoinPrice1AMCreate,
+  ICoinPrice1AMDetail,
   ICoinPrice1AMUpdate,
 } from "coin-price-1am.interface";
 import moment from "moment";
 import { getRepository } from "typeorm";
+import { CoinPrice1AM } from "../entities/coin-price-1am.entity";
 
 const list = async () => {
   const coinRepo =
@@ -12,6 +13,13 @@ const list = async () => {
   const listCoinPrice = await coinRepo.getMany();
 
   return listCoinPrice;
+};
+
+const detail = async (params: ICoinPrice1AMDetail) => {
+  const coin = await getRepository(CoinPrice1AM).findOne({
+    symbol: params.symbol,
+  });
+  return coin;
 };
 
 const create = async (params: ICoinPrice1AMCreate) => {
@@ -28,4 +36,5 @@ const update = async (params: ICoinPrice1AMUpdate) => {
   return updatedCoin;
 };
 
-export default { create, update, list };
+
+export default { create, update, list, detail };

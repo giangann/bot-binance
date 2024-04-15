@@ -4,7 +4,16 @@ export interface ServerToClientEvents {
   noArg: () => void;
   basicEmit: (a: number, b: string, c: Buffer) => void;
   withAck: (d: string, callback: (e: number) => void) => void;
-  // newNoti: (noti: INotiRealtime) => void;
+  "ws-balance": (total: number, btc: number, usdt: number) => void;
+  "bot-running": (msg: string) => void;
+  "new-order": (
+    direction: string,
+    transaction_size: number,
+    percent_change: string,
+    price: string,
+    symbol: string
+  ) => void;
+  "bot-quit": (msg: string) => void;
 }
 
 export interface ClientToServerEvents {

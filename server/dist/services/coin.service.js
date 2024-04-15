@@ -12,13 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const coin_price_1am_entity_1 = require("../entities/coin-price-1am.entity");
 const moment_1 = __importDefault(require("moment"));
 const typeorm_1 = require("typeorm");
+const coin_price_1am_entity_1 = require("../entities/coin-price-1am.entity");
 const list = () => __awaiter(void 0, void 0, void 0, function* () {
     const coinRepo = (0, typeorm_1.getRepository)(coin_price_1am_entity_1.CoinPrice1AM).createQueryBuilder("coin_price_1am");
     const listCoinPrice = yield coinRepo.getMany();
     return listCoinPrice;
+});
+const detail = (params) => __awaiter(void 0, void 0, void 0, function* () {
+    const coin = yield (0, typeorm_1.getRepository)(coin_price_1am_entity_1.CoinPrice1AM).findOne({
+        symbol: params.symbol,
+    });
+    return coin;
 });
 const create = (params) => __awaiter(void 0, void 0, void 0, function* () {
     const createdCoin = yield (0, typeorm_1.getRepository)(coin_price_1am_entity_1.CoinPrice1AM).save(params);
@@ -29,4 +35,4 @@ const update = (params) => __awaiter(void 0, void 0, void 0, function* () {
     const updatedCoin = yield (0, typeorm_1.getRepository)(coin_price_1am_entity_1.CoinPrice1AM).update({ symbol: params.symbol }, { price: params.price, updatedAt });
     return updatedCoin;
 });
-exports.default = { create, update, list };
+exports.default = { create, update, list, detail };

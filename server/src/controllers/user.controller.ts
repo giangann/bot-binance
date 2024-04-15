@@ -11,8 +11,13 @@ const getBalance: IController = async (req, res) => {
   try {
     const balance = await binanceService.getMyBalance();
 
-    console.log("balance total", balance);
-
+    // update balance realtime each 5s
+    setInterval(async () => {
+      const balance = await binanceService.getMyBalance();
+      const { total, btc, usdt } = balance;
+      global.wsServerGlob.emit("ws-balance", total, btc, usdt);
+    }, 5000);
+    // 
     ServerResponse.response(res, balance);
   } catch (err) {
     console.log(err);

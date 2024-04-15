@@ -10,8 +10,11 @@ export interface IMarketOrderChainRecord {
 
 export interface IMarketOrderPieceRecord {
   id: string;
+  symbol: string;
   market_order_chains_id: number;
   total_balance: string;
+  price: string;
+  percent_change: string;
   order_chain: IMarketOrderChainRecord;
   timestamp: string;
   createdAt: string;

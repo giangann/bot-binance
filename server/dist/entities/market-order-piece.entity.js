@@ -30,6 +30,14 @@ __decorate([
     __metadata("design:type", String)
 ], MarketOrderPiece.prototype, "percent_change", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], MarketOrderPiece.prototype, "symbol", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], MarketOrderPiece.prototype, "price", void 0);
+__decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], MarketOrderPiece.prototype, "timestamp", void 0);

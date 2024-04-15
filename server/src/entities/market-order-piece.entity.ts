@@ -15,6 +15,12 @@ export class MarketOrderPiece extends BaseEntity {
   @Column({ nullable: false })
   percent_change: string;
 
+  @Column({ nullable: false })
+  symbol: string;
+
+  @Column({ nullable: false })
+  price: string;
+
   @Column()
   timestamp: string;
 

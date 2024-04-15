@@ -3,7 +3,7 @@ import {
   Entity,
   JoinColumn,
   OneToMany,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { BaseEntity } from "./base.entity";
 import { MarketOrderPiece } from "./market-order-piece.entity";
@@ -23,6 +23,12 @@ export class MarketOrderChain extends BaseEntity {
 
   @Column()
   total_balance_end: string;
+
+  @Column()
+  price_start: string;
+
+  @Column()
+  price_end: string;
 
   @Column()
   percent_change: string;

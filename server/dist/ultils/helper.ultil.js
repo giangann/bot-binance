@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.compareDate = exports.priceToPercent = void 0;
 function priceToPercent(p1, p2) {
+    console.log("prev", p1, "curr", p2);
     if (p1 < p2)
         return (p2 / p1 - 1) * 100;
     else

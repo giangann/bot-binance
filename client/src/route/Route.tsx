@@ -13,9 +13,9 @@ const routes: RouteObject[] = [
         element: <Home />,
       },
       {
-        path:'/chuoi-lenh',
-        element: <ListOrderChain/>
-      }
+        path: "/chuoi-lenh",
+        element: <ListOrderChain />,
+      },
     ],
   },
 ];

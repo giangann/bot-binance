@@ -21,7 +21,13 @@ const STOP_PERCENT = 2.5 / 100;
 const getBalance = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const balance = yield binance_service_1.default.getMyBalance();
-        console.log("balance total", balance);
+        // update balance realtime each 5s
+        setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
+            const balance = yield binance_service_1.default.getMyBalance();
+            const { total, btc, usdt } = balance;
+            global.wsServerGlob.emit("ws-balance", total, btc, usdt);
+        }), 5000);
+        // 
         server_response_ultil_1.ServerResponse.response(res, balance);
     }
     catch (err) {

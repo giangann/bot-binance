@@ -36,6 +36,14 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
+], MarketOrderChain.prototype, "price_start", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], MarketOrderChain.prototype, "price_end", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
 ], MarketOrderChain.prototype, "percent_change", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => market_order_piece_entity_1.MarketOrderPiece, (piece) => piece.order_chain),

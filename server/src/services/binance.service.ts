@@ -22,10 +22,8 @@ const getMyBalance = async () => {
 
 // assume that just have bitcoin and usdt in balance
 async function calTotalToUsdt(balance: Balances) {
-  let params = {
-    symbol: "BTCUSDT",
-  };
-  let tickerBTCUSDT = await getTickerPrice(params);
+  const symbol = "BTCUSDT";
+  let tickerBTCUSDT = await getTickerPrice(symbol);
   let totalBitcoin = balance.BTC.total * parseFloat(tickerBTCUSDT.price);
   let btc = balance.BTC.total;
   let usdt = balance.USDT.total;
@@ -38,9 +36,20 @@ async function calTotalToUsdt(balance: Balances) {
   return totalByUSDT;
 }
 
-const getTickerPrice = async (params: { symbol: string }) => {
-  const tickerPrice = await binance.fapiPublicV2GetTickerPrice(params);
+const getTickerPrice = async (symbol: string) => {
+  const tickerPrice = await binance.fapiPublicV2GetTickerPrice({
+    symbol,
+  });
   return tickerPrice;
+};
+
+const getSymbolPriceNow = async (symbol: string): Promise<number> => {
+  const symbolPrice = await binance.fapiPublicV2GetTickerPrice({
+    symbol,
+  });
+  if ("price" in symbolPrice) {
+    return parseFloat(symbolPrice.price);
+  }
 };
 
 const getOrderHistory = async (symbol: string) => {
@@ -70,4 +79,5 @@ export default {
   getOrderHistory,
   getTradeHistory,
   createMarketOrder,
+  getSymbolPriceNow,
 };

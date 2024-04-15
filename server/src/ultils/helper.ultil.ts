@@ -1,4 +1,5 @@
 export function priceToPercent(p1: number, p2: number) {
+  console.log("prev", p1, "curr", p2);
   if (p1 < p2) return (p2 / p1 - 1) * 100;
   else return -(p1 / p2 - 1) * 100;
 }
