@@ -27,11 +27,10 @@ const getBalance = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             const { total, btc, usdt } = balance;
             global.wsServerGlob.emit("ws-balance", total, btc, usdt);
         }), 5000);
-        // 
         server_response_ultil_1.ServerResponse.response(res, balance);
     }
     catch (err) {
-        console.log(err);
+        console.log(err.message);
     }
 });
 const getOrderHistory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

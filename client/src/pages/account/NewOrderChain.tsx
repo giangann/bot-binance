@@ -6,11 +6,12 @@ import {
   Grid,
   Stack,
 } from "@mui/material";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BaseInput } from "../../components/Input";
 import { getApi, postApi } from "../../request/request";
 import { toast } from "react-toastify";
+import { SocketContext } from "../../context/SocketContext";
 
 type TNewOrderChain = {
   symbol: string;
@@ -31,6 +32,8 @@ const defaultValue: TNewOrderChain = {
 export const NewOrderChain = () => {
   const [open, setOpen] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const socket = useContext(SocketContext);
+
   const {
     register,
     handleSubmit,
@@ -58,6 +61,15 @@ export const NewOrderChain = () => {
       toast.info("Bot đã được dừng lại và thoát, hãy load lại trang");
     else toast.error(response.error.message);
   };
+
+  useEffect(() => {
+    socket?.on("bot-running", (msg) => {
+      toast.info(msg);
+    });
+    return () => {
+      socket?.off("bot-running");
+    };
+  }, []);
 
   return (
     <Box>

@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bot_service_1 = __importDefault(require("../services/bot.service"));
-const server_response_ultil_1 = require("../ultils/server-response.ultil");
-const market_order_chain_service_1 = __importDefault(require("../services/market-order-chain.service"));
 const binance_service_1 = __importDefault(require("../services/binance.service"));
+const bot_service_1 = __importDefault(require("../services/bot.service"));
+const market_order_chain_service_1 = __importDefault(require("../services/market-order-chain.service"));
+const server_response_ultil_1 = require("../ultils/server-response.ultil");
 const active = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let params = {

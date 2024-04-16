@@ -12,12 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const moment_1 = __importDefault(require("moment"));
 const helper_ultil_1 = require("../ultils/helper.ultil");
 const binance_service_1 = __importDefault(require("./binance.service"));
-const market_order_piece_service_1 = __importDefault(require("./market-order-piece.service"));
-const moment_1 = __importDefault(require("moment"));
 const coin_service_1 = __importDefault(require("./coin.service"));
-const helper_ultil_2 = require("../ultils/helper.ultil");
+const market_order_piece_service_1 = __importDefault(require("./market-order-piece.service"));
 var interval = null;
 const active = (params, chainId) => __awaiter(void 0, void 0, void 0, function* () {
     interval = setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
@@ -64,7 +63,7 @@ function tick(params, chainId) {
         }
         console.log("bot is running");
         // ws emit bot is running
-        wsServerGlob.emit("bot-running", "bot is running");
+        wsServerGlob.emit("bot-running", "bot đang chạy, bỏ qua checkpoint do chênh lệch giá không đủ điều kiện, check lại sau 5s ");
     });
 }
 function saveOrderPiece(params) {
@@ -113,7 +112,7 @@ function getLastOrder(symbol) {
             createdAt: (0, moment_1.default)().format("YYYY-MM-DD"),
             symbol: symbol,
         });
-        let orderSortByDate = orders.sort((a, b) => (0, helper_ultil_2.compareDate)(a.createdAt, b.createdAt));
+        let orderSortByDate = orders.sort((a, b) => (0, helper_ultil_1.compareDate)(a.createdAt, b.createdAt));
         return orderSortByDate[0];
     });
 }
@@ -129,21 +128,12 @@ function todayHasOrder(symbol) {
         return isSymbolHasOrderToday;
     });
 }
-// async function test() {
-//   const newOrder = await binanceService.createMarketOrder(
-//     "BTCUSDT",
-//     "sell",
-//     0.020282689991760156
-//   );
-//   console.log(newOrder)
-// }
-// test()
 const quit = () => {
     clearInterval(interval);
-    wsServerGlob.emit('bot-quit', 'bot was quited');
+    wsServerGlob.emit("bot-quit", "bot was quited");
     //   ws emit quit bot
 };
 exports.default = {
     active,
-    quit
+    quit,
 };

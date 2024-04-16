@@ -17,10 +17,10 @@ const getBalance: IController = async (req, res) => {
       const { total, btc, usdt } = balance;
       global.wsServerGlob.emit("ws-balance", total, btc, usdt);
     }, 5000);
-    // 
+    
     ServerResponse.response(res, balance);
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
   }
 };
 

@@ -1,12 +1,10 @@
-import { IMarketOrderPieceCreate } from "market-order-piece.interface";
-import { priceToPercent } from "../ultils/helper.ultil";
-import binanceService from "./binance.service";
-import marketOrderPieceService from "./market-order-piece.service";
-import moment from "moment";
-import { connectDatabase } from "../loaders/db-connect";
-import coinService from "./coin.service";
-import { compareDate } from "../ultils/helper.ultil";
 import { IBotActive } from "bot.interface";
+import { IMarketOrderPieceCreate } from "market-order-piece.interface";
+import moment from "moment";
+import { compareDate, priceToPercent } from "../ultils/helper.ultil";
+import binanceService from "./binance.service";
+import coinService from "./coin.service";
+import marketOrderPieceService from "./market-order-piece.service";
 
 var interval: string | number | NodeJS.Timeout = null;
 const active = async (params: IBotActive, chainId: number) => {
@@ -83,7 +81,10 @@ async function tick(params: IBotActive, chainId: number) {
 
   console.log("bot is running");
   // ws emit bot is running
-  wsServerGlob.emit("bot-running", "bot is running");
+  wsServerGlob.emit(
+    "bot-running",
+    "bot đang chạy, bỏ qua checkpoint do chênh lệch giá không đủ điều kiện, check lại sau 5s "
+  );
 }
 
 async function saveOrderPiece(params: IMarketOrderPieceCreate) {
@@ -152,23 +153,13 @@ async function todayHasOrder(symbol: string): Promise<boolean> {
   return isSymbolHasOrderToday;
 }
 
-// async function test() {
-//   const newOrder = await binanceService.createMarketOrder(
-//     "BTCUSDT",
-//     "sell",
-//     0.020282689991760156
-//   );
-//   console.log(newOrder)
-// }
-// test()
-
 const quit = () => {
   clearInterval(interval);
-  wsServerGlob.emit('bot-quit','bot was quited')
+  wsServerGlob.emit("bot-quit", "bot was quited");
   //   ws emit quit bot
 };
 
 export default {
   active,
-  quit
+  quit,
 };

@@ -12,8 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const axios_1 = __importDefault(require("axios"));
 const ccxt_1 = __importDefault(require("ccxt"));
 // binance config
+const baseUrl = "https://fapi.binance.com/fapi/";
 const secret = "4wTgPjsyA9z1FIyUug81SOuTzCP5pZNyD3wHoIHpkjQ8yzoKUXgLaiV5izztl5qp";
 const apiKey = "1A0eAdDSYP6mamVZRCmc0cSt4qm4K7pwaONb55yTlIdfuHMUYmyztBZnSbZ3hPBb";
 const binance = new ccxt_1.default.binance({ apiKey, secret });
@@ -32,6 +34,7 @@ function calTotalToUsdt(balance) {
     return __awaiter(this, void 0, void 0, function* () {
         const symbol = "BTCUSDT";
         let tickerBTCUSDT = yield getTickerPrice(symbol);
+        console.log(tickerBTCUSDT);
         let totalBitcoin = balance.BTC.total * parseFloat(tickerBTCUSDT.price);
         let btc = balance.BTC.total;
         let usdt = balance.USDT.total;
@@ -43,16 +46,21 @@ function calTotalToUsdt(balance) {
         return totalByUSDT;
     });
 }
+const tickerPriceUrl = `${baseUrl}v2/ticker/price`;
 const getTickerPrice = (symbol) => __awaiter(void 0, void 0, void 0, function* () {
-    const tickerPrice = yield binance.fapiPublicV2GetTickerPrice({
-        symbol,
+    const response = yield axios_1.default.get(tickerPriceUrl, {
+        params: { symbol },
     });
+    const tickerPrice = response.data;
     return tickerPrice;
 });
+const getTickersPrice = () => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield axios_1.default.get(tickerPriceUrl);
+    const tickersPrice = response.data;
+    return tickersPrice;
+});
 const getSymbolPriceNow = (symbol) => __awaiter(void 0, void 0, void 0, function* () {
-    const symbolPrice = yield binance.fapiPublicV2GetTickerPrice({
-        symbol,
-    });
+    const symbolPrice = yield getTickerPrice(symbol);
     if ("price" in symbolPrice) {
         return parseFloat(symbolPrice.price);
     }
@@ -72,6 +80,7 @@ const createMarketOrder = (symbol, side, amount, price) => __awaiter(void 0, voi
 exports.default = {
     getMyBalance,
     getTickerPrice,
+    getTickersPrice,
     getOrderHistory,
     getTradeHistory,
     createMarketOrder,
