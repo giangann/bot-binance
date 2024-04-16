@@ -4,6 +4,7 @@ export interface IMarketOrderPieceRecord {
   id: string;
   market_order_chains_id: number;
   symbol: string;
+  direction: string;
   total_balance: string;
   price: string;
   percent_change: string;
@@ -21,6 +22,7 @@ export interface IMarketOrderPieceCreate {
   market_order_chains_id: number;
   total_balance: string;
   symbol: string;
+  direction: string;
   price: string;
   percent_change: string;
   timestamp?: string;

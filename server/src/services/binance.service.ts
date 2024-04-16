@@ -11,11 +11,7 @@ const apiKey =
 const binance = new ccxt.binance({ apiKey, secret });
 binance.setSandboxMode(true);
 
-// constant
-const TRADE_SIZE_BY_USDT = 100;
-const DOUBLE_PERCENT = 5 / 100;
-const STOP_PERCENT = 2.5 / 100;
-
+// get balance now
 const getMyBalance = async () => {
   const balance = await binance.fetchBalance();
   let total = await calTotalToUsdt(balance);
@@ -26,7 +22,6 @@ const getMyBalance = async () => {
 async function calTotalToUsdt(balance: Balances) {
   const symbol = "BTCUSDT";
   let tickerBTCUSDT = await getTickerPrice(symbol);
-  console.log(tickerBTCUSDT);
   let totalBitcoin = balance.BTC.total * parseFloat(tickerBTCUSDT.price);
   let btc = balance.BTC.total;
   let usdt = balance.USDT.total;

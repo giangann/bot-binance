@@ -14,6 +14,7 @@ export interface ServerToClientEvents {
     symbol: string
   ) => void;
   "bot-quit": (msg: string) => void;
+  "bot-err": (errMsg: string) => void;
 }
 
 export interface ClientToServerEvents {

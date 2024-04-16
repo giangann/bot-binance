@@ -45,7 +45,8 @@ export const NewOrderChain = () => {
     console.log("values ", values);
     try {
       const response = await postApi<TNewOrderChain>("bot/active", values);
-      if (response.success) toast.success("Bot kích hoạt thành công");
+      if (response.success)
+        toast.success("Bot kích hoạt thành công, check point mỗi 5s");
       else toast.error(response.error.message);
     } catch (err) {
       console.log(err);
@@ -71,6 +72,14 @@ export const NewOrderChain = () => {
     };
   }, []);
 
+  useEffect(() => {
+    socket?.on("bot-err", (errMsg) => {
+      toast.error(errMsg);
+    });
+    return () => {
+      socket?.off("bot-ert");
+    };
+  }, []);
   return (
     <Box>
       <Button

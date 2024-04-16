@@ -19,6 +19,9 @@ export class MarketOrderPiece extends BaseEntity {
   symbol: string;
 
   @Column({ nullable: false })
+  direction: string;
+
+  @Column({ nullable: false })
   price: string;
 
   @Column()

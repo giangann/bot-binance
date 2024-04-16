@@ -1,5 +1,5 @@
 import { Box, Stack, Typography, styled } from "@mui/material";
-import { grey } from "@mui/material/colors";
+import { blue, grey } from "@mui/material/colors";
 import dayjs from "dayjs";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { getApi } from "../../request/request";
@@ -72,19 +72,57 @@ export const ListOrderChain = () => {
 };
 
 const OrderChain = (props: IMarketOrderChainRecord) => {
-  const { order_pieces, id } = props;
+  const {
+    order_pieces,
+    id,
+    status,
+    total_balance_start,
+    total_balance_end,
+    percent_change,
+  } = props;
   return (
-    <ChainBox>
-      <Stack direction={"row"}>
+    <ChainBox open={status === "open"}>
+      <Stack
+        direction={"row"}
+        spacing={2}
+        sx={{ borderBottom: `1px solid ${grey["50"]}`, pb: 0.5, mb: 1 }}
+      >
         <Typography>{id}</Typography>
+        <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
+          <Typography>
+            status:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {status}
+            </Typography>
+          </Typography>
+          <Typography>
+            total_balance_start:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {total_balance_start}
+            </Typography>
+          </Typography>
+          <Typography>
+            total_balance_end:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {total_balance_end}
+            </Typography>
+          </Typography>
+          <Typography>
+            percent_change:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {percent_change}%
+            </Typography>
+          </Typography>
+        </Stack>
       </Stack>
       <Stack spacing={1}>
         <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
           <Typography>id</Typography>
+          <Typography>symbol</Typography>
+          <Typography>direction</Typography>
           <Typography>total_balance</Typography>
           <Typography>price</Typography>
           <Typography>percent_change</Typography>
-
           <Typography>createdAt</Typography>
         </Stack>
         {order_pieces.map((piece) => (
@@ -96,11 +134,21 @@ const OrderChain = (props: IMarketOrderChainRecord) => {
 };
 
 const OrderPiece = (props: IMarketOrderPieceRecord) => {
-  const { id, total_balance, price, percent_change, createdAt } = props;
+  const {
+    id,
+    symbol,
+    total_balance,
+    direction,
+    price,
+    percent_change,
+    createdAt,
+  } = props;
   return (
     <PieceBox>
       <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
         <Typography>{id}</Typography>
+        <Typography>{symbol}</Typography>
+        <Typography>{direction}</Typography>
         <Typography>{total_balance}</Typography>
         <Typography>{price}</Typography>
         <Typography>{percent_change}%</Typography>
@@ -113,15 +161,18 @@ const OrderPiece = (props: IMarketOrderPieceRecord) => {
   );
 };
 
-const ChainBox = styled(Box)(({ theme }) => ({
+const ChainBox = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<{ open: boolean }>(({ open, theme }) => ({
   padding: 16,
   borderRadius: 16,
-  backgroundColor: grey["400"],
+  backgroundColor: open ? blue["200"] : grey["400"],
   [theme.breakpoints.down("sm")]: {},
 }));
 const PieceBox = styled(Box)(({ theme }) => ({
   padding: 8,
   paddingLeft: 16,
+  marginLeft: 8,
   borderRadius: 8,
   backgroundColor: grey["50"],
   [theme.breakpoints.down("sm")]: {},

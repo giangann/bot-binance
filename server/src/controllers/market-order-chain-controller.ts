@@ -7,9 +7,9 @@ const list: IController = async (req, res) => {
     const listChain = await marketOrderChainService.list();
     ServerResponse.response(res, listChain);
   } catch (err) {
+    console.log("err", err);
     ServerResponse.error(res, err.message);
   }
 };
-
 
 export default { list };

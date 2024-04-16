@@ -5,6 +5,7 @@ import { compareDate, priceToPercent } from "../ultils/helper.ultil";
 import binanceService from "./binance.service";
 import coinService from "./coin.service";
 import marketOrderPieceService from "./market-order-piece.service";
+import marketOrderChainService from "./market-order-chain.service";
 
 var interval: string | number | NodeJS.Timeout = null;
 const active = async (params: IBotActive, chainId: number) => {
@@ -13,6 +14,8 @@ const active = async (params: IBotActive, chainId: number) => {
       await tick(params, chainId);
     } catch (err) {
       console.log(err);
+      // emit error
+      wsServerGlob.emit("bot-err", err.message);
       return false;
     }
   }, 5000);
@@ -66,6 +69,7 @@ async function tick(params: IBotActive, chainId: number) {
       percent_change: percent_change.toString(),
       price: price.toString(),
       symbol,
+      direction: direction,
       total_balance: (await binanceService.getMyBalance()).total.toString(),
     });
 
@@ -79,12 +83,12 @@ async function tick(params: IBotActive, chainId: number) {
     );
   }
 
-  console.log("bot is running");
-  // ws emit bot is running
-  wsServerGlob.emit(
-    "bot-running",
-    "bot đang chạy, bỏ qua checkpoint do chênh lệch giá không đủ điều kiện, check lại sau 5s "
-  );
+  if (!isExecute) {
+    wsServerGlob.emit(
+      "bot-running",
+      "bot đang chạy, bỏ qua checkpoint do chênh lệch giá không đủ điều kiện, check lại sau 5s "
+    );
+  }
 }
 
 async function saveOrderPiece(params: IMarketOrderPieceCreate) {
@@ -153,10 +157,40 @@ async function todayHasOrder(symbol: string): Promise<boolean> {
   return isSymbolHasOrderToday;
 }
 
-const quit = () => {
+async function getChainOpen() {
+  const listOpenOrder = await marketOrderChainService.list({ status: "open" });
+
+  return listOpenOrder[0];
+}
+async function updateOrderChain(total_balance_end: number) {
+  try {
+    const chainIsOpen = await getChainOpen();
+    const { total_balance_start } = chainIsOpen;
+
+    const updatedRes = await marketOrderChainService.update({
+      id: chainIsOpen.id,
+      total_balance_end: total_balance_end.toString(),
+      percent_change: (
+        total_balance_end / parseFloat(total_balance_start)
+      ).toString(),
+      price_end: "0.000",
+      status: "closed",
+      updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+    });
+
+    return updatedRes;
+  } catch (err) {
+    console.log("err updateOrderChain", err);
+  }
+}
+
+const quit = async () => {
   clearInterval(interval);
-  wsServerGlob.emit("bot-quit", "bot was quited");
+  const totalBalanceNow = (await binanceService.getMyBalance()).total;
+  await updateOrderChain(totalBalanceNow);
+
   //   ws emit quit bot
+  wsServerGlob.emit("bot-quit", "bot was quited");
 };
 
 export default {
