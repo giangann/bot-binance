@@ -20,6 +20,7 @@ const list = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         server_response_ultil_1.ServerResponse.response(res, listChain);
     }
     catch (err) {
+        console.log("err", err);
         server_response_ultil_1.ServerResponse.error(res, err.message);
     }
 });

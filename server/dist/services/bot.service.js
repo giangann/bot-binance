@@ -17,6 +17,7 @@ const helper_ultil_1 = require("../ultils/helper.ultil");
 const binance_service_1 = __importDefault(require("./binance.service"));
 const coin_service_1 = __importDefault(require("./coin.service"));
 const market_order_piece_service_1 = __importDefault(require("./market-order-piece.service"));
+const market_order_chain_service_1 = __importDefault(require("./market-order-chain.service"));
 var interval = null;
 const active = (params, chainId) => __awaiter(void 0, void 0, void 0, function* () {
     interval = setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
@@ -25,6 +26,8 @@ const active = (params, chainId) => __awaiter(void 0, void 0, void 0, function* 
         }
         catch (err) {
             console.log(err);
+            // emit error
+            wsServerGlob.emit("bot-err", err.message);
             return false;
         }
     }), 5000);
@@ -57,13 +60,14 @@ function tick(params, chainId) {
                 percent_change: percent_change.toString(),
                 price: price.toString(),
                 symbol,
+                direction: direction,
                 total_balance: (yield binance_service_1.default.getMyBalance()).total.toString(),
             });
             wsServerGlob.emit("new-order", direction, transaction_size, percent_change.toString(), price.toString(), symbol);
         }
-        console.log("bot is running");
-        // ws emit bot is running
-        wsServerGlob.emit("bot-running", "bot đang chạy, bỏ qua checkpoint do chênh lệch giá không đủ điều kiện, check lại sau 5s ");
+        if (!isExecute) {
+            wsServerGlob.emit("bot-running", "bot đang chạy, bỏ qua checkpoint do chênh lệch giá không đủ điều kiện, check lại sau 5s ");
+        }
     });
 }
 function saveOrderPiece(params) {
@@ -128,11 +132,39 @@ function todayHasOrder(symbol) {
         return isSymbolHasOrderToday;
     });
 }
-const quit = () => {
+function getChainOpen() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const listOpenOrder = yield market_order_chain_service_1.default.list({ status: "open" });
+        return listOpenOrder[0];
+    });
+}
+function updateOrderChain(total_balance_end) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const chainIsOpen = yield getChainOpen();
+            const { total_balance_start } = chainIsOpen;
+            const updatedRes = yield market_order_chain_service_1.default.update({
+                id: chainIsOpen.id,
+                total_balance_end: total_balance_end.toString(),
+                percent_change: (total_balance_end / parseFloat(total_balance_start)).toString(),
+                price_end: "0.000",
+                status: "closed",
+                updatedAt: (0, moment_1.default)().format("YYYY-MM-DD HH:mm:ss"),
+            });
+            return updatedRes;
+        }
+        catch (err) {
+            console.log("err updateOrderChain", err);
+        }
+    });
+}
+const quit = () => __awaiter(void 0, void 0, void 0, function* () {
     clearInterval(interval);
-    wsServerGlob.emit("bot-quit", "bot was quited");
+    const totalBalanceNow = (yield binance_service_1.default.getMyBalance()).total;
+    yield updateOrderChain(totalBalanceNow);
     //   ws emit quit bot
-};
+    wsServerGlob.emit("bot-quit", "bot was quited");
+});
 exports.default = {
     active,
     quit,

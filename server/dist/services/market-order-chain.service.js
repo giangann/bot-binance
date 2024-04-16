@@ -11,11 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const market_order_chain_entity_1 = require("../entities/market-order-chain.entity");
-const list = () => __awaiter(void 0, void 0, void 0, function* () {
-    const listRecords = yield (0, typeorm_1.getRepository)(market_order_chain_entity_1.MarketOrderChain)
+const list = (params) => __awaiter(void 0, void 0, void 0, function* () {
+    const status = params === null || params === void 0 ? void 0 : params.status;
+    const repo = (0, typeorm_1.getRepository)(market_order_chain_entity_1.MarketOrderChain)
         .createQueryBuilder("market_order_chains")
-        .leftJoinAndSelect("market_order_chains.order_pieces", "pieces")
-        .getMany();
+        .leftJoinAndSelect("market_order_chains.order_pieces", "pieces");
+    if (status) {
+        repo.andWhere("market_order_chains.status = :status", { status });
+    }
+    const listRecords = yield repo.getMany();
     return listRecords;
 });
 const create = (params) => __awaiter(void 0, void 0, void 0, function* () {
