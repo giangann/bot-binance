@@ -1,7 +1,7 @@
-import coinPrice1amController from "../controllers/coin-price-1am.controller";
+import coinController from "../controllers/coin.controller";
 import express from "express";
 
-const coinPrice1amRoute = express.Router();
-coinPrice1amRoute.get("/", coinPrice1amController.list);
+const coinRoute = express.Router();
+coinRoute.get("/curr-price", coinController.getNowClosePrices);
 
-export default coinPrice1amRoute;
+export default coinRoute;

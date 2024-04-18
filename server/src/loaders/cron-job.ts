@@ -2,6 +2,7 @@ import axios from "axios";
 import { ICoin } from "coin.interface";
 import cron from "node-cron";
 import coinService from "../services/coin.service";
+import binanceService from "../services/binance.service";
 
 export const cronJobSchedule = async () => {
   console.log("cron job file");
@@ -21,12 +22,10 @@ export const cronJobSchedule = async () => {
 };
 
 async function crawCoinPrices() {
-  const response = await axios.get(
-    "https://fapi.binance.com/fapi/v2/ticker/price"
-  );
+  const symbols = await binanceService.getAllSymbol();
+  const prices = await binanceService.getSymbolsClosePrice(symbols);
 
-  const coins: ICoin[] = response.data;
-  return coins;
+  return prices;
 }
 
 async function updateCoinTable() {
@@ -34,7 +33,8 @@ async function updateCoinTable() {
     const coins = await crawCoinPrices();
     const updatedCoins = await Promise.all(
       coins.map((coin) => {
-        return coinService.update(coin);
+        let coinParams = { ...coin, price: coin.price.toString() };
+        return coinService.update(coinParams);
       })
     );
     return updatedCoins;

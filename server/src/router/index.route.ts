@@ -9,6 +9,7 @@ const indexRoute = express.Router();
 
 indexRoute.use("/binance", binanceRoute);
 indexRoute.use("/coin-price-1am", coinPrice1amRoute);
+indexRoute.use("/coin", coinPrice1amRoute);
 indexRoute.use("/user", userRoute);
 indexRoute.use("/order-chain", orderChainRoute);
 indexRoute.use("/bot", botRoute);

@@ -1,6 +1,6 @@
-import IController from "IController";
 import axios from "axios";
 import ccxt, { Balances } from "ccxt";
+import { TSymbolPrice } from "../types/symbol-price";
 
 // binance config
 const baseUrl = "https://fapi.binance.com/fapi/";
@@ -61,6 +61,39 @@ const getSymbolPriceNow = async (symbol: string): Promise<number> => {
   }
 };
 
+const getSymbolClosePrice = async (symbol: string): Promise<TSymbolPrice> => {
+  let price = 0;
+  let timestamp = "";
+  const ohlcv = await binance.fetchOHLCV(symbol, "1m", undefined, 1);
+  if (ohlcv.length) {
+    const lastOHLCV = ohlcv[0];
+    if (lastOHLCV.length >= 5) {
+      //[time, open, high, low, close, volum]
+      timestamp = lastOHLCV[0].toString();
+      price = lastOHLCV[4];
+    }
+  }
+  return { timestamp, symbol, price };
+};
+
+const getAllSymbol = async () => {
+  const tickersPrice = await getTickersPrice();
+  const symbols = tickersPrice.map((ticker) => {
+    return ticker.symbol;
+  });
+  return symbols;
+};
+
+const getSymbolsClosePrice = async (
+  symbols: string[]
+): Promise<TSymbolPrice[]> => {
+  return Promise.all(
+    symbols.map((symbol) => {
+      return getSymbolClosePrice(symbol);
+    })
+  );
+};
+
 const getOrderHistory = async (symbol: string) => {
   const orders = await binance.fetchOrders(symbol);
   return orders;
@@ -90,4 +123,7 @@ export default {
   getTradeHistory,
   createMarketOrder,
   getSymbolPriceNow,
+  getSymbolClosePrice,
+  getSymbolsClosePrice,
+  getAllSymbol,
 };

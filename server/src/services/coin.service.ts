@@ -15,6 +15,12 @@ const list = async () => {
   return listCoinPrice;
 };
 
+const getAllSymbolsDB = async (): Promise<string[]> => {
+  const listCoinPrice = await list();
+  const symbols = listCoinPrice.map((coin) => coin.symbol);
+  return symbols;
+};
+
 const detail = async (params: ICoinPrice1AMDetail) => {
   const coin = await getRepository(CoinPrice1AM).findOne({
     symbol: params.symbol,
@@ -36,5 +42,4 @@ const update = async (params: ICoinPrice1AMUpdate) => {
   return updatedCoin;
 };
 
-
-export default { create, update, list, detail };
+export default { create, update, list, detail, getAllSymbolsDB };

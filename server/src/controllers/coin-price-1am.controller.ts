@@ -7,7 +7,7 @@ const list: IController = async (req, res) => {
     const listCoinPrices = await coinService.list();
     return ServerResponse.response(res, listCoinPrices);
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return ServerResponse.error(res, err.name || "Server err");
   }
 };
