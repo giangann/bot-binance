@@ -13,12 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cronJobSchedule = void 0;
-const axios_1 = __importDefault(require("axios"));
 const node_cron_1 = __importDefault(require("node-cron"));
+const binance_service_1 = __importDefault(require("../services/binance.service"));
 const coin_service_1 = __importDefault(require("../services/coin.service"));
 const cronJobSchedule = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("cron job file");
-    const task = node_cron_1.default.schedule("0 0 1 * * *", () => {
+    const task = node_cron_1.default.schedule("0 31 1 * * *", () => {
         console.log("task run");
         updateCoinTable();
     }, {
@@ -30,9 +30,9 @@ const cronJobSchedule = () => __awaiter(void 0, void 0, void 0, function* () {
 exports.cronJobSchedule = cronJobSchedule;
 function crawCoinPrices() {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield axios_1.default.get("https://fapi.binance.com/fapi/v2/ticker/price");
-        const coins = response.data;
-        return coins;
+        const symbols = yield binance_service_1.default.getAllSymbol();
+        const prices = yield binance_service_1.default.getSymbolsClosePrice(symbols);
+        return prices;
     });
 }
 function updateCoinTable() {
@@ -40,7 +40,8 @@ function updateCoinTable() {
         try {
             const coins = yield crawCoinPrices();
             const updatedCoins = yield Promise.all(coins.map((coin) => {
-                return coin_service_1.default.update(coin);
+                let coinParams = Object.assign(Object.assign({}, coin), { price: coin.price.toString() });
+                return coin_service_1.default.update(coinParams);
             }));
             return updatedCoins;
         }

@@ -1,7 +1,6 @@
 import axios from "axios";
 import ccxt, { Balances } from "ccxt";
 import { TSymbolPrice } from "../types/symbol-price";
-
 // binance config
 const baseUrl = "https://fapi.binance.com/fapi/";
 const secret =
@@ -11,6 +10,10 @@ const apiKey =
 const binance = new ccxt.binance({ apiKey, secret });
 binance.setSandboxMode(true);
 
+const fetchMyBalance = async () => {
+  const balance = await binance.fetchBalance();
+  return balance;
+};
 // get balance now
 const getMyBalance = async () => {
   const balance = await binance.fetchBalance();
@@ -126,4 +129,5 @@ export default {
   getSymbolClosePrice,
   getSymbolsClosePrice,
   getAllSymbol,
+  fetchMyBalance,
 };

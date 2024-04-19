@@ -22,6 +22,14 @@ const list = (params) => __awaiter(void 0, void 0, void 0, function* () {
     const listRecords = yield repo.getMany();
     return listRecords;
 });
+const detail = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const repo = (0, typeorm_1.getRepository)(market_order_chain_entity_1.MarketOrderChain)
+        .createQueryBuilder("market_order_chains")
+        .leftJoinAndSelect("market_order_chains.order_pieces", "order_pieces")
+        .where("market_order_chains.id = :id", { id });
+    const orderChain = yield repo.getOne();
+    return orderChain;
+});
 const create = (params) => __awaiter(void 0, void 0, void 0, function* () {
     const createdRecord = yield (0, typeorm_1.getRepository)(market_order_chain_entity_1.MarketOrderChain).save(params);
     return createdRecord;
@@ -33,4 +41,4 @@ const update = (params) => __awaiter(void 0, void 0, void 0, function* () {
     const updateRes = yield repo.update(filtered, params);
     return updateRes;
 });
-exports.default = { create, list, update };
+exports.default = { create, list, update, detail };

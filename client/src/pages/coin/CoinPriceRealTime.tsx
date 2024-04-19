@@ -1,6 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { CustomTable, StrictField } from "../../components/Table/Customtable";
+import { SocketContext } from "../../context/SocketContext";
 import {
   ICoinPrice,
   ICoinPriceChange,
@@ -9,6 +10,7 @@ import {
 import { CoinContext } from "./Coin";
 
 export const CoinPriceRealTime = () => {
+  const socket = useContext(SocketContext);
   const [coinPrices, setCoinPrices] = useState<ICoinPriceChange[]>([]);
   const coinPricesFilterd = coinPrices.filter(
     (coin) => parseFloat(coin.percentChange) >= 5
@@ -41,22 +43,20 @@ export const CoinPriceRealTime = () => {
     },
   ];
   useEffect(() => {
-    async function fetchCoinPrices() {
-      const endpoint = "https://fapi.binance.com/fapi/v2/ticker/price";
-      const response = await fetch(endpoint);
-      const data: ICoinPrice[] = await response.json();
-      setCoinPrices(
-        sortCoinByPercentChange(coinWithPercentChange(data, coinPricesMap))
+    socket?.on("symbols-price", (symbolPrice: ICoinPrice[]) => {
+      const coinAddFieldPercentChange = coinWithPercentChange(
+        symbolPrice,
+        coinPricesMap
       );
-    }
-    fetchCoinPrices();
+      const coinSortedByPercentChange = sortCoinByPercentChange(
+        coinAddFieldPercentChange
+      );
+      setCoinPrices(coinSortedByPercentChange);
+    });
 
-    const interval = setInterval(() => {
-      fetchCoinPrices();
-    }, 2000);
-
-    // clean up
-    return () => clearInterval(interval);
+    return () => {
+      socket?.off("symbols-price");
+    };
   }, [coinPricesMap]);
 
   return (

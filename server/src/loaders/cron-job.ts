@@ -1,13 +1,11 @@
-import axios from "axios";
-import { ICoin } from "coin.interface";
 import cron from "node-cron";
-import coinService from "../services/coin.service";
 import binanceService from "../services/binance.service";
+import coinService from "../services/coin.service";
 
 export const cronJobSchedule = async () => {
   console.log("cron job file");
   const task = cron.schedule(
-    "0 0 1 * * *",
+    "0 31 1 * * *",
     () => {
       console.log("task run");
       updateCoinTable();

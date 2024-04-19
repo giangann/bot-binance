@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadApp = void 0;
+const create_interval_1 = require("./create-interval");
 const cron_job_1 = require("./cron-job");
 const db_connect_1 = require("./db-connect");
 const http_server_1 = require("./http-server");
@@ -20,6 +21,8 @@ const loadApp = () => __awaiter(void 0, void 0, void 0, function* () {
     global.wsServerGlob = wsServer;
     (0, cron_job_1.cronJobSchedule)();
     yield (0, db_connect_1.connectDatabase)();
+    // await getPriceOfSymbols();
+    (0, create_interval_1.createInterval)();
     return {
         httpServer,
         wsServer,

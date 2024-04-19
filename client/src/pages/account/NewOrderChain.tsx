@@ -14,17 +14,13 @@ import { toast } from "react-toastify";
 import { SocketContext } from "../../context/SocketContext";
 
 type TNewOrderChain = {
-  symbol: string;
   transaction_size: string;
-  transaction_increase: string;
   percent_to_buy: string;
   percent_to_sell: string;
 };
 
 const defaultValue: TNewOrderChain = {
-  symbol: "BTCUSDT",
   transaction_size: "100",
-  transaction_increase: "100",
   percent_to_buy: "5",
   percent_to_sell: "-2.5",
 };
@@ -46,7 +42,7 @@ export const NewOrderChain = () => {
     try {
       const response = await postApi<TNewOrderChain>("bot/active", values);
       if (response.success)
-        toast.success("Bot kích hoạt thành công, check point mỗi 5s");
+        toast.success("Bot kích hoạt thành công, check point mỗi 10s");
       else toast.error(response.error.message);
     } catch (err) {
       console.log(err);
@@ -105,24 +101,8 @@ export const NewOrderChain = () => {
           <Grid container spacing={2} mb={2}>
             <Grid item xs={12} sm={6}>
               <BaseInput
-                {...register("symbol")}
-                label="Nhập symbol"
-                placeholder="vd BTCUSDT"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <BaseInput
                 {...register("transaction_size")}
                 label="Giá trị lệnh (USD)"
-                placeholder="Nhập số"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <BaseInput
-                {...register("transaction_increase")}
-                label="Giá trị tăng khi lãi"
                 placeholder="Nhập số"
               />
             </Grid>

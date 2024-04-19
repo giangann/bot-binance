@@ -5,20 +5,24 @@ import {
 import { getRepository } from "typeorm";
 import { MarketOrderPiece } from "../entities/market-order-piece.entity";
 
-const list = async (params: IMarketOrderPieceList) => {
-  let { symbol, createdAt } = params;
+const list = async (params?: IMarketOrderPieceList) => {
   const repo = getRepository(MarketOrderPiece)
     .createQueryBuilder("market_order_pieces")
     .leftJoinAndSelect("market_order_pieces.order_chain", "order_chain");
 
+  let symbol = params?.symbol;
   if (symbol) {
-    repo.where("market_order_pieces.symbol = :symbol", { symbol });
+    repo.andWhere("market_order_pieces.symbol = :symbol", { symbol });
   }
+  let createdAt = params?.createdAt;
   if (createdAt) {
-    repo.andWhere('market_order_pieces.createdAt >= :createdAt', { createdAt });
-    repo.andWhere('market_order_pieces.createdAt < :createdAt + interval 1 day', {
-      createdAt,
-    });
+    repo.andWhere("market_order_pieces.createdAt >= :createdAt", { createdAt });
+    repo.andWhere(
+      "market_order_pieces.createdAt < :createdAt + interval 1 day",
+      {
+        createdAt,
+      }
+    );
   }
 
   const listRecord = await repo.getMany();

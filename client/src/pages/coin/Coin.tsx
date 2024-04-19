@@ -21,7 +21,10 @@ export const Coin = () => {
       try {
         const response = await getApi<ICoinPrice[]>("coin-price-1am");
         if (response.success) setCoinPrices(response.data);
-        else setCoinPrices(data.data);
+        else {
+          console.log("response", response);
+          setCoinPrices(data.data);
+        }
       } catch (err) {
         console.log(err);
         setCoinPrices(data.data);

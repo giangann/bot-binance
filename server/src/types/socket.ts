@@ -1,10 +1,14 @@
 import { Server } from "socket.io";
+import { TSymbolPrice } from "./symbol-price";
 
 export interface ServerToClientEvents {
   noArg: () => void;
   basicEmit: (a: number, b: string, c: Buffer) => void;
   withAck: (d: string, callback: (e: number) => void) => void;
-  "ws-balance": (total: number, btc: number, usdt: number) => void;
+  "ws-balance": (
+    total: number,
+    coins: { coin: string; amount: number; price: number; total: number }[]
+  ) => void;
   "bot-running": (msg: string) => void;
   "new-order": (
     direction: string,
@@ -13,8 +17,10 @@ export interface ServerToClientEvents {
     price: string,
     symbol: string
   ) => void;
+  "new-orders": (nums_of_order: number) => void;
   "bot-quit": (msg: string) => void;
   "bot-err": (errMsg: string) => void;
+  "symbols-price": (symbolPrices: TSymbolPrice[]) => void;
 }
 
 export interface ClientToServerEvents {

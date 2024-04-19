@@ -22,7 +22,7 @@ __decorate([
     __metadata("design:type", String)
 ], MarketOrderPiece.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", String)
 ], MarketOrderPiece.prototype, "total_balance", void 0);
 __decorate([
@@ -42,7 +42,15 @@ __decorate([
     __metadata("design:type", String)
 ], MarketOrderPiece.prototype, "price", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], MarketOrderPiece.prototype, "amount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], MarketOrderPiece.prototype, "transaction_size", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], MarketOrderPiece.prototype, "timestamp", void 0);
 __decorate([

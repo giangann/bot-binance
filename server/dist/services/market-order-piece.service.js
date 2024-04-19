@@ -12,16 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const market_order_piece_entity_1 = require("../entities/market-order-piece.entity");
 const list = (params) => __awaiter(void 0, void 0, void 0, function* () {
-    let { symbol, createdAt } = params;
     const repo = (0, typeorm_1.getRepository)(market_order_piece_entity_1.MarketOrderPiece)
         .createQueryBuilder("market_order_pieces")
         .leftJoinAndSelect("market_order_pieces.order_chain", "order_chain");
+    let symbol = params === null || params === void 0 ? void 0 : params.symbol;
     if (symbol) {
-        repo.where("market_order_pieces.symbol = :symbol", { symbol });
+        repo.andWhere("market_order_pieces.symbol = :symbol", { symbol });
     }
+    let createdAt = params === null || params === void 0 ? void 0 : params.createdAt;
     if (createdAt) {
-        repo.andWhere('market_order_pieces.createdAt >= :createdAt', { createdAt });
-        repo.andWhere('market_order_pieces.createdAt < :createdAt + interval 1 day', {
+        repo.andWhere("market_order_pieces.createdAt >= :createdAt", { createdAt });
+        repo.andWhere("market_order_pieces.createdAt < :createdAt + interval 1 day", {
             createdAt,
         });
     }

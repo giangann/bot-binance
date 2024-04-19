@@ -8,6 +8,8 @@ export interface IMarketOrderPieceRecord {
   total_balance: string;
   price: string;
   percent_change: string;
+  amount: string;
+  transaction_size: string;
   timestamp: string;
   createdAt: string;
   updatedAt: string;
@@ -25,6 +27,8 @@ export interface IMarketOrderPieceCreate {
   direction: string;
   price: string;
   percent_change: string;
+  amount: string;
+  transaction_size: string;
   timestamp?: string;
 }
 

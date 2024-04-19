@@ -9,7 +9,7 @@ export const createWebSocket = (httpServer: http.Server) => {
   io.on("connection", (socket) => {
     console.log("new client connect");
 
-    socket.emit('noArg')
+    socket.emit("noArg");
   });
 
   return io;

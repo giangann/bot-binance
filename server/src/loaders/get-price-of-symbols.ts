@@ -6,18 +6,18 @@ export const getPriceOfSymbols = async () => {
   try {
     const symbols = await coinService.getAllSymbolsDB();
     const prices = await binanceService.getSymbolsClosePrice(symbols);
-    global.symbolsPrice = arrayToMap(prices);
+    global.symbolsPriceMap = arrayToMap(prices);
 
     console.log(
       "load price map to ram success, with first symbols is",
-      global.symbolsPrice[Object.keys(global.symbolsPrice)[0]]
+      global.symbolsPriceMap[Object.keys(global.symbolsPriceMap)[0]]
     );
   } catch (err) {
     console.log("err", err);
   }
 };
 
-function arrayToMap(arr: TSymbolPrice[]) {
+export function arrayToMap(arr: TSymbolPrice[]) {
   let map: TSymbolPriceMap = {};
   for (let el of arr) {
     let key = el.symbol;

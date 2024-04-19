@@ -6,6 +6,9 @@ export interface IMarketOrderChainRecord {
   id: number;
   status: TOrderChainStatus;
   total_balance_start: string;
+  transaction_size_start: number;
+  percent_to_buy: string;
+  percent_to_sell: string;
   total_balance_end?: string;
   price_start: string;
   price_end?: string;
@@ -21,6 +24,9 @@ export interface IMarketOrderChainEntity extends IMarketOrderChainRecord {
 export interface IMarketOrderChainCreate {
   status: TOrderChainStatus;
   total_balance_start: string;
+  transaction_size_start: number;
+  percent_to_buy: string;
+  percent_to_sell: string;
   price_start: string;
 }
 

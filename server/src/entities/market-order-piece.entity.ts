@@ -9,7 +9,7 @@ export class MarketOrderPiece extends BaseEntity {
   @PrimaryColumn()
   id: string;
 
-  @Column()
+  @Column({ nullable: false })
   total_balance: string;
 
   @Column({ nullable: false })
@@ -24,7 +24,13 @@ export class MarketOrderPiece extends BaseEntity {
   @Column({ nullable: false })
   price: string;
 
-  @Column()
+  @Column({ nullable: false })
+  amount: string;
+
+  @Column({ nullable: false })
+  transaction_size: string;
+
+  @Column({ nullable: true })
   timestamp: string;
 
   @Column({ type: "int", nullable: false })

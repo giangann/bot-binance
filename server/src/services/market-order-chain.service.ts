@@ -20,6 +20,15 @@ const list = async (params?: { status: TOrderChainStatus }) => {
   return listRecords;
 };
 
+const detail = async (id: number) => {
+  const repo = getRepository(MarketOrderChain)
+    .createQueryBuilder("market_order_chains")
+    .leftJoinAndSelect("market_order_chains.order_pieces", "order_pieces")
+    .where("market_order_chains.id = :id", { id });
+  const orderChain = await repo.getOne();
+  return orderChain
+};
+
 const create = async (params: IMarketOrderChainCreate) => {
   const createdRecord = await getRepository(MarketOrderChain).save(params);
   return createdRecord;
@@ -33,4 +42,4 @@ const update = async (params: IMarketOrderChainUpdate) => {
   return updateRes;
 };
 
-export default { create, list, update };
+export default { create, list, update, detail };

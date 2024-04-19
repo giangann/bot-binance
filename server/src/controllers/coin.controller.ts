@@ -1,10 +1,13 @@
 import IController from "IController";
 import { ServerResponse } from "../ultils/server-response.ultil";
+import coinService from "../services/coin.service";
+import binanceService from "../services/binance.service";
 
-const getNowClosePrices: IController = (req, res) => {
+const getNowClosePrices: IController = async (req, res) => {
   try {
-    const prices = global.symbolsPrice;
-    ServerResponse.response(res, prices);
+    const currSymbols = await coinService.getAllSymbolsDB();
+    const currPrices = await binanceService.getSymbolsClosePrice(currSymbols);
+    ServerResponse.response(res, currPrices);
   } catch (err) {
     console.log("err", err);
     ServerResponse.error(res, err.message);

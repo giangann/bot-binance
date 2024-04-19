@@ -23,20 +23,34 @@ export const ListOrderChain = () => {
     fetchOrderChains();
   }, []);
 
-  useEffect(() => {
-    socket?.on(
-      "new-order",
-      (direction, transaction_size, percent_change, price, symbol) => {
-        // console.log(direction, transaction_size, percent_change, price, symbol);
-        const toastNotiMsg = `Lênh mới được tạo: ${direction} ${transaction_size} USD của ${symbol} giá ${price} USD với %giá thay đổi ${percent_change}`;
-        // toast.success("toastNotiMsg");
-        toast.success(toastNotiMsg);
+  // useEffect(() => {
+  //   socket?.on(
+  //     "new-order",
+  //     (direction, transaction_size, percent_change, price, symbol) => {
+  //       // console.log(direction, transaction_size, percent_change, price, symbol);
+  //       const toastNotiMsg = `Lênh mới được tạo: ${direction} ${transaction_size} USD của ${symbol} giá ${price} USD với %giá thay đổi ${percent_change}`;
+  //       // toast.success("toastNotiMsg");
+  //       toast.success(toastNotiMsg);
 
-        fetchOrderChains();
-      }
-    );
+  //       fetchOrderChains();
+  //     }
+  //   );
+  //   return () => {
+  //     socket?.off("new-order");
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    socket?.on("new-orders", (nums_of_order: number) => {
+      // console.log(direction, transaction_size, percent_change, price, symbol);
+      const toastNotiMsg = `Có ${nums_of_order} lệnh mới được tạo`;
+      // toast.success("toastNotiMsg");
+      toast.success(toastNotiMsg);
+
+      fetchOrderChains();
+    });
     return () => {
-      socket?.off("new-order");
+      socket?.off("new-orders");
     };
   }, []);
 
@@ -77,6 +91,9 @@ const OrderChain = (props: IMarketOrderChainRecord) => {
     id,
     status,
     total_balance_start,
+    transaction_size_start,
+    percent_to_buy,
+    percent_to_sell,
     total_balance_end,
     percent_change,
   } = props;
@@ -95,6 +112,26 @@ const OrderChain = (props: IMarketOrderChainRecord) => {
               {status}
             </Typography>
           </Typography>
+          {/*  */}
+          <Typography>
+            transaction_size_start:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {transaction_size_start} USD
+            </Typography>
+          </Typography>
+          <Typography>
+            percent_to_buy:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {percent_to_buy}%
+            </Typography>
+          </Typography>
+          <Typography>
+            percent_to_sell:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {percent_to_sell}%
+            </Typography>
+          </Typography>
+          {/*  */}
           <Typography>
             total_balance_start:{" "}
             <Typography sx={{ fontWeight: 600 }} component={"span"}>
@@ -117,13 +154,14 @@ const OrderChain = (props: IMarketOrderChainRecord) => {
       </Stack>
       <Stack spacing={1}>
         <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
-          <Typography>id</Typography>
-          <Typography>symbol</Typography>
-          <Typography>direction</Typography>
-          <Typography>total_balance</Typography>
-          <Typography>price</Typography>
-          <Typography>percent_change</Typography>
-          <Typography>createdAt</Typography>
+          <PieceHeader>id</PieceHeader>
+          <PieceHeader>symbol</PieceHeader>
+          <PieceHeader>direction</PieceHeader>
+          <PieceHeader>transaction_size</PieceHeader>
+          <PieceHeader>price</PieceHeader>
+          <PieceHeader>percent_change</PieceHeader>
+          <PieceHeader>amount</PieceHeader>
+          <PieceHeader>createdAt</PieceHeader>
         </Stack>
         {order_pieces.map((piece) => (
           <OrderPiece {...piece} />
@@ -137,7 +175,8 @@ const OrderPiece = (props: IMarketOrderPieceRecord) => {
   const {
     id,
     symbol,
-    total_balance,
+    transaction_size,
+    amount,
     direction,
     price,
     percent_change,
@@ -146,16 +185,15 @@ const OrderPiece = (props: IMarketOrderPieceRecord) => {
   return (
     <PieceBox>
       <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
-        <Typography>{id}</Typography>
-        <Typography>{symbol}</Typography>
-        <Typography>{direction}</Typography>
-        <Typography>{total_balance}</Typography>
-        <Typography>{price}</Typography>
-        <Typography>{percent_change}%</Typography>
+        <PieceCell>{id}</PieceCell>
+        <PieceCell>{symbol}</PieceCell>
+        <PieceCell>{direction}</PieceCell>
+        <PieceCell>{transaction_size}</PieceCell>
+        <PieceCell>{price}</PieceCell>
+        <PieceCell>{parseFloat(percent_change).toFixed(2)}%</PieceCell>
+        <PieceCell>{parseFloat(amount).toFixed(5)}</PieceCell>
 
-        <Typography>
-          {dayjs(createdAt).format("DD/MM/YYYY HH:mm:ss")}
-        </Typography>
+        <PieceCell>{dayjs(createdAt).format("DD/MM/YYYY HH:mm:ss")}</PieceCell>
       </Stack>
     </PieceBox>
   );
@@ -177,3 +215,10 @@ const PieceBox = styled(Box)(({ theme }) => ({
   backgroundColor: grey["50"],
   [theme.breakpoints.down("sm")]: {},
 }));
+const PieceCell = styled(Typography)({
+  flexBasis: `${100 / 8}%`,
+});
+
+const PieceHeader = styled(PieceCell)({
+  textAlign: "left",
+});

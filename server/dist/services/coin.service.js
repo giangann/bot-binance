@@ -20,6 +20,11 @@ const list = () => __awaiter(void 0, void 0, void 0, function* () {
     const listCoinPrice = yield coinRepo.getMany();
     return listCoinPrice;
 });
+const getAllSymbolsDB = () => __awaiter(void 0, void 0, void 0, function* () {
+    const listCoinPrice = yield list();
+    const symbols = listCoinPrice.map((coin) => coin.symbol);
+    return symbols;
+});
 const detail = (params) => __awaiter(void 0, void 0, void 0, function* () {
     const coin = yield (0, typeorm_1.getRepository)(coin_price_1am_entity_1.CoinPrice1AM).findOne({
         symbol: params.symbol,
@@ -35,4 +40,4 @@ const update = (params) => __awaiter(void 0, void 0, void 0, function* () {
     const updatedCoin = yield (0, typeorm_1.getRepository)(coin_price_1am_entity_1.CoinPrice1AM).update({ symbol: params.symbol }, { price: params.price, updatedAt });
     return updatedCoin;
 });
-exports.default = { create, update, list, detail };
+exports.default = { create, update, list, detail, getAllSymbolsDB };

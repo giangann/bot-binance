@@ -8,7 +8,7 @@ const createWebSocket = (httpServer) => {
     });
     io.on("connection", (socket) => {
         console.log("new client connect");
-        socket.emit('noArg');
+        socket.emit("noArg");
     });
     return io;
 };
