@@ -23,41 +23,46 @@ const createInterval = () => {
     const interval = setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         console.log("start tick");
-        // fetch now symbols price
-        const symbols = yield coin_service_1.default.getAllSymbolsDB();
-        const prices = yield binance_service_1.default.getSymbolsClosePrice(symbols);
-        global.symbolsPriceMap = (0, get_price_of_symbols_1.arrayToMap)(prices);
-        global.wsServerGlob.emit("symbols-price", prices);
-        // calculate total
-        const { total_balance_usdt, totalUSDT, coins } = yield calCulateBalance();
-        global.wsServerGlob.emit("ws-balance", total_balance_usdt, totalUSDT, coins);
-        // make order
-        const chainOpen = yield getChainOpen();
-        if (chainOpen) {
-            const { orderParams, orderPieceParams } = yield genOrderParams();
-            console.log("found ", orderParams.length, " coin need to order is", orderParams);
-            const binanceOrdersCreated = yield makeOrders(orderParams);
-            console.log("binance order arr", binanceOrdersCreated);
-            const errOrders = binanceOrdersCreated.filter((order) => order === null);
-            let newOrderPieceParams = [];
-            for (let createdOrder of binanceOrdersCreated) {
-                if (createdOrder && createdOrder) {
-                    for (let orderPieceParam of orderPieceParams) {
-                        let createdSymbol = ((_a = createdOrder.info) === null || _a === void 0 ? void 0 : _a.symbol) || createdOrder.symbol;
-                        let hasBackSlash = createdSymbol.includes("/");
-                        if (hasBackSlash) {
-                            createdSymbol = createdSymbol.split("/").join("");
-                        }
-                        if (createdSymbol === orderPieceParam.symbol) {
-                            newOrderPieceParams.push(Object.assign(Object.assign({}, orderPieceParam), { id: createdOrder.id }));
+        try {
+            // fetch now symbols price
+            const symbols = yield coin_service_1.default.getAllSymbolsDB();
+            const prices = yield binance_service_1.default.getSymbolsClosePrice(symbols);
+            global.symbolsPriceMap = (0, get_price_of_symbols_1.arrayToMap)(prices);
+            global.wsServerGlob.emit("symbols-price", prices);
+            // calculate total
+            const { total_balance_usdt, totalUSDT, coins } = yield calCulateBalance();
+            global.wsServerGlob.emit("ws-balance", total_balance_usdt, totalUSDT, coins);
+            // make order
+            const chainOpen = yield getChainOpen();
+            if (chainOpen) {
+                const { orderParams, orderPieceParams } = yield genOrderParams();
+                console.log("found ", orderParams.length, " coin need to order is", orderParams);
+                const binanceOrdersCreated = yield makeOrders(orderParams);
+                console.log("binance order arr", binanceOrdersCreated);
+                const errOrders = binanceOrdersCreated.filter((order) => order === null);
+                let newOrderPieceParams = [];
+                for (let createdOrder of binanceOrdersCreated) {
+                    if (createdOrder && createdOrder) {
+                        for (let orderPieceParam of orderPieceParams) {
+                            let createdSymbol = ((_a = createdOrder.info) === null || _a === void 0 ? void 0 : _a.symbol) || createdOrder.symbol;
+                            let hasBackSlash = createdSymbol.includes("/");
+                            if (hasBackSlash) {
+                                createdSymbol = createdSymbol.split("/").join("");
+                            }
+                            if (createdSymbol === orderPieceParam.symbol) {
+                                newOrderPieceParams.push(Object.assign(Object.assign({}, orderPieceParam), { id: createdOrder.id }));
+                            }
                         }
                     }
                 }
+                // save order pieces
+                console.log("newOrderPieceParams", newOrderPieceParams);
+                const newOrderPieces = yield saveOrderPieces(newOrderPieceParams);
+                global.wsServerGlob.emit("new-orders", newOrderPieces.length);
             }
-            // save order pieces
-            console.log("newOrderPieceParams", newOrderPieceParams);
-            const newOrderPieces = yield saveOrderPieces(newOrderPieceParams);
-            global.wsServerGlob.emit("new-orders", newOrderPieces.length);
+        }
+        catch (err) {
+            global.wsServerGlob.emit("app-err", err.message);
         }
         console.log("emit and end tick");
     }), 10000);
@@ -113,7 +118,7 @@ function makeOrders(orderParams) {
             catch (error) {
                 let errorMsg = `Error creating order for ${symbol}: ${error.message}`;
                 console.error(errorMsg);
-                global.wsServerGlob.emit('order-err', errorMsg);
+                global.wsServerGlob.emit("order-err", errorMsg);
                 // Return a placeholder value or handle the error as needed
                 return null; // or throw error; depending on your error handling strategy
             }

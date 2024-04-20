@@ -3,9 +3,19 @@ import { Outlet } from "react-router-dom";
 import { SocketContext } from "./context/SocketContext";
 import { io } from "socket.io-client";
 import { baseURL } from "./request/request";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 const wsServer = io(baseURL);
 export const Layout = () => {
+  useEffect(() => {
+    wsServer?.on("app-err", (errMsg: string) => {
+      toast.error(errMsg);
+    });
+    return () => {
+      wsServer?.off("app-err");
+    };
+  }, []);
   return (
     <SocketContext.Provider value={wsServer}>
       <Box sx={{ maxWidth: 1500, margin: "auto", padding: { xs: 1, sm: 2 } }}>

@@ -13,60 +13,65 @@ import { arrayToMap } from "./get-price-of-symbols";
 const createInterval = () => {
   const interval = setInterval(async () => {
     console.log("start tick");
+    try {
+      // fetch now symbols price
+      const symbols = await coinService.getAllSymbolsDB();
+      const prices = await binanceService.getSymbolsClosePrice(symbols);
+      global.symbolsPriceMap = arrayToMap(prices);
+      global.wsServerGlob.emit("symbols-price", prices);
 
-    // fetch now symbols price
-    const symbols = await coinService.getAllSymbolsDB();
-    const prices = await binanceService.getSymbolsClosePrice(symbols);
-    global.symbolsPriceMap = arrayToMap(prices);
-    global.wsServerGlob.emit("symbols-price", prices);
-
-    // calculate total
-    const { total_balance_usdt, totalUSDT, coins } = await calCulateBalance();
-    global.wsServerGlob.emit(
-      "ws-balance",
-      total_balance_usdt,
-      totalUSDT,
-      coins
-    );
-
-    // make order
-    const chainOpen = await getChainOpen();
-    if (chainOpen) {
-      const { orderParams, orderPieceParams } = await genOrderParams();
-      console.log(
-        "found ",
-        orderParams.length,
-        " coin need to order is",
-        orderParams
+      // calculate total
+      const { total_balance_usdt, totalUSDT, coins } = await calCulateBalance();
+      global.wsServerGlob.emit(
+        "ws-balance",
+        total_balance_usdt,
+        totalUSDT,
+        coins
       );
-      const binanceOrdersCreated = await makeOrders(orderParams);
-      console.log("binance order arr", binanceOrdersCreated);
-      const errOrders = binanceOrdersCreated.filter((order) => order === null);
 
-      let newOrderPieceParams: IMarketOrderPieceCreate[] = [];
-      for (let createdOrder of binanceOrdersCreated) {
-        if (createdOrder && createdOrder) {
-          for (let orderPieceParam of orderPieceParams) {
-            let createdSymbol =
-              createdOrder.info?.symbol || createdOrder.symbol;
-            let hasBackSlash = createdSymbol.includes("/");
-            if (hasBackSlash) {
-              createdSymbol = createdSymbol.split("/").join("");
-            }
-            if (createdSymbol === orderPieceParam.symbol) {
-              newOrderPieceParams.push({
-                ...orderPieceParam,
-                id: createdOrder.id,
-              });
+      // make order
+      const chainOpen = await getChainOpen();
+      if (chainOpen) {
+        const { orderParams, orderPieceParams } = await genOrderParams();
+        console.log(
+          "found ",
+          orderParams.length,
+          " coin need to order is",
+          orderParams
+        );
+        const binanceOrdersCreated = await makeOrders(orderParams);
+        console.log("binance order arr", binanceOrdersCreated);
+        const errOrders = binanceOrdersCreated.filter(
+          (order) => order === null
+        );
+
+        let newOrderPieceParams: IMarketOrderPieceCreate[] = [];
+        for (let createdOrder of binanceOrdersCreated) {
+          if (createdOrder && createdOrder) {
+            for (let orderPieceParam of orderPieceParams) {
+              let createdSymbol =
+                createdOrder.info?.symbol || createdOrder.symbol;
+              let hasBackSlash = createdSymbol.includes("/");
+              if (hasBackSlash) {
+                createdSymbol = createdSymbol.split("/").join("");
+              }
+              if (createdSymbol === orderPieceParam.symbol) {
+                newOrderPieceParams.push({
+                  ...orderPieceParam,
+                  id: createdOrder.id,
+                });
+              }
             }
           }
         }
-      }
 
-      // save order pieces
-      console.log("newOrderPieceParams", newOrderPieceParams);
-      const newOrderPieces = await saveOrderPieces(newOrderPieceParams);
-      global.wsServerGlob.emit("new-orders", newOrderPieces.length);
+        // save order pieces
+        console.log("newOrderPieceParams", newOrderPieceParams);
+        const newOrderPieces = await saveOrderPieces(newOrderPieceParams);
+        global.wsServerGlob.emit("new-orders", newOrderPieces.length);
+      }
+    } catch (err) {
+      global.wsServerGlob.emit("app-err", err.message);
     }
 
     console.log("emit and end tick");
@@ -139,9 +144,9 @@ async function makeOrders(orderParams: TOrderParams[]) {
     try {
       return await binanceService.createMarketOrder(symbol, direction, amount);
     } catch (error) {
-      let errorMsg = `Error creating order for ${symbol}: ${error.message}` 
+      let errorMsg = `Error creating order for ${symbol}: ${error.message}`;
       console.error(errorMsg);
-      global.wsServerGlob.emit('order-err',errorMsg)
+      global.wsServerGlob.emit("order-err", errorMsg);
       // Return a placeholder value or handle the error as needed
       return null; // or throw error; depending on your error handling strategy
     }
