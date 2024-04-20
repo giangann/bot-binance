@@ -20,6 +20,7 @@ export interface ServerToClientEvents {
   ) => void;
   "new-orders": (nums_of_order: number) => void;
   "err-orders": (nums_of_errs: number) => void;
+  "order-err": (msg: string) => void;
   "bot-quit": (msg: string) => void;
   "bot-err": (errMsg: string) => void;
   "symbols-price": (symbolPrices: TSymbolPrice[]) => void;

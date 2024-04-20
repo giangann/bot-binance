@@ -55,6 +55,15 @@ export const ListOrderChain = () => {
   }, []);
 
   useEffect(() => {
+    socket?.on("order-err", (errMsg: string) => {
+      toast.warning(errMsg);
+    });
+    return () => {
+      socket?.off("order-err");
+    };
+  }, []);
+
+  useEffect(() => {
     socket?.on("bot-quit", (msg) => {
       toast.info(msg);
       fetchOrderChains();

@@ -139,7 +139,9 @@ async function makeOrders(orderParams: TOrderParams[]) {
     try {
       return await binanceService.createMarketOrder(symbol, direction, amount);
     } catch (error) {
-      console.error(`Error creating order for ${symbol}:`, error.message);
+      let errorMsg = `Error creating order for ${symbol}: ${error.message}` 
+      console.error(errorMsg);
+      global.wsServerGlob.emit('order-err',errorMsg)
       // Return a placeholder value or handle the error as needed
       return null; // or throw error; depending on your error handling strategy
     }
