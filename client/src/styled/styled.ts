@@ -16,3 +16,9 @@ export const ButtonResponsive = styled(Button)(({ theme }) => ({
     padding: "6px 16px",
   },
 }));
+
+export const CenterBox = styled(Box)({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+});

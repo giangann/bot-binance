@@ -3,5 +3,5 @@ import marketOrderChainController from "../controllers/market-order-chain-contro
 const orderChainRoute = Router();
 
 orderChainRoute.get("/", marketOrderChainController.list);
-
+orderChainRoute.get("/log/:chainId", marketOrderChainController.getLogs);
 export default orderChainRoute;

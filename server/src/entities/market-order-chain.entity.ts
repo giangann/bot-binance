@@ -8,6 +8,7 @@ import {
 import { BaseEntity } from "./base.entity";
 import { MarketOrderPiece } from "./market-order-piece.entity";
 import { TOrderChainStatus } from "market-order-chain.interface";
+import { Log } from "./log.entity";
 
 // Entities
 
@@ -46,4 +47,8 @@ export class MarketOrderChain extends BaseEntity {
   @OneToMany(() => MarketOrderPiece, (piece) => piece.order_chain)
   @JoinColumn({ name: "id", referencedColumnName: "market_order_chains_id" })
   order_pieces: MarketOrderPiece[];
+
+  @OneToMany(() => Log, (log) => log.order_chain)
+  @JoinColumn({ name: "id", referencedColumnName: "market_order_chains_id" })
+  logs: Log[];
 }

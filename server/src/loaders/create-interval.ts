@@ -9,6 +9,7 @@ import coinService from "../services/coin.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import marketOrderPieceService from "../services/market-order-piece.service";
 import { arrayToMap } from "./get-price-of-symbols";
+import logService from "../services/log.service";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
@@ -39,11 +40,15 @@ const createInterval = () => {
           " coin need to order is",
           orderParams
         );
-        const binanceOrdersCreated = await makeOrders(orderParams);
+        const binanceOrdersCreated = await makeOrders(
+          orderParams,
+          chainOpen.id
+        );
         console.log("binance order arr", binanceOrdersCreated);
         const errOrders = binanceOrdersCreated.filter(
           (order) => order === null
         );
+        global.wsServerGlob.emit('err-orders',errOrders.length)
 
         let newOrderPieceParams: IMarketOrderPieceCreate[] = [];
         for (let createdOrder of binanceOrdersCreated) {
@@ -138,15 +143,21 @@ type TOrderParams = {
   amount: number;
   percent?: number;
 };
-async function makeOrders(orderParams: TOrderParams[]) {
+async function makeOrders(orderParams: TOrderParams[], chainId: number) {
   const promises = orderParams.map(async (param) => {
     const { symbol, amount, direction } = param;
     try {
       return await binanceService.createMarketOrder(symbol, direction, amount);
     } catch (error) {
-      let errorMsg = `Error creating order for ${symbol}: ${error.message}`;
+      let errorMsg = `Error creating ${direction} order for ${amount.toFixed(
+        5
+      )} of ${symbol}: ${error.message}`;
       console.error(errorMsg);
-      global.wsServerGlob.emit("order-err", errorMsg);
+      await logService.create({
+        market_order_chains_id: chainId,
+        message: errorMsg,
+        type: "order-err",
+      });
       // Return a placeholder value or handle the error as needed
       return null; // or throw error; depending on your error handling strategy
     }

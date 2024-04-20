@@ -19,6 +19,7 @@ const coin_service_1 = __importDefault(require("../services/coin.service"));
 const market_order_chain_service_1 = __importDefault(require("../services/market-order-chain.service"));
 const market_order_piece_service_1 = __importDefault(require("../services/market-order-piece.service"));
 const get_price_of_symbols_1 = require("./get-price-of-symbols");
+const log_service_1 = __importDefault(require("../services/log.service"));
 const createInterval = () => {
     const interval = setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
@@ -37,9 +38,10 @@ const createInterval = () => {
             if (chainOpen) {
                 const { orderParams, orderPieceParams } = yield genOrderParams();
                 console.log("found ", orderParams.length, " coin need to order is", orderParams);
-                const binanceOrdersCreated = yield makeOrders(orderParams);
+                const binanceOrdersCreated = yield makeOrders(orderParams, chainOpen.id);
                 console.log("binance order arr", binanceOrdersCreated);
                 const errOrders = binanceOrdersCreated.filter((order) => order === null);
+                global.wsServerGlob.emit('err-orders', errOrders.length);
                 let newOrderPieceParams = [];
                 for (let createdOrder of binanceOrdersCreated) {
                     if (createdOrder && createdOrder) {
@@ -108,7 +110,7 @@ function calCulateBalance() {
         };
     });
 }
-function makeOrders(orderParams) {
+function makeOrders(orderParams, chainId) {
     return __awaiter(this, void 0, void 0, function* () {
         const promises = orderParams.map((param) => __awaiter(this, void 0, void 0, function* () {
             const { symbol, amount, direction } = param;
@@ -116,9 +118,13 @@ function makeOrders(orderParams) {
                 return yield binance_service_1.default.createMarketOrder(symbol, direction, amount);
             }
             catch (error) {
-                let errorMsg = `Error creating order for ${symbol}: ${error.message}`;
+                let errorMsg = `Error creating ${direction} order for ${amount.toFixed(5)} of ${symbol}: ${error.message}`;
                 console.error(errorMsg);
-                global.wsServerGlob.emit("order-err", errorMsg);
+                yield log_service_1.default.create({
+                    market_order_chains_id: chainId,
+                    message: errorMsg,
+                    type: "order-err",
+                });
                 // Return a placeholder value or handle the error as needed
                 return null; // or throw error; depending on your error handling strategy
             }

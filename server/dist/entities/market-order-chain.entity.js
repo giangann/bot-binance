@@ -13,6 +13,7 @@ exports.MarketOrderChain = void 0;
 const typeorm_1 = require("typeorm");
 const base_entity_1 = require("./base.entity");
 const market_order_piece_entity_1 = require("./market-order-piece.entity");
+const log_entity_1 = require("./log.entity");
 // Entities
 let MarketOrderChain = class MarketOrderChain extends base_entity_1.BaseEntity {
 };
@@ -62,6 +63,11 @@ __decorate([
     (0, typeorm_1.JoinColumn)({ name: "id", referencedColumnName: "market_order_chains_id" }),
     __metadata("design:type", Array)
 ], MarketOrderChain.prototype, "order_pieces", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => log_entity_1.Log, (log) => log.order_chain),
+    (0, typeorm_1.JoinColumn)({ name: "id", referencedColumnName: "market_order_chains_id" }),
+    __metadata("design:type", Array)
+], MarketOrderChain.prototype, "logs", void 0);
 exports.MarketOrderChain = MarketOrderChain = __decorate([
     (0, typeorm_1.Entity)("market_order_chains", { orderBy: { createdAt: "DESC" } })
 ], MarketOrderChain);

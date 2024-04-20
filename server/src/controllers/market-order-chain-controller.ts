@@ -1,6 +1,7 @@
 import IController from "IController";
 import marketOrderChainService from "../services/market-order-chain.service";
 import { ServerResponse } from "../ultils/server-response.ultil";
+import logService from "../services/log.service";
 
 const list: IController = async (req, res) => {
   try {
@@ -12,4 +13,15 @@ const list: IController = async (req, res) => {
   }
 };
 
-export default { list };
+const getLogs: IController = async (req, res) => {
+  try {
+    const chainId = parseInt(req.params?.chainId);
+    const logs = await logService.list({ market_order_chains_id: chainId });
+    ServerResponse.response(res, logs);
+  } catch (err) {
+    console.log("err", err);
+    ServerResponse.error(res, err.message);
+  }
+};
+
+export default { list, getLogs };
