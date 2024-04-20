@@ -2,7 +2,6 @@ import * as bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
 import indexRoute from "../router/index.route";
-
 export const createHttpServer = () => {
   const port = process.env.PORT;
   const app: express.Express = express();

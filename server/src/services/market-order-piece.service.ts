@@ -4,6 +4,7 @@ import {
 } from "market-order-piece.interface";
 import { getRepository } from "typeorm";
 import { MarketOrderPiece } from "../entities/market-order-piece.entity";
+import moment from "moment";
 
 const list = async (params?: IMarketOrderPieceList) => {
   const repo = getRepository(MarketOrderPiece)
@@ -30,7 +31,14 @@ const list = async (params?: IMarketOrderPieceList) => {
 };
 
 const create = async (params: IMarketOrderPieceCreate) => {
-  const createdRecord = await getRepository(MarketOrderPiece).save(params);
+  const paramsWithDateTime: IMarketOrderPieceCreate = {
+    ...params,
+    createdAt: moment().format("YYYY-MM-DD hh:mm:ss"),
+    updatedAt: moment().format("YYYY-MM-DD hh:mm:ss"),
+  };
+  const createdRecord = await getRepository(MarketOrderPiece).save(
+    paramsWithDateTime
+  );
   return createdRecord;
 };
 

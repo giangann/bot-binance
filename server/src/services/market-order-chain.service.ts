@@ -5,6 +5,7 @@ import {
 } from "market-order-chain.interface";
 import { getRepository } from "typeorm";
 import { MarketOrderChain } from "../entities/market-order-chain.entity";
+import moment from "moment";
 
 const list = async (params?: { status: TOrderChainStatus }) => {
   const status = params?.status;
@@ -26,17 +27,25 @@ const detail = async (id: number) => {
     .leftJoinAndSelect("market_order_chains.order_pieces", "order_pieces")
     .where("market_order_chains.id = :id", { id });
   const orderChain = await repo.getOne();
-  return orderChain
+  return orderChain;
 };
 
 const create = async (params: IMarketOrderChainCreate) => {
-  const createdRecord = await getRepository(MarketOrderChain).save(params);
+  const paramsWithDateTime: IMarketOrderChainCreate = {
+    ...params,
+    createdAt: moment().format("YYYY-MM-DD hh:mm:ss"),
+    updatedAt: moment().format("YYYY-MM-DD hh:mm:ss"),
+  };
+  const createdRecord = await getRepository(MarketOrderChain).save(
+    paramsWithDateTime
+  );
   return createdRecord;
 };
 
 const update = async (params: IMarketOrderChainUpdate) => {
   const filtered = { id: params.id };
   delete params.id;
+  params.updatedAt = moment().format("YYYY-MM-DD hh:mm:ss");
   const repo = getRepository(MarketOrderChain);
   const updateRes = await repo.update(filtered, params);
   return updateRes;

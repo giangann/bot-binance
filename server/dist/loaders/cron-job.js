@@ -18,7 +18,7 @@ const binance_service_1 = __importDefault(require("../services/binance.service")
 const coin_service_1 = __importDefault(require("../services/coin.service"));
 const cronJobSchedule = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("cron job file");
-    const task = node_cron_1.default.schedule("0 31 1 * * *", () => {
+    const task = node_cron_1.default.schedule("0 0 1 * * *", () => {
         console.log("task run");
         updateCoinTable();
     }, {

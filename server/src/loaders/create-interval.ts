@@ -1,3 +1,4 @@
+import { IMarketOrderChainEntity } from "market-order-chain.interface";
 import {
   IMarketOrderPieceCreate,
   IMarketOrderPieceEntity,
@@ -8,8 +9,6 @@ import coinService from "../services/coin.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import marketOrderPieceService from "../services/market-order-piece.service";
 import { arrayToMap } from "./get-price-of-symbols";
-import { IMarketOrderChainEntity } from "market-order-chain.interface";
-import { Socket } from "socket.io";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
@@ -22,8 +21,13 @@ const createInterval = () => {
     global.wsServerGlob.emit("symbols-price", prices);
 
     // calculate total
-    const { total_balance_usdt, coins } = await calCulateBalance();
-    global.wsServerGlob.emit("ws-balance", total_balance_usdt, coins);
+    const { total_balance_usdt, totalUSDT, coins } = await calCulateBalance();
+    global.wsServerGlob.emit(
+      "ws-balance",
+      total_balance_usdt,
+      totalUSDT,
+      coins
+    );
 
     // make order
     const chainOpen = await getChainOpen();
@@ -37,10 +41,11 @@ const createInterval = () => {
       );
       const binanceOrdersCreated = await makeOrders(orderParams);
       console.log("binance order arr", binanceOrdersCreated);
+      const errOrders = binanceOrdersCreated.filter((order) => order === null);
 
       let newOrderPieceParams: IMarketOrderPieceCreate[] = [];
       for (let createdOrder of binanceOrdersCreated) {
-        if (createdOrder) {
+        if (createdOrder && createdOrder) {
           for (let orderPieceParam of orderPieceParams) {
             let createdSymbol =
               createdOrder.info?.symbol || createdOrder.symbol;
@@ -76,7 +81,9 @@ async function calCulateBalance() {
     [key: string]: number; // coinName: amount
   };
   const currCoins: string[] = Object.keys(balancesTotalObj);
-  let totalBalancesUSDT = balancesTotalObj["USDT"]; // init with usdt amount
+  let totalUSDT = balancesTotalObj["USDT"];
+  let totalBalancesUSDT = totalUSDT; // init with usdt amount
+  console.log("init balance", totalBalancesUSDT);
   let coinsBalances: {
     coin: string;
     amount: number;
@@ -113,7 +120,11 @@ async function calCulateBalance() {
   // save to global
   global.totalBalancesUSDT = totalBalancesUSDT;
 
-  return { total_balance_usdt: totalBalancesUSDT, coins: coinsBalances };
+  return {
+    totalUSDT,
+    total_balance_usdt: totalBalancesUSDT,
+    coins: coinsBalances,
+  };
 }
 
 type TOrderParams = {

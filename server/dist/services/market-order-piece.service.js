@@ -8,9 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const market_order_piece_entity_1 = require("../entities/market-order-piece.entity");
+const moment_1 = __importDefault(require("moment"));
 const list = (params) => __awaiter(void 0, void 0, void 0, function* () {
     const repo = (0, typeorm_1.getRepository)(market_order_piece_entity_1.MarketOrderPiece)
         .createQueryBuilder("market_order_pieces")
@@ -30,7 +34,8 @@ const list = (params) => __awaiter(void 0, void 0, void 0, function* () {
     return listRecord;
 });
 const create = (params) => __awaiter(void 0, void 0, void 0, function* () {
-    const createdRecord = yield (0, typeorm_1.getRepository)(market_order_piece_entity_1.MarketOrderPiece).save(params);
+    const paramsWithDateTime = Object.assign(Object.assign({}, params), { createdAt: (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss"), updatedAt: (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss") });
+    const createdRecord = yield (0, typeorm_1.getRepository)(market_order_piece_entity_1.MarketOrderPiece).save(paramsWithDateTime);
     return createdRecord;
 });
 exports.default = { list, create };

@@ -1,14 +1,24 @@
 import axios from "axios";
 import ccxt, { Balances } from "ccxt";
 import { TSymbolPrice } from "../types/symbol-price";
+import dotenv from "dotenv";
+dotenv.config();
 // binance config
-const baseUrl = "https://fapi.binance.com/fapi/";
-const secret =
-  "4wTgPjsyA9z1FIyUug81SOuTzCP5pZNyD3wHoIHpkjQ8yzoKUXgLaiV5izztl5qp";
-const apiKey =
-  "1A0eAdDSYP6mamVZRCmc0cSt4qm4K7pwaONb55yTlIdfuHMUYmyztBZnSbZ3hPBb";
+// const baseUrl = "https://testnet.binancefuture.com/fapi/";
+// const baseUrl = "https://fapi.binance.com/fapi/";
+
+// const secret =
+//   "4wTgPjsyA9z1FIyUug81SOuTzCP5pZNyD3wHoIHpkjQ8yzoKUXgLaiV5izztl5qp";
+// const apiKey =
+//   "1A0eAdDSYP6mamVZRCmc0cSt4qm4K7pwaONb55yTlIdfuHMUYmyztBZnSbZ3hPBb";
+
+const baseUrl = process.env.BINANCE_BASE_URL;
+const secret = process.env.BINANCE_SECRET;
+const apiKey = process.env.BINANCE_API_KEY;
+const sandBoxMode = process.env.BINANCE_SANDBOX_MODE;
 const binance = new ccxt.binance({ apiKey, secret });
-binance.setSandboxMode(true);
+// binance.setSandboxMode(true);
+binance.setSandboxMode(Boolean(sandBoxMode));
 
 const fetchMyBalance = async () => {
   const balance = await binance.fetchBalance();
@@ -37,7 +47,7 @@ async function calTotalToUsdt(balance: Balances) {
   return totalByUSDT;
 }
 
-const tickerPriceUrl = `${baseUrl}v2/ticker/price`;
+const tickerPriceUrl = `${baseUrl}/fapi/v2/ticker/price`;
 type TTickerPrice = {
   symbol: string;
   price: string;

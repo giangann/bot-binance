@@ -7,6 +7,7 @@ export interface ServerToClientEvents {
   withAck: (d: string, callback: (e: number) => void) => void;
   "ws-balance": (
     total: number,
+    total_usdt: number,
     coins: { coin: string; amount: number; price: number; total: number }[]
   ) => void;
   "bot-running": (msg: string) => void;
@@ -18,6 +19,7 @@ export interface ServerToClientEvents {
     symbol: string
   ) => void;
   "new-orders": (nums_of_order: number) => void;
+  "err-orders": (nums_of_errs: number) => void;
   "bot-quit": (msg: string) => void;
   "bot-err": (errMsg: string) => void;
   "symbols-price": (symbolPrices: TSymbolPrice[]) => void;

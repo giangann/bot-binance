@@ -29,8 +29,8 @@ const createInterval = () => {
         global.symbolsPriceMap = (0, get_price_of_symbols_1.arrayToMap)(prices);
         global.wsServerGlob.emit("symbols-price", prices);
         // calculate total
-        const { total_balance_usdt, coins } = yield calCulateBalance();
-        global.wsServerGlob.emit("ws-balance", total_balance_usdt, coins);
+        const { total_balance_usdt, totalUSDT, coins } = yield calCulateBalance();
+        global.wsServerGlob.emit("ws-balance", total_balance_usdt, totalUSDT, coins);
         // make order
         const chainOpen = yield getChainOpen();
         if (chainOpen) {
@@ -38,9 +38,10 @@ const createInterval = () => {
             console.log("found ", orderParams.length, " coin need to order is", orderParams);
             const binanceOrdersCreated = yield makeOrders(orderParams);
             console.log("binance order arr", binanceOrdersCreated);
+            const errOrders = binanceOrdersCreated.filter((order) => order === null);
             let newOrderPieceParams = [];
             for (let createdOrder of binanceOrdersCreated) {
-                if (createdOrder) {
+                if (createdOrder && createdOrder) {
                     for (let orderPieceParam of orderPieceParams) {
                         let createdSymbol = ((_a = createdOrder.info) === null || _a === void 0 ? void 0 : _a.symbol) || createdOrder.symbol;
                         let hasBackSlash = createdSymbol.includes("/");
@@ -69,7 +70,9 @@ function calCulateBalance() {
         const balances = yield binance_service_1.default.fetchMyBalance();
         const balancesTotalObj = balances.total;
         const currCoins = Object.keys(balancesTotalObj);
-        let totalBalancesUSDT = balancesTotalObj["USDT"]; // init with usdt amount
+        let totalUSDT = balancesTotalObj["USDT"];
+        let totalBalancesUSDT = totalUSDT; // init with usdt amount
+        console.log("init balance", totalBalancesUSDT);
         let coinsBalances = [];
         // loop to calculate totalBalances to Usdt
         for (let coinName of currCoins) {
@@ -93,7 +96,11 @@ function calCulateBalance() {
         console.log(consoleMsg);
         // save to global
         global.totalBalancesUSDT = totalBalancesUSDT;
-        return { total_balance_usdt: totalBalancesUSDT, coins: coinsBalances };
+        return {
+            totalUSDT,
+            total_balance_usdt: totalBalancesUSDT,
+            coins: coinsBalances,
+        };
     });
 }
 function makeOrders(orderParams) {

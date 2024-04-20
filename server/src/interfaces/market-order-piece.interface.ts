@@ -30,6 +30,8 @@ export interface IMarketOrderPieceCreate {
   amount: string;
   transaction_size: string;
   timestamp?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IMarketOrderPieceList

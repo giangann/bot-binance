@@ -14,12 +14,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const ccxt_1 = __importDefault(require("ccxt"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 // binance config
-const baseUrl = "https://fapi.binance.com/fapi/";
-const secret = "4wTgPjsyA9z1FIyUug81SOuTzCP5pZNyD3wHoIHpkjQ8yzoKUXgLaiV5izztl5qp";
-const apiKey = "1A0eAdDSYP6mamVZRCmc0cSt4qm4K7pwaONb55yTlIdfuHMUYmyztBZnSbZ3hPBb";
+// const baseUrl = "https://testnet.binancefuture.com/fapi/";
+// const baseUrl = "https://fapi.binance.com/fapi/";
+// const secret =
+//   "4wTgPjsyA9z1FIyUug81SOuTzCP5pZNyD3wHoIHpkjQ8yzoKUXgLaiV5izztl5qp";
+// const apiKey =
+//   "1A0eAdDSYP6mamVZRCmc0cSt4qm4K7pwaONb55yTlIdfuHMUYmyztBZnSbZ3hPBb";
+const baseUrl = process.env.BINANCE_BASE_URL;
+const secret = process.env.BINANCE_SECRET;
+const apiKey = process.env.BINANCE_API_KEY;
+const sandBoxMode = process.env.BINANCE_SANDBOX_MODE;
 const binance = new ccxt_1.default.binance({ apiKey, secret });
-binance.setSandboxMode(true);
+// binance.setSandboxMode(true);
+binance.setSandboxMode(Boolean(sandBoxMode));
 const fetchMyBalance = () => __awaiter(void 0, void 0, void 0, function* () {
     const balance = yield binance.fetchBalance();
     return balance;
@@ -46,7 +56,7 @@ function calTotalToUsdt(balance) {
         return totalByUSDT;
     });
 }
-const tickerPriceUrl = `${baseUrl}v2/ticker/price`;
+const tickerPriceUrl = `${baseUrl}/fapi/v2/ticker/price`;
 const getTickerPrice = (symbol) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield axios_1.default.get(tickerPriceUrl, {
         params: { symbol },
