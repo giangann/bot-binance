@@ -1,143 +1,151 @@
-import axios from "axios";
-import ccxt, { Balances } from "ccxt";
-import { TSymbolPrice } from "../types/symbol-price";
+import axios, { AxiosRequestConfig } from "axios";
 import dotenv from "dotenv";
+import { TAccount } from "../types/account";
+import { TCreateOrderErr, TNewOrder, TOrder, TResponse } from "../types/order";
+import { TPosition } from "../types/position";
+import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
+import {
+  getTimestampOfToday1AM,
+  paramsToQueryWithSignature,
+} from "../ultils/helper.ultil";
+import coinService from "./coin.service";
 dotenv.config();
-// binance config
-// const baseUrl = "https://testnet.binancefuture.com/fapi/";
-// const baseUrl = "https://fapi.binance.com/fapi/";
 
-// const secret =
-//   "4wTgPjsyA9z1FIyUug81SOuTzCP5pZNyD3wHoIHpkjQ8yzoKUXgLaiV5izztl5qp";
-// const apiKey =
-//   "1A0eAdDSYP6mamVZRCmc0cSt4qm4K7pwaONb55yTlIdfuHMUYmyztBZnSbZ3hPBb";
-
+// GET ENV
 const baseUrl = process.env.BINANCE_BASE_URL;
 const secret = process.env.BINANCE_SECRET;
 const apiKey = process.env.BINANCE_API_KEY;
-const sandBoxMode = process.env.BINANCE_SANDBOX_MODE;
-const binance = new ccxt.binance({ apiKey, secret });
-// binance.setSandboxMode(true);
-binance.setSandboxMode(Boolean(sandBoxMode));
 
-const fetchMyBalance = async () => {
-  const balance = await binance.fetchBalance();
-  return balance;
+// CONSTANT
+const commonParams = {
+  recvWindow: 5000,
+  // timestamp: Date.now(),
 };
-// get balance now
-const getMyBalance = async () => {
-  const balance = await binance.fetchBalance();
-  let total = await calTotalToUsdt(balance);
-  return total;
+const commonHeader = {
+  "X-MBX-APIKEY": apiKey,
+};
+const commonAxiosOpt: AxiosRequestConfig = {
+  headers: { ...commonHeader },
 };
 
-// assume that just have bitcoin and usdt in balance
-async function calTotalToUsdt(balance: Balances) {
-  const symbol = "BTCUSDT";
-  let tickerBTCUSDT = await getTickerPrice(symbol);
-  let totalBitcoin = balance.BTC.total * parseFloat(tickerBTCUSDT.price);
-  let btc = balance.BTC.total;
-  let usdt = balance.USDT.total;
-  let totalByUSDT = {
-    total: totalBitcoin + usdt,
-    btc,
-    usdt,
-  };
-
-  return totalByUSDT;
-}
-
-const tickerPriceUrl = `${baseUrl}/fapi/v2/ticker/price`;
-type TTickerPrice = {
-  symbol: string;
-  price: string;
-  time: number;
+const getPositions = async (): Promise<TPosition[]> => {
+  const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+  const queryString = paramsToQueryWithSignature(secret, paramsNow);
+  const endpoint = "/fapi/v2/positionRisk";
+  const url = `${baseUrl}${endpoint}?${queryString}`;
+  const response = await axios.get(url, commonAxiosOpt);
+  const positions = response.data;
+  return positions;
 };
-const getTickerPrice = async (symbol: string): Promise<TTickerPrice> => {
-  const response = await axios.get(tickerPriceUrl, {
+
+const getAccountInfo = async (): Promise<TAccount> => {
+  const endpoint = "/fapi/v2/account";
+  const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+  const queryString = paramsToQueryWithSignature(secret, paramsNow);
+  const url = `${baseUrl}${endpoint}?${queryString}`;
+  const response = await axios.get(url, commonAxiosOpt);
+  const accInfo = response.data;
+  return accInfo;
+};
+const test = async () => {
+  const data = await getAccountInfo();
+  console.log("getAccountInfo", data);
+  console.log("some info", data.availableBalance, data.totalWalletBalance);
+};
+// test();
+const getSymbolPriceTickers1Am = async (): Promise<
+  Omit<TSymbolPriceTicker, "time">[]
+> => {
+  const price1Am = await coinService.list();
+  return price1Am;
+};
+
+const getSymbolPriceTicker = async (
+  symbol: string
+): Promise<TSymbolPriceTicker> => {
+  const endpoint = "/fapi/v2/ticker/price";
+  const url = `${baseUrl}${endpoint}`;
+  const response = await axios.get(url, {
     params: { symbol },
   });
-  const tickerPrice: TTickerPrice = response.data;
+  const tickerPrice: TSymbolPriceTicker = response.data;
   return tickerPrice;
 };
 
-const getTickersPrice = async (): Promise<TTickerPrice[]> => {
-  const response = await axios.get(tickerPriceUrl);
-  const tickersPrice: TTickerPrice[] = response.data;
+const getSymbolPriceTickers = async (): Promise<TSymbolPriceTicker[]> => {
+  const endpoint = "/fapi/v2/ticker/price";
+  const url = `${baseUrl}${endpoint}`;
+  const response = await axios.get(url);
+  const tickersPrice: TSymbolPriceTicker[] = response.data;
   return tickersPrice;
 };
 
-const getSymbolPriceNow = async (symbol: string): Promise<number> => {
-  const symbolPrice = await getTickerPrice(symbol);
-  if ("price" in symbolPrice) {
-    return parseFloat(symbolPrice.price);
-  }
-};
+const getOrdersFromToday1Am = async (): Promise<TOrder[]> => {
+  const endpoint = "/fapi/v1/allOrders";
+  const paramsNow = { ...commonParams, timestamp: Date.now() };
+  const params = {
+    ...paramsNow,
+    startTime: getTimestampOfToday1AM(),
+  };
+  const queryString = paramsToQueryWithSignature(secret, params);
+  const url = `${baseUrl}${endpoint}?${queryString}`;
+  const response = await axios.get(url, commonAxiosOpt);
+  const orders = response.data;
 
-const getSymbolClosePrice = async (symbol: string): Promise<TSymbolPrice> => {
-  let price = 0;
-  let timestamp = "";
-  const ohlcv = await binance.fetchOHLCV(symbol, "1m", undefined, 1);
-  if (ohlcv.length) {
-    const lastOHLCV = ohlcv[0];
-    if (lastOHLCV.length >= 5) {
-      //[time, open, high, low, close, volum]
-      timestamp = lastOHLCV[0].toString();
-      price = lastOHLCV[4];
-    }
-  }
-  return { timestamp, symbol, price };
-};
-
-const getAllSymbol = async () => {
-  const tickersPrice = await getTickersPrice();
-  const symbols = tickersPrice.map((ticker) => {
-    return ticker.symbol;
-  });
-  return symbols;
-};
-
-const getSymbolsClosePrice = async (
-  symbols: string[]
-): Promise<TSymbolPrice[]> => {
-  return Promise.all(
-    symbols.map((symbol) => {
-      return getSymbolClosePrice(symbol);
-    })
-  );
-};
-
-const getOrderHistory = async (symbol: string) => {
-  const orders = await binance.fetchOrders(symbol);
   return orders;
-};
-
-const getTradeHistory = async (symbol: string) => {
-  const tradeList = await binance.fetchMyTrades(symbol);
-  return tradeList;
 };
 
 const createMarketOrder = async (
   symbol: string,
-  side: "buy" | "sell",
-  amount: number,
-  price?: number
-) => {
-  const newMarketOrder = binance.createMarketOrder(symbol, side, amount, price);
+  side: "BUY" | "SELL",
+  quantity: number,
+  type: string = "market",
+  _price?: number
+): Promise<TResponse<TNewOrder>> => {
+  try {
+    const endpoint = "/fapi/v1/order";
+    const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+    let orderParams = {
+      symbol,
+      type,
+      quantity,
+      side,
+      ...paramsNow,
+    };
+    const queryString = paramsToQueryWithSignature(secret, orderParams);
+    const response = await fetch(`${baseUrl}${endpoint}?${queryString}`, {
+      method: "POST",
+      headers: {
+        "X-MBX-APIKEY": apiKey,
+        "Content-Type": "application/json",
+      },
+    });
 
-  return newMarketOrder;
+    if (response.status === 200 || response.status === 201) {
+      const data: TNewOrder = await response.json();
+      return {
+        success: true,
+        data: data,
+      };
+    } else {
+      const err: TCreateOrderErr = await response.json();
+      return {
+        success: false,
+        error: err,
+        payload: orderParams,
+      };
+    }
+  } catch (err) {
+    console.log("err msg", err);
+  }
 };
 
 export default {
-  getMyBalance,
-  getTickerPrice,
-  getTickersPrice,
-  getOrderHistory,
-  getTradeHistory,
+  getSymbolPriceTicker,
+  getSymbolPriceTickers,
   createMarketOrder,
-  getSymbolPriceNow,
-  getSymbolClosePrice,
-  getSymbolsClosePrice,
-  getAllSymbol,
-  fetchMyBalance,
+  getSymbolPriceTickers1Am,
+  getPositions,
+  getAccountInfo,
+  getOrdersFromToday1Am,
 };

@@ -27,34 +27,26 @@ export const ListOrderChain = () => {
     fetchOrderChains();
   }, []);
 
-  // useEffect(() => {
-  //   socket?.on(
-  //     "new-order",
-  //     (direction, transaction_size, percent_change, price, symbol) => {
-  //       // console.log(direction, transaction_size, percent_change, price, symbol);
-  //       const toastNotiMsg = `Lênh mới được tạo: ${direction} ${transaction_size} USD của ${symbol} giá ${price} USD với %giá thay đổi ${percent_change}`;
-  //       // toast.success("toastNotiMsg");
-  //       toast.success(toastNotiMsg);
-
-  //       fetchOrderChains();
-  //     }
-  //   );
-  //   return () => {
-  //     socket?.off("new-order");
-  //   };
-  // }, []);
-
   useEffect(() => {
-    socket?.on("new-orders", (nums_of_order: number) => {
-      // console.log(direction, transaction_size, percent_change, price, symbol);
-      const toastNotiMsg = `Có ${nums_of_order} lệnh mới được tạo`;
-      // toast.success("toastNotiMsg");
-      toast.success(toastNotiMsg);
+    socket?.on(
+      "bot-tick",
+      (
+        nums_of_order: number,
+        num_of_success_order: number,
+        num_of_error_order: number
+      ) => {
+        const infoMsg = `Có ${nums_of_order} lệnh được đặt`;
+        const successMsg = `Có ${num_of_success_order} lệnh thành công`;
+        const errorMsg = `Có ${num_of_error_order} lệnh thất bại`;
+        toast.info(infoMsg);
+        toast.success(successMsg);
+        toast.error(errorMsg);
 
-      fetchOrderChains();
-    });
+        fetchOrderChains();
+      }
+    );
     return () => {
-      socket?.off("new-orders");
+      socket?.off("bot-tick");
     };
   }, []);
 
@@ -73,7 +65,7 @@ export const ListOrderChain = () => {
       fetchOrderChains();
     });
     return () => {
-      socket?.off("new-order");
+      socket?.off("bot-quit");
     };
   }, []);
   return (
@@ -103,12 +95,9 @@ const OrderChain = (props: IMarketOrderChainRecord) => {
     order_pieces,
     id,
     status,
-    total_balance_start,
     transaction_size_start,
     percent_to_buy,
     percent_to_sell,
-    total_balance_end,
-    percent_change,
   } = props;
 
   return (
@@ -154,25 +143,6 @@ const OrderChain = (props: IMarketOrderChainRecord) => {
               percent_to_sell:{" "}
               <Typography sx={{ fontWeight: 600 }} component={"span"}>
                 {percent_to_sell}%
-              </Typography>
-            </Typography>
-            {/*  */}
-            <Typography>
-              total_balance_start:{" "}
-              <Typography sx={{ fontWeight: 600 }} component={"span"}>
-                {total_balance_start}
-              </Typography>
-            </Typography>
-            <Typography>
-              total_balance_end:{" "}
-              <Typography sx={{ fontWeight: 600 }} component={"span"}>
-                {total_balance_end}
-              </Typography>
-            </Typography>
-            <Typography>
-              percent_change:{" "}
-              <Typography sx={{ fontWeight: 600 }} component={"span"}>
-                {percent_change}%
               </Typography>
             </Typography>
           </Stack>

@@ -1,81 +1,111 @@
 import { IMarketOrderChainEntity } from "market-order-chain.interface";
-import {
-  IMarketOrderPieceCreate,
-  IMarketOrderPieceEntity,
-} from "market-order-piece.interface";
-import moment from "moment";
+import { IMarketOrderPieceCreate } from "market-order-piece.interface";
 import binanceService from "../services/binance.service";
-import coinService from "../services/coin.service";
+import logService from "../services/log.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import marketOrderPieceService from "../services/market-order-piece.service";
-import { arrayToMap } from "./get-price-of-symbols";
-import logService from "../services/log.service";
+import {
+  TNewOrder,
+  TOrder,
+  TResponSuccess,
+  TResponse,
+  TResponseFailure,
+} from "../types/order";
+import { TPosition } from "../types/position";
+import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
+import { connectDatabase } from "./db-connect";
+import { ILogCreate } from "log.interface";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
     console.log("start tick");
     try {
-      // fetch now symbols price
-      const symbols = await coinService.getAllSymbolsDB();
-      const prices = await binanceService.getSymbolsClosePrice(symbols);
-      global.symbolsPriceMap = arrayToMap(prices);
-      global.wsServerGlob.emit("symbols-price", prices);
+      // fetch symbolPriceTickers now
+      const symbolPriceTickers = await binanceService.getSymbolPriceTickers();
+      const symbolPriceTickersMap = symbolPriceTickersToMap(symbolPriceTickers);
+      global.wsServerGlob.emit("symbols-price", symbolPriceTickers);
 
-      // calculate total
-      const { total_balance_usdt, totalUSDT, coins } = await calCulateBalance();
+      // fetch chain open
+      const openChain = await getChainOpen();
+      if (openChain) {
+        // fetch symbolPriceTickers 1AM from DB
+        const symbolPriceTickers1Am =
+          await binanceService.getSymbolPriceTickers1Am();
+        const symbolPriceTickers1AmMap = symbolPriceTickersToMap(
+          symbolPriceTickers1Am
+        );
+
+        // // fetch list position
+        const positions = await binanceService.getPositions();
+        const positionsMap = positionsToMap(positions);
+
+        // // fetch list Orders Today
+        const ordersFrom1Am = await binanceService.getOrdersFromToday1Am();
+        const ordersFrom1AmMap = ordersToMap(ordersFrom1Am); // last order of each symbol
+
+        // gen order params
+        const orderParams = genMarketOrderParams(
+          symbolPriceTickersMap,
+          symbolPriceTickers1AmMap,
+          positionsMap,
+          ordersFrom1AmMap,
+          openChain
+        );
+
+        const createdOrders = await makeOrders(orderParams);
+        const successOrders = filterOrder(
+          createdOrders,
+          true
+        ) as TResponSuccess<TNewOrder>[];
+        const failureOrders = filterOrder(
+          createdOrders,
+          false
+        ) as TResponseFailure[];
+
+        console.log(
+          "success orders: ",
+          successOrders,
+          " failedOrders: ",
+          failureOrders
+        );
+        console.log(
+          "success orders: ",
+          successOrders.length,
+          " failedOrders: ",
+          failureOrders.length
+        );
+        const successOrdersData = successOrders.map((order) => {
+          return order.data;
+        });
+
+        const logParmas = genLogParams(failureOrders, openChain.id);
+        await saveLogs(logParmas);
+
+        const orderPieceParams = genOrderPieceParams(
+          successOrdersData,
+          orderParams,
+          openChain.id
+        );
+        await saveOrderPieces(orderPieceParams);
+
+        global.wsServerGlob.emit(
+          "bot-tick",
+          orderParams.length,
+          successOrders.length,
+          failureOrders.length
+        );
+      }
+
+      // fetch balance in account
+      const accInfo = await binanceService.getAccountInfo();
+      const { totalWalletBalance, availableBalance } = accInfo;
       global.wsServerGlob.emit(
         "ws-balance",
-        total_balance_usdt,
-        totalUSDT,
-        coins
+        totalWalletBalance,
+        availableBalance
       );
-
-      // make order
-      const chainOpen = await getChainOpen();
-      if (chainOpen) {
-        const { orderParams, orderPieceParams } = await genOrderParams();
-        console.log(
-          "found ",
-          orderParams.length,
-          " coin need to order is",
-          orderParams
-        );
-        const binanceOrdersCreated = await makeOrders(
-          orderParams,
-          chainOpen.id
-        );
-        console.log("binance order arr", binanceOrdersCreated);
-        const errOrders = binanceOrdersCreated.filter(
-          (order) => order === null
-        );
-        global.wsServerGlob.emit('err-orders',errOrders.length)
-
-        let newOrderPieceParams: IMarketOrderPieceCreate[] = [];
-        for (let createdOrder of binanceOrdersCreated) {
-          if (createdOrder && createdOrder) {
-            for (let orderPieceParam of orderPieceParams) {
-              let createdSymbol =
-                createdOrder.info?.symbol || createdOrder.symbol;
-              let hasBackSlash = createdSymbol.includes("/");
-              if (hasBackSlash) {
-                createdSymbol = createdSymbol.split("/").join("");
-              }
-              if (createdSymbol === orderPieceParam.symbol) {
-                newOrderPieceParams.push({
-                  ...orderPieceParam,
-                  id: createdOrder.id,
-                });
-              }
-            }
-          }
-        }
-
-        // save order pieces
-        console.log("newOrderPieceParams", newOrderPieceParams);
-        const newOrderPieces = await saveOrderPieces(newOrderPieceParams);
-        global.wsServerGlob.emit("new-orders", newOrderPieces.length);
-      }
     } catch (err) {
+      console.log("err", err);
       global.wsServerGlob.emit("app-err", err.message);
     }
 
@@ -85,85 +115,131 @@ const createInterval = () => {
   global.tickInterval = interval;
 };
 
-async function calCulateBalance() {
-  const balances = await binanceService.fetchMyBalance();
-  const balancesTotalObj = balances.total as unknown as {
-    [key: string]: number; // coinName: amount
-  };
-  const currCoins: string[] = Object.keys(balancesTotalObj);
-  let totalUSDT = balancesTotalObj["USDT"];
-  let totalBalancesUSDT = totalUSDT; // init with usdt amount
-  console.log("init balance", totalBalancesUSDT);
-  let coinsBalances: {
-    coin: string;
-    amount: number;
-    price: number;
-    total: number;
-  }[] = [];
+const test = async () => {
+  await connectDatabase();
 
-  // loop to calculate totalBalances to Usdt
-  for (let coinName of currCoins) {
-    let coinSymbolUSDT = coinName + "USDT";
-    let symbolPrice = global.symbolsPriceMap[coinSymbolUSDT]?.price;
+  try {
+    // fetch chain open
+    const openChain = await getChainOpen();
+    if (openChain) {
+      // fetch symbolPriceTickers now
+      const symbolPriceTickers = await binanceService.getSymbolPriceTickers();
+      const symbolPriceTickersMap = symbolPriceTickersToMap(symbolPriceTickers);
 
-    if (symbolPrice) {
-      let coinAmount = balancesTotalObj[coinName];
-      let coinTotal = coinAmount * symbolPrice;
-      let coinObj = {
-        coin: coinName,
-        amount: coinAmount,
-        price: symbolPrice,
-        total: coinTotal,
-      };
+      // fetch symbolPriceTickers 1AM from DB
+      const symbolPriceTickers1Am =
+        await binanceService.getSymbolPriceTickers1Am();
+      const symbolPriceTickers1AmMap = symbolPriceTickersToMap(
+        symbolPriceTickers1Am
+      );
 
-      totalBalancesUSDT += coinTotal;
-      coinsBalances.push(coinObj);
+      // // fetch list position
+      const positions = await binanceService.getPositions();
+      const positionsMap = positionsToMap(positions);
+
+      // // fetch list Orders Today
+      const ordersFrom1Am = await binanceService.getOrdersFromToday1Am();
+      const ordersFrom1AmMap = ordersToMap(ordersFrom1Am); // last order of each symbol
+
+      // gen order params
+      const orderParams = genMarketOrderParams(
+        symbolPriceTickersMap,
+        symbolPriceTickers1AmMap,
+        positionsMap,
+        ordersFrom1AmMap,
+        openChain
+      );
+
+      const createdOrders = await makeOrders(orderParams);
+      const successOrders = filterOrder(
+        createdOrders,
+        true
+      ) as TResponSuccess<TNewOrder>[];
+      const failureOrders = filterOrder(
+        createdOrders,
+        false
+      ) as TResponseFailure[];
+
+      console.log(
+        "success orders: ",
+        successOrders,
+        " failedOrders: ",
+        failureOrders
+      );
+      console.log(
+        "success orders: ",
+        successOrders.length,
+        " failedOrders: ",
+        failureOrders.length
+      );
+      const successOrdersData = successOrders.map((order) => {
+        return order.data;
+      });
+
+      const logParmas = genLogParams(failureOrders, openChain.id);
+      await saveLogs(logParmas);
+
+      const orderPieceParams = genOrderPieceParams(
+        successOrdersData,
+        orderParams,
+        openChain.id
+      );
+      await saveOrderPieces(orderPieceParams);
     }
+  } catch (err) {
+    console.log("err", err);
+    // global.wsServerGlob.emit("app-err", err.message);
   }
-
-  // log info to console
-  let consoleMsg = `Total: ${currCoins.length} in balance, calculated: ${
-    coinsBalances.length
-  }, can't calculated: ${currCoins.length - coinsBalances.length}`;
-  console.log(consoleMsg);
-
-  // save to global
-  global.totalBalancesUSDT = totalBalancesUSDT;
-
-  return {
-    totalUSDT,
-    total_balance_usdt: totalBalancesUSDT,
-    coins: coinsBalances,
-  };
-}
+};
+// test();
 
 type TOrderParams = {
   symbol: string;
-  direction: "buy" | "sell";
+  direction: "BUY" | "SELL";
   amount: number;
   percent?: number;
+  order_size?: number;
+  price_ticker?: number;
 };
-async function makeOrders(orderParams: TOrderParams[], chainId: number) {
+async function makeOrders(orderParams: TOrderParams[]) {
   const promises = orderParams.map(async (param) => {
     const { symbol, amount, direction } = param;
     try {
       return await binanceService.createMarketOrder(symbol, direction, amount);
     } catch (error) {
-      let errorMsg = `Error creating ${direction} order for ${amount.toFixed(
-        5
-      )} of ${symbol}: ${error.message}`;
-      console.error(errorMsg);
-      await logService.create({
-        market_order_chains_id: chainId,
-        message: errorMsg,
-        type: "order-err",
-      });
-      // Return a placeholder value or handle the error as needed
-      return null; // or throw error; depending on your error handling strategy
+      console.log("error", error);
     }
   });
 
   return Promise.all(promises);
+}
+function genOrderPieceParams(
+  newOrders: TNewOrder[],
+  orderParams: TOrderParams[],
+  chainId: number
+): IMarketOrderPieceCreate[] {
+  let orderPieceParams: IMarketOrderPieceCreate[] = [];
+
+  for (let newOrder of newOrders) {
+    for (let orderParam of orderParams) {
+      if (newOrder?.symbol === orderParam.symbol) {
+        let orderPiceParam: IMarketOrderPieceCreate = {
+          id: newOrder.orderId.toString(),
+          market_order_chains_id: chainId,
+          amount: orderParam.amount.toString(),
+          direction: orderParam.direction,
+          percent_change: orderParam.percent.toFixed(5),
+          symbol: orderParam.symbol,
+          price: orderParam.price_ticker.toString(),
+          total_balance: "0.00", // can't defined
+          transaction_size: orderParam.order_size.toString(),
+        };
+        orderPieceParams.push(orderPiceParam);
+      }
+    }
+  }
+
+  return orderPieceParams;
 }
 async function saveOrderPieces(orderPieceParams: IMarketOrderPieceCreate[]) {
   return Promise.all(
@@ -172,124 +248,186 @@ async function saveOrderPieces(orderPieceParams: IMarketOrderPieceCreate[]) {
     })
   );
 }
-async function genOrderParams() {
-  // to get able symbols, each symbols should be calculate percent price change
-  const symbols = Object.keys(global.symbolsPriceMap);
-  // get today orderPieces map
-  const orderPiecesMap = await toDayOrderPiecesMap();
-  // get coin 1 am prices map
-  const coin1AmPricesMap = await coin1AmSymbolPricesMap();
-  // init order params
-  let orderParams: TOrderParams[] = [];
-  let orderPieceParams: Omit<IMarketOrderPieceCreate, "id">[] = [];
-  // get chain is open
-  const openChain = await getChainOpen();
-  const { percent_to_buy, percent_to_sell, transaction_size_start } = openChain;
-  const percentToBuy = parseFloat(percent_to_buy);
-  const percentToSell = parseFloat(percent_to_sell);
 
-  for (let symbolKey of symbols) {
-    let transaction_size: number = transaction_size_start;
-    let percentChange: number = 0;
-    let currPrice = global.symbolsPriceMap[symbolKey].price;
-    let isTodayHasOrder: boolean;
-
-    // already have order today
-    if (symbolKey in orderPiecesMap) {
-      let prevPrice = parseFloat(orderPiecesMap[symbolKey].price);
-      percentChange = (currPrice / prevPrice - 1) * 100;
-      isTodayHasOrder = true;
-    }
-    // first order of day
-    else {
-      let prevPrice = parseFloat(coin1AmPricesMap[symbolKey].price);
-      percentChange = (currPrice / prevPrice - 1) * 100;
-      isTodayHasOrder = false;
-    }
-
-    let direction: "buy" | "sell" | null = null;
-    if (percentChange >= percentToBuy) direction = "buy";
-    if (percentChange <= percentToSell) direction = "sell";
-    if (percentChange < percentToSell && percentChange > percentToBuy)
-      direction = null;
-
-    // define transaction_size
-    if (isTodayHasOrder) {
-      let base = direction === "buy" ? 2 : 0.5;
-      transaction_size =
-        parseFloat(orderPiecesMap[symbolKey].transaction_size) * base;
-    } else {
-      transaction_size =
-        direction === "buy"
-          ? transaction_size_start
-          : transaction_size_start / 2;
-    }
-
-    // define param
-    if (direction) {
-      let orderParam: TOrderParams = {
-        amount: transaction_size / currPrice,
-        direction,
-        symbol: symbolKey,
-      };
-      orderParams.push(orderParam);
-
-      let orderPieceParam: Omit<IMarketOrderPieceCreate, "id"> = {
-        direction,
-        market_order_chains_id: openChain.id,
-        percent_change: percentChange.toString(),
-        price: currPrice.toString(),
-        symbol: symbolKey,
-        total_balance: "0.0000",
-        amount: (transaction_size / currPrice).toString(),
-        transaction_size: transaction_size.toString(),
-      };
-      orderPieceParams.push(orderPieceParam);
-    }
+function genLogParams(
+  failedOrders: TResponseFailure[],
+  chainId: number
+): ILogCreate[] {
+  let params: ILogCreate[] = [];
+  for (let failedOrder of failedOrders) {
+    let {
+      error: { code, msg },
+    } = failedOrder;
+    let orderInfo = failedOrder?.payload;
+    params.push({
+      message: `code: ${code}, message: ${msg}, ${JSON.stringify(orderInfo)}`,
+      market_order_chains_id: chainId,
+      type: "order-err",
+    });
   }
-
-  return { orderParams, orderPieceParams };
+  return params;
+}
+async function saveLogs(logParams: ILogCreate[]) {
+  return Promise.all(
+    logParams.map(async (param) => {
+      return await logService.create(param);
+    })
+  );
 }
 
-type ICoinPricesMap = { [symbol: string]: { symbol: string; price: string } };
-async function coin1AmSymbolPricesMap() {
-  const coin1AmPrices = await coinService.list();
-  let res: ICoinPricesMap = {};
-  for (let piece of coin1AmPrices) {
-    let key = piece.symbol;
-    if (!(key in res)) {
-      res[key] = piece;
-    }
-  }
-  return res;
-}
-
-async function toDayOrderPiecesMap() {
-  const orderPieces = await marketOrderPieceService.list({
-    createdAt: moment().format("YYYY-MM-DD"),
-  });
-  const orderPiecesMap = createOrderPiecesMap(orderPieces);
-  return orderPiecesMap;
+function filterOrder(newOrders: TResponse<TNewOrder>[], success: boolean) {
+  return newOrders.filter((newOrder) => newOrder.success === success);
 }
 
 // if order with same symbol, get only 1 latest order
-type IOrderPiecesMap = { [symbol: string]: IMarketOrderPieceEntity };
-function createOrderPiecesMap(
-  orderPieces: IMarketOrderPieceEntity[]
-): IOrderPiecesMap {
-  let res: IOrderPiecesMap = {};
-  for (let piece of orderPieces) {
-    let key = piece.symbol;
-    if (!(key in res)) {
-      res[key] = piece;
-    }
-  }
-  return res;
-}
 async function getChainOpen(): Promise<IMarketOrderChainEntity | null> {
   const openChain = await marketOrderChainService.list({ status: "open" });
   if (openChain.length) return openChain[0];
   else return null;
 }
 
+function symbolPriceTickersToMap<T extends Omit<TSymbolPriceTicker, "time">>(
+  symbolPriceTickers: T[]
+) {
+  let res: Record<string, T> = {};
+
+  for (let symbolPrice of symbolPriceTickers) {
+    let key = symbolPrice.symbol;
+    if (!(key in res)) {
+      res[key] = symbolPrice;
+    }
+  }
+  return res;
+}
+
+function positionsToMap(positions: TPosition[]) {
+  let res: Record<string, TPosition> = {};
+  for (let position of positions) {
+    let key = position.symbol;
+    if (!(key in res)) {
+      res[key] = position;
+    }
+  }
+  return res;
+}
+
+function ordersToMap(orders: TOrder[]): Record<string, TOrder> {
+  let res: Record<string, TOrder> = {};
+
+  // lastest order first
+  const sortOrders = orders.sort((a, b) => b.time - a.time);
+  for (let order of sortOrders) {
+    let key = order.symbol;
+    if (!(key in res)) {
+      res[key] = order;
+    }
+  }
+  return res;
+}
+
+function genMarketOrderParams(
+  symbolPriceTickersMap: Record<string, TSymbolPriceTicker>,
+  symbolPriceTickers1AmMap: Record<string, Omit<TSymbolPriceTicker, "time">>,
+  positionsMap: Record<string, TPosition>,
+  ordersFrom1AmMap: Record<string, TOrder>,
+  openChain: IMarketOrderChainEntity
+) {
+  try {
+    const { percent_to_buy, percent_to_sell, transaction_size_start } =
+      openChain;
+    let orderParams: TOrderParams[] = [];
+    // loop through symbolPriceTickers
+    const symbols = Object.keys(symbolPriceTickersMap);
+    for (let symbol of symbols) {
+      // get prev price
+      let prevPrice = parseFloat(symbolPriceTickers1AmMap[symbol]?.price);
+      // check to day has order
+      let todayLatestOrder = ordersFrom1AmMap[symbol];
+      if (todayLatestOrder) {
+        prevPrice = parseFloat(todayLatestOrder.avgPrice);
+      }
+      // get current price
+      let currPrice = parseFloat(symbolPriceTickersMap[symbol]?.price);
+
+      // check if need to skip, continue to next symbol
+      if (!prevPrice || !currPrice) {
+        continue;
+      }
+
+      // calculate percentChange
+      const percent_change = (currPrice / prevPrice - 1) * 100;
+
+      // direction and order_size
+      let direction: "BUY" | "SELL" | "" = "";
+      let order_size = transaction_size_start;
+      if (percent_change <= parseFloat(percent_to_sell)) {
+        direction = "SELL";
+        if (todayLatestOrder) {
+          let prevSize =
+            parseFloat(todayLatestOrder.avgPrice) *
+            parseFloat(todayLatestOrder.origQty);
+          order_size = prevSize / 2;
+        }
+      }
+      if (percent_change >= parseFloat(percent_to_buy)) {
+        direction = "BUY";
+        if (todayLatestOrder) {
+          let prevSize =
+            parseFloat(todayLatestOrder.avgPrice) *
+            parseFloat(todayLatestOrder.origQty);
+          order_size = prevSize * 2;
+        }
+      }
+      let amount = order_size / currPrice;
+      if (direction !== "") {
+        // check if amount able
+        if (direction === "SELL") {
+          const currPosition = positionsMap[symbol];
+          if (currPosition) {
+            const positionAmt = parseFloat(currPosition.positionAmt);
+            if (!positionAmt) continue; // if don't have this position so skip
+            if (positionAmt < amount) amount = positionAmt;
+          }
+        }
+
+        orderParams.push({
+          amount: validateAmount(amount),
+          direction,
+          symbol,
+          percent: percent_change,
+          order_size,
+          price_ticker: currPrice,
+        });
+
+        console.log(
+          "symbol: ",
+          symbol,
+          " today has order: ",
+          Boolean(todayLatestOrder),
+          " prevPrice: ",
+          prevPrice.toFixed(3),
+          " currPrice: ",
+          currPrice.toFixed(3),
+          " percentChange: ",
+          percent_change,
+          " direction: ",
+          direction,
+          " size: ",
+          order_size,
+          " amont: ",
+          amount
+        );
+      }
+    }
+    console.log("total", orderParams.length, " orders");
+    return orderParams;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function validateAmount(amount: number) {
+  if (amount >= 1) return Math.round(amount);
+  if (amount < 1) return Math.round(amount * 1e3) / 1e3;
+}
 export { createInterval };

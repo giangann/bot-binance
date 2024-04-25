@@ -19,20 +19,12 @@ export const cronJobSchedule = async () => {
   task.start();
 };
 
-async function crawCoinPrices() {
-  const symbols = await binanceService.getAllSymbol();
-  const prices = await binanceService.getSymbolsClosePrice(symbols);
-
-  return prices;
-}
-
 async function updateCoinTable() {
   try {
-    const coins = await crawCoinPrices();
+    const symbolPriceTickersNow = await binanceService.getSymbolPriceTickers();
     const updatedCoins = await Promise.all(
-      coins.map((coin) => {
-        let coinParams = { ...coin, price: coin.price.toString() };
-        return coinService.update(coinParams);
+      symbolPriceTickersNow.map((symbolPrice) => {
+        return coinService.update(symbolPrice);
       })
     );
     return updatedCoins;

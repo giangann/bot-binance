@@ -28,20 +28,12 @@ const cronJobSchedule = () => __awaiter(void 0, void 0, void 0, function* () {
     task.start();
 });
 exports.cronJobSchedule = cronJobSchedule;
-function crawCoinPrices() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const symbols = yield binance_service_1.default.getAllSymbol();
-        const prices = yield binance_service_1.default.getSymbolsClosePrice(symbols);
-        return prices;
-    });
-}
 function updateCoinTable() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const coins = yield crawCoinPrices();
-            const updatedCoins = yield Promise.all(coins.map((coin) => {
-                let coinParams = Object.assign(Object.assign({}, coin), { price: coin.price.toString() });
-                return coin_service_1.default.update(coinParams);
+            const symbolPriceTickersNow = yield binance_service_1.default.getSymbolPriceTickers();
+            const updatedCoins = yield Promise.all(symbolPriceTickersNow.map((symbolPrice) => {
+                return coin_service_1.default.update(symbolPrice);
             }));
             return updatedCoins;
         }

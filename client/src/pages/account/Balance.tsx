@@ -8,12 +8,11 @@ export const Balance = () => {
   const socket = useContext(SocketContext);
 
   useEffect(() => {
-    socket?.on("ws-balance", (newTotal, totalUSDT) => {
-      console.log(newTotal, totalUSDT);
+    socket?.on("ws-balance", (totalWalletBalance, availableBalance) => {
       setBalance({
         ...balance,
-        total: newTotal,
-        usdt: totalUSDT,
+        totalWalletBalance,
+        availableBalance,
       });
     });
     return () => {
@@ -24,10 +23,14 @@ export const Balance = () => {
     <Box>
       <Typography variant="h6">Your balance</Typography>
       {/* total, coin avaiable */}
-      {balance.total ? (
+      {balance.totalWalletBalance ? (
         <>
-          <Typography>Total: {balance.total} $</Typography>
-          <Typography>USDT: {balance.usdt} $</Typography>
+          <Typography>
+            totalWalletBalance: {balance.totalWalletBalance} $
+          </Typography>
+          <Typography>
+            availableBalance: {balance.availableBalance} $
+          </Typography>
         </>
       ) : (
         <Skeleton

@@ -13,57 +13,54 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createInterval = void 0;
-const moment_1 = __importDefault(require("moment"));
 const binance_service_1 = __importDefault(require("../services/binance.service"));
-const coin_service_1 = __importDefault(require("../services/coin.service"));
+const log_service_1 = __importDefault(require("../services/log.service"));
 const market_order_chain_service_1 = __importDefault(require("../services/market-order-chain.service"));
 const market_order_piece_service_1 = __importDefault(require("../services/market-order-piece.service"));
-const get_price_of_symbols_1 = require("./get-price-of-symbols");
-const log_service_1 = __importDefault(require("../services/log.service"));
+const db_connect_1 = require("./db-connect");
 const createInterval = () => {
     const interval = setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
         console.log("start tick");
         try {
-            // fetch now symbols price
-            const symbols = yield coin_service_1.default.getAllSymbolsDB();
-            const prices = yield binance_service_1.default.getSymbolsClosePrice(symbols);
-            global.symbolsPriceMap = (0, get_price_of_symbols_1.arrayToMap)(prices);
-            global.wsServerGlob.emit("symbols-price", prices);
-            // calculate total
-            const { total_balance_usdt, totalUSDT, coins } = yield calCulateBalance();
-            global.wsServerGlob.emit("ws-balance", total_balance_usdt, totalUSDT, coins);
-            // make order
-            const chainOpen = yield getChainOpen();
-            if (chainOpen) {
-                const { orderParams, orderPieceParams } = yield genOrderParams();
-                console.log("found ", orderParams.length, " coin need to order is", orderParams);
-                const binanceOrdersCreated = yield makeOrders(orderParams, chainOpen.id);
-                console.log("binance order arr", binanceOrdersCreated);
-                const errOrders = binanceOrdersCreated.filter((order) => order === null);
-                global.wsServerGlob.emit('err-orders', errOrders.length);
-                let newOrderPieceParams = [];
-                for (let createdOrder of binanceOrdersCreated) {
-                    if (createdOrder && createdOrder) {
-                        for (let orderPieceParam of orderPieceParams) {
-                            let createdSymbol = ((_a = createdOrder.info) === null || _a === void 0 ? void 0 : _a.symbol) || createdOrder.symbol;
-                            let hasBackSlash = createdSymbol.includes("/");
-                            if (hasBackSlash) {
-                                createdSymbol = createdSymbol.split("/").join("");
-                            }
-                            if (createdSymbol === orderPieceParam.symbol) {
-                                newOrderPieceParams.push(Object.assign(Object.assign({}, orderPieceParam), { id: createdOrder.id }));
-                            }
-                        }
-                    }
-                }
-                // save order pieces
-                console.log("newOrderPieceParams", newOrderPieceParams);
-                const newOrderPieces = yield saveOrderPieces(newOrderPieceParams);
-                global.wsServerGlob.emit("new-orders", newOrderPieces.length);
+            // fetch symbolPriceTickers now
+            const symbolPriceTickers = yield binance_service_1.default.getSymbolPriceTickers();
+            const symbolPriceTickersMap = symbolPriceTickersToMap(symbolPriceTickers);
+            global.wsServerGlob.emit("symbols-price", symbolPriceTickers);
+            // fetch chain open
+            const openChain = yield getChainOpen();
+            if (openChain) {
+                // fetch symbolPriceTickers 1AM from DB
+                const symbolPriceTickers1Am = yield binance_service_1.default.getSymbolPriceTickers1Am();
+                const symbolPriceTickers1AmMap = symbolPriceTickersToMap(symbolPriceTickers1Am);
+                // // fetch list position
+                const positions = yield binance_service_1.default.getPositions();
+                const positionsMap = positionsToMap(positions);
+                // // fetch list Orders Today
+                const ordersFrom1Am = yield binance_service_1.default.getOrdersFromToday1Am();
+                const ordersFrom1AmMap = ordersToMap(ordersFrom1Am); // last order of each symbol
+                // gen order params
+                const orderParams = genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, ordersFrom1AmMap, openChain);
+                const createdOrders = yield makeOrders(orderParams);
+                const successOrders = filterOrder(createdOrders, true);
+                const failureOrders = filterOrder(createdOrders, false);
+                console.log("success orders: ", successOrders, " failedOrders: ", failureOrders);
+                console.log("success orders: ", successOrders.length, " failedOrders: ", failureOrders.length);
+                const successOrdersData = successOrders.map((order) => {
+                    return order.data;
+                });
+                const logParmas = genLogParams(failureOrders, openChain.id);
+                yield saveLogs(logParmas);
+                const orderPieceParams = genOrderPieceParams(successOrdersData, orderParams, openChain.id);
+                yield saveOrderPieces(orderPieceParams);
+                global.wsServerGlob.emit("bot-tick", orderParams.length, successOrders.length, failureOrders.length);
             }
+            // fetch balance in account
+            const accInfo = yield binance_service_1.default.getAccountInfo();
+            const { totalWalletBalance, availableBalance } = accInfo;
+            global.wsServerGlob.emit("ws-balance", totalWalletBalance, availableBalance);
         }
         catch (err) {
+            console.log("err", err);
             global.wsServerGlob.emit("app-err", err.message);
         }
         console.log("emit and end tick");
@@ -71,46 +68,46 @@ const createInterval = () => {
     global.tickInterval = interval;
 };
 exports.createInterval = createInterval;
-function calCulateBalance() {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const balances = yield binance_service_1.default.fetchMyBalance();
-        const balancesTotalObj = balances.total;
-        const currCoins = Object.keys(balancesTotalObj);
-        let totalUSDT = balancesTotalObj["USDT"];
-        let totalBalancesUSDT = totalUSDT; // init with usdt amount
-        console.log("init balance", totalBalancesUSDT);
-        let coinsBalances = [];
-        // loop to calculate totalBalances to Usdt
-        for (let coinName of currCoins) {
-            let coinSymbolUSDT = coinName + "USDT";
-            let symbolPrice = (_a = global.symbolsPriceMap[coinSymbolUSDT]) === null || _a === void 0 ? void 0 : _a.price;
-            if (symbolPrice) {
-                let coinAmount = balancesTotalObj[coinName];
-                let coinTotal = coinAmount * symbolPrice;
-                let coinObj = {
-                    coin: coinName,
-                    amount: coinAmount,
-                    price: symbolPrice,
-                    total: coinTotal,
-                };
-                totalBalancesUSDT += coinTotal;
-                coinsBalances.push(coinObj);
-            }
+const test = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, db_connect_1.connectDatabase)();
+    try {
+        // fetch chain open
+        const openChain = yield getChainOpen();
+        if (openChain) {
+            // fetch symbolPriceTickers now
+            const symbolPriceTickers = yield binance_service_1.default.getSymbolPriceTickers();
+            const symbolPriceTickersMap = symbolPriceTickersToMap(symbolPriceTickers);
+            // fetch symbolPriceTickers 1AM from DB
+            const symbolPriceTickers1Am = yield binance_service_1.default.getSymbolPriceTickers1Am();
+            const symbolPriceTickers1AmMap = symbolPriceTickersToMap(symbolPriceTickers1Am);
+            // // fetch list position
+            const positions = yield binance_service_1.default.getPositions();
+            const positionsMap = positionsToMap(positions);
+            // // fetch list Orders Today
+            const ordersFrom1Am = yield binance_service_1.default.getOrdersFromToday1Am();
+            const ordersFrom1AmMap = ordersToMap(ordersFrom1Am); // last order of each symbol
+            // gen order params
+            const orderParams = genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, ordersFrom1AmMap, openChain);
+            const createdOrders = yield makeOrders(orderParams);
+            const successOrders = filterOrder(createdOrders, true);
+            const failureOrders = filterOrder(createdOrders, false);
+            console.log("success orders: ", successOrders, " failedOrders: ", failureOrders);
+            console.log("success orders: ", successOrders.length, " failedOrders: ", failureOrders.length);
+            const successOrdersData = successOrders.map((order) => {
+                return order.data;
+            });
+            const logParmas = genLogParams(failureOrders, openChain.id);
+            yield saveLogs(logParmas);
+            const orderPieceParams = genOrderPieceParams(successOrdersData, orderParams, openChain.id);
+            yield saveOrderPieces(orderPieceParams);
         }
-        // log info to console
-        let consoleMsg = `Total: ${currCoins.length} in balance, calculated: ${coinsBalances.length}, can't calculated: ${currCoins.length - coinsBalances.length}`;
-        console.log(consoleMsg);
-        // save to global
-        global.totalBalancesUSDT = totalBalancesUSDT;
-        return {
-            totalUSDT,
-            total_balance_usdt: totalBalancesUSDT,
-            coins: coinsBalances,
-        };
-    });
-}
-function makeOrders(orderParams, chainId) {
+    }
+    catch (err) {
+        console.log("err", err);
+        // global.wsServerGlob.emit("app-err", err.message);
+    }
+});
+function makeOrders(orderParams) {
     return __awaiter(this, void 0, void 0, function* () {
         const promises = orderParams.map((param) => __awaiter(this, void 0, void 0, function* () {
             const { symbol, amount, direction } = param;
@@ -118,19 +115,33 @@ function makeOrders(orderParams, chainId) {
                 return yield binance_service_1.default.createMarketOrder(symbol, direction, amount);
             }
             catch (error) {
-                let errorMsg = `Error creating ${direction} order for ${amount.toFixed(5)} of ${symbol}: ${error.message}`;
-                console.error(errorMsg);
-                yield log_service_1.default.create({
-                    market_order_chains_id: chainId,
-                    message: errorMsg,
-                    type: "order-err",
-                });
-                // Return a placeholder value or handle the error as needed
-                return null; // or throw error; depending on your error handling strategy
+                console.log("error", error);
             }
         }));
         return Promise.all(promises);
     });
+}
+function genOrderPieceParams(newOrders, orderParams, chainId) {
+    let orderPieceParams = [];
+    for (let newOrder of newOrders) {
+        for (let orderParam of orderParams) {
+            if ((newOrder === null || newOrder === void 0 ? void 0 : newOrder.symbol) === orderParam.symbol) {
+                let orderPiceParam = {
+                    id: newOrder.orderId.toString(),
+                    market_order_chains_id: chainId,
+                    amount: orderParam.amount.toString(),
+                    direction: orderParam.direction,
+                    percent_change: orderParam.percent.toFixed(5),
+                    symbol: orderParam.symbol,
+                    price: orderParam.price_ticker.toString(),
+                    total_balance: "0.00", // can't defined
+                    transaction_size: orderParam.order_size.toString(),
+                };
+                orderPieceParams.push(orderPiceParam);
+            }
+        }
+    }
+    return orderPieceParams;
 }
 function saveOrderPieces(orderPieceParams) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -139,114 +150,30 @@ function saveOrderPieces(orderPieceParams) {
         })));
     });
 }
-function genOrderParams() {
-    return __awaiter(this, void 0, void 0, function* () {
-        // to get able symbols, each symbols should be calculate percent price change
-        const symbols = Object.keys(global.symbolsPriceMap);
-        // get today orderPieces map
-        const orderPiecesMap = yield toDayOrderPiecesMap();
-        // get coin 1 am prices map
-        const coin1AmPricesMap = yield coin1AmSymbolPricesMap();
-        // init order params
-        let orderParams = [];
-        let orderPieceParams = [];
-        // get chain is open
-        const openChain = yield getChainOpen();
-        const { percent_to_buy, percent_to_sell, transaction_size_start } = openChain;
-        const percentToBuy = parseFloat(percent_to_buy);
-        const percentToSell = parseFloat(percent_to_sell);
-        for (let symbolKey of symbols) {
-            let transaction_size = transaction_size_start;
-            let percentChange = 0;
-            let currPrice = global.symbolsPriceMap[symbolKey].price;
-            let isTodayHasOrder;
-            // already have order today
-            if (symbolKey in orderPiecesMap) {
-                let prevPrice = parseFloat(orderPiecesMap[symbolKey].price);
-                percentChange = (currPrice / prevPrice - 1) * 100;
-                isTodayHasOrder = true;
-            }
-            // first order of day
-            else {
-                let prevPrice = parseFloat(coin1AmPricesMap[symbolKey].price);
-                percentChange = (currPrice / prevPrice - 1) * 100;
-                isTodayHasOrder = false;
-            }
-            let direction = null;
-            if (percentChange >= percentToBuy)
-                direction = "buy";
-            if (percentChange <= percentToSell)
-                direction = "sell";
-            if (percentChange < percentToSell && percentChange > percentToBuy)
-                direction = null;
-            // define transaction_size
-            if (isTodayHasOrder) {
-                let base = direction === "buy" ? 2 : 0.5;
-                transaction_size =
-                    parseFloat(orderPiecesMap[symbolKey].transaction_size) * base;
-            }
-            else {
-                transaction_size =
-                    direction === "buy"
-                        ? transaction_size_start
-                        : transaction_size_start / 2;
-            }
-            // define param
-            if (direction) {
-                let orderParam = {
-                    amount: transaction_size / currPrice,
-                    direction,
-                    symbol: symbolKey,
-                };
-                orderParams.push(orderParam);
-                let orderPieceParam = {
-                    direction,
-                    market_order_chains_id: openChain.id,
-                    percent_change: percentChange.toString(),
-                    price: currPrice.toString(),
-                    symbol: symbolKey,
-                    total_balance: "0.0000",
-                    amount: (transaction_size / currPrice).toString(),
-                    transaction_size: transaction_size.toString(),
-                };
-                orderPieceParams.push(orderPieceParam);
-            }
-        }
-        return { orderParams, orderPieceParams };
-    });
-}
-function coin1AmSymbolPricesMap() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const coin1AmPrices = yield coin_service_1.default.list();
-        let res = {};
-        for (let piece of coin1AmPrices) {
-            let key = piece.symbol;
-            if (!(key in res)) {
-                res[key] = piece;
-            }
-        }
-        return res;
-    });
-}
-function toDayOrderPiecesMap() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const orderPieces = yield market_order_piece_service_1.default.list({
-            createdAt: (0, moment_1.default)().format("YYYY-MM-DD"),
+function genLogParams(failedOrders, chainId) {
+    let params = [];
+    for (let failedOrder of failedOrders) {
+        let { error: { code, msg }, } = failedOrder;
+        let orderInfo = failedOrder === null || failedOrder === void 0 ? void 0 : failedOrder.payload;
+        params.push({
+            message: `code: ${code}, message: ${msg}, ${JSON.stringify(orderInfo)}`,
+            market_order_chains_id: chainId,
+            type: "order-err",
         });
-        const orderPiecesMap = createOrderPiecesMap(orderPieces);
-        return orderPiecesMap;
+    }
+    return params;
+}
+function saveLogs(logParams) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return Promise.all(logParams.map((param) => __awaiter(this, void 0, void 0, function* () {
+            return yield log_service_1.default.create(param);
+        })));
     });
 }
-function createOrderPiecesMap(orderPieces) {
-    let res = {};
-    for (let piece of orderPieces) {
-        let key = piece.symbol;
-        if (!(key in res)) {
-            res[key] = piece;
-        }
-    }
-    return res;
+function filterOrder(newOrders, success) {
+    return newOrders.filter((newOrder) => newOrder.success === success);
 }
+// if order with same symbol, get only 1 latest order
 function getChainOpen() {
     return __awaiter(this, void 0, void 0, function* () {
         const openChain = yield market_order_chain_service_1.default.list({ status: "open" });
@@ -255,4 +182,115 @@ function getChainOpen() {
         else
             return null;
     });
+}
+function symbolPriceTickersToMap(symbolPriceTickers) {
+    let res = {};
+    for (let symbolPrice of symbolPriceTickers) {
+        let key = symbolPrice.symbol;
+        if (!(key in res)) {
+            res[key] = symbolPrice;
+        }
+    }
+    return res;
+}
+function positionsToMap(positions) {
+    let res = {};
+    for (let position of positions) {
+        let key = position.symbol;
+        if (!(key in res)) {
+            res[key] = position;
+        }
+    }
+    return res;
+}
+function ordersToMap(orders) {
+    let res = {};
+    // lastest order first
+    const sortOrders = orders.sort((a, b) => b.time - a.time);
+    for (let order of sortOrders) {
+        let key = order.symbol;
+        if (!(key in res)) {
+            res[key] = order;
+        }
+    }
+    return res;
+}
+function genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, ordersFrom1AmMap, openChain) {
+    var _a, _b;
+    try {
+        const { percent_to_buy, percent_to_sell, transaction_size_start } = openChain;
+        let orderParams = [];
+        // loop through symbolPriceTickers
+        const symbols = Object.keys(symbolPriceTickersMap);
+        for (let symbol of symbols) {
+            // get prev price
+            let prevPrice = parseFloat((_a = symbolPriceTickers1AmMap[symbol]) === null || _a === void 0 ? void 0 : _a.price);
+            // check to day has order
+            let todayLatestOrder = ordersFrom1AmMap[symbol];
+            if (todayLatestOrder) {
+                prevPrice = parseFloat(todayLatestOrder.avgPrice);
+            }
+            // get current price
+            let currPrice = parseFloat((_b = symbolPriceTickersMap[symbol]) === null || _b === void 0 ? void 0 : _b.price);
+            // check if need to skip, continue to next symbol
+            if (!prevPrice || !currPrice) {
+                continue;
+            }
+            // calculate percentChange
+            const percent_change = (currPrice / prevPrice - 1) * 100;
+            // direction and order_size
+            let direction = "";
+            let order_size = transaction_size_start;
+            if (percent_change <= parseFloat(percent_to_sell)) {
+                direction = "SELL";
+                if (todayLatestOrder) {
+                    let prevSize = parseFloat(todayLatestOrder.avgPrice) *
+                        parseFloat(todayLatestOrder.origQty);
+                    order_size = prevSize / 2;
+                }
+            }
+            if (percent_change >= parseFloat(percent_to_buy)) {
+                direction = "BUY";
+                if (todayLatestOrder) {
+                    let prevSize = parseFloat(todayLatestOrder.avgPrice) *
+                        parseFloat(todayLatestOrder.origQty);
+                    order_size = prevSize * 2;
+                }
+            }
+            let amount = order_size / currPrice;
+            if (direction !== "") {
+                // check if amount able
+                if (direction === "SELL") {
+                    const currPosition = positionsMap[symbol];
+                    if (currPosition) {
+                        const positionAmt = parseFloat(currPosition.positionAmt);
+                        if (!positionAmt)
+                            continue; // if don't have this position so skip
+                        if (positionAmt < amount)
+                            amount = positionAmt;
+                    }
+                }
+                orderParams.push({
+                    amount: validateAmount(amount),
+                    direction,
+                    symbol,
+                    percent: percent_change,
+                    order_size,
+                    price_ticker: currPrice,
+                });
+                console.log("symbol: ", symbol, " today has order: ", Boolean(todayLatestOrder), " prevPrice: ", prevPrice.toFixed(3), " currPrice: ", currPrice.toFixed(3), " percentChange: ", percent_change, " direction: ", direction, " size: ", order_size, " amont: ", amount);
+            }
+        }
+        console.log("total", orderParams.length, " orders");
+        return orderParams;
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
+function validateAmount(amount) {
+    if (amount >= 1)
+        return Math.round(amount);
+    if (amount < 1)
+        return Math.round(amount * 1e3) / 1e3;
 }

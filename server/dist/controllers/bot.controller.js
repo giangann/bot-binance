@@ -23,8 +23,7 @@ const active = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             percent_to_sell: req.body.percent_to_sell,
         };
         // create new chain
-        const currBalance = global.totalBalancesUSDT;
-        const newOrderChain = yield market_order_chain_service_1.default.create(Object.assign({ price_start: "0.000", status: "open", total_balance_start: currBalance.toString() }, params));
+        const newOrderChain = yield market_order_chain_service_1.default.create(Object.assign({ status: "open", price_start: "0.000", total_balance_start: "0.000" }, params));
         server_response_ultil_1.ServerResponse.response(res, newOrderChain);
     }
     catch (err) {

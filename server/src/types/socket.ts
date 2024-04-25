@@ -5,11 +5,7 @@ export interface ServerToClientEvents {
   noArg: () => void;
   basicEmit: (a: number, b: string, c: Buffer) => void;
   withAck: (d: string, callback: (e: number) => void) => void;
-  "ws-balance": (
-    total: number,
-    total_usdt: number,
-    coins: { coin: string; amount: number; price: number; total: number }[]
-  ) => void;
+  "ws-balance": (totalWalletBalance: string, availableBalance: string) => void;
   "bot-running": (msg: string) => void;
   "new-order": (
     direction: string,
@@ -24,6 +20,11 @@ export interface ServerToClientEvents {
   "app-err": (msg: string) => void;
   "bot-quit": (msg: string) => void;
   "bot-err": (errMsg: string) => void;
+  "bot-tick": (
+    num_of_order: number,
+    num_of_success_order: number,
+    num_of_error_order: number
+  ) => void;
   "symbols-price": (symbolPrices: TSymbolPrice[]) => void;
 }
 

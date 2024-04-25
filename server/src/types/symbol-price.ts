@@ -1,6 +1,6 @@
 export type TSymbolPrice = {
-  timestamp: string;
-  price: number;
+  time: number;
+  price: string;
   symbol: string;
 };
 

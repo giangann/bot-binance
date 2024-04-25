@@ -1,7 +1,6 @@
 import { createInterval } from "./create-interval";
 import { cronJobSchedule } from "./cron-job";
 import { connectDatabase } from "./db-connect";
-import { getPriceOfSymbols } from "./get-price-of-symbols";
 import { createHttpServer } from "./http-server";
 import { createWebSocket } from "./ws-server";
 
@@ -11,7 +10,6 @@ export const loadApp = async () => {
   global.wsServerGlob = wsServer;
   cronJobSchedule();
   await connectDatabase();
-  // await getPriceOfSymbols();
   createInterval();
   return {
     httpServer,

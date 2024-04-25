@@ -12,11 +12,10 @@ const active: IController = async (req, res) => {
     };
 
     // create new chain
-    const currBalance = global.totalBalancesUSDT;
     const newOrderChain = await marketOrderChainService.create({
-      price_start: "0.000",
       status: "open",
-      total_balance_start: currBalance.toString(),
+      price_start: "0.000", // can't defined
+      total_balance_start: "0.000", // can't defined
       ...params,
     });
 

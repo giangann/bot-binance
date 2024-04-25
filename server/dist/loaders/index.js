@@ -21,7 +21,6 @@ const loadApp = () => __awaiter(void 0, void 0, void 0, function* () {
     global.wsServerGlob = wsServer;
     (0, cron_job_1.cronJobSchedule)();
     yield (0, db_connect_1.connectDatabase)();
-    // await getPriceOfSymbols();
     (0, create_interval_1.createInterval)();
     return {
         httpServer,

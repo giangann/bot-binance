@@ -20,15 +20,14 @@ function getChainOpen() {
         return listOpenOrder[0];
     });
 }
-function updateOrderChain(total_balance_end) {
+function updateOrderChain() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const chainIsOpen = yield getChainOpen();
-            const { total_balance_start } = chainIsOpen;
             const updatedRes = yield market_order_chain_service_1.default.update({
                 id: chainIsOpen.id,
-                total_balance_end: total_balance_end.toString(),
-                percent_change: (total_balance_end / parseFloat(total_balance_start)).toString(),
+                total_balance_end: "0.000",
+                percent_change: "0.000", // can't defined
                 price_end: "0.000",
                 status: "closed",
                 updatedAt: (0, moment_1.default)().format("YYYY-MM-DD HH:mm:ss"),
@@ -41,8 +40,7 @@ function updateOrderChain(total_balance_end) {
     });
 }
 const quit = () => __awaiter(void 0, void 0, void 0, function* () {
-    const totalBalanceNow = global.totalBalancesUSDT;
-    yield updateOrderChain(totalBalanceNow);
+    yield updateOrderChain();
     //   ws emit quit bot
     wsServerGlob.emit("bot-quit", "bot was quited");
 });
