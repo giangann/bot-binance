@@ -8,7 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const binance_service_1 = __importDefault(require("../services/binance.service"));
 const server_response_ultil_1 = require("../ultils/server-response.ultil");
 // constant
 const TRADE_SIZE_BY_USDT = 100;
@@ -48,4 +52,13 @@ const getTradeHistory = (req, res) => __awaiter(void 0, void 0, void 0, function
         server_response_ultil_1.ServerResponse.error(res, err.message);
     }
 });
-exports.default = { getBalance, getOrderHistory, getTradeHistory };
+const getAccInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const accInfo = yield binance_service_1.default.getAccountInfo();
+        server_response_ultil_1.ServerResponse.response(res, accInfo);
+    }
+    catch (err) {
+        server_response_ultil_1.ServerResponse.error(res, err.message);
+    }
+});
+exports.default = { getBalance, getOrderHistory, getTradeHistory, getAccInfo };

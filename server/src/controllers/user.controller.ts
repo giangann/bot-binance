@@ -10,14 +10,12 @@ const STOP_PERCENT = 2.5 / 100;
 const getBalance: IController = async (req, res) => {
   try {
     // const balance = await binanceService.fetchMyBalance();
-
     // update balance realtime each 5s
     // setInterval(async () => {
     //   const balance = await binanceService.getMyBalance();
     //   const { total, btc, usdt } = balance;
     //   global.wsServerGlob.emit("ws-balance", total, btc, usdt);
     // }, 5000);
-    
     // ServerResponse.response(res, balance);
   } catch (err) {
     console.log(err.message);
@@ -28,7 +26,6 @@ const getOrderHistory: IController = async (req, res) => {
   try {
     // get list order id from order service in database
     // const orders = await binanceService.getOrderHistory("BTCUSDT");
-
     // ServerResponse.response(res, orders);
   } catch (err) {
     ServerResponse.error(res, err.message);
@@ -44,4 +41,13 @@ const getTradeHistory: IController = async (req, res) => {
   }
 };
 
-export default { getBalance, getOrderHistory, getTradeHistory };
+const getAccInfo: IController = async (req, res) => {
+  try {
+    const accInfo = await binanceService.getAccountInfo();
+    ServerResponse.response(res, accInfo);
+  } catch (err) {
+    ServerResponse.error(res, err.message);
+  }
+};
+
+export default { getBalance, getOrderHistory, getTradeHistory, getAccInfo };

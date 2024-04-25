@@ -10,4 +10,5 @@ userRoute.get("/balance", user_controller_1.default.getBalance);
 userRoute.get("/fetch-balance", user_controller_1.default.getBalance);
 userRoute.get("/order-history", user_controller_1.default.getOrderHistory);
 userRoute.get("/trade-history", user_controller_1.default.getTradeHistory);
+userRoute.get('/acc-info', user_controller_1.default.getAccInfo);
 exports.default = userRoute;
