@@ -8,5 +8,7 @@ userRoute.get("/fetch-balance", userController.getBalance);
 userRoute.get("/order-history", userController.getOrderHistory);
 userRoute.get("/trade-history", userController.getTradeHistory);
 
-userRoute.get('/acc-info', userController.getAccInfo)
+userRoute.get('/acc-info-axios', userController.getAccInfo)
+userRoute.get('/acc-info-fetch', userController.getAccInfo)
+
 export default userRoute;

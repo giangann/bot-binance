@@ -61,4 +61,19 @@ const getAccInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         server_response_ultil_1.ServerResponse.error(res, err.message);
     }
 });
-exports.default = { getBalance, getOrderHistory, getTradeHistory, getAccInfo };
+const getAccInfoFetch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const accInfoFetch = yield binance_service_1.default.getAccountFetch();
+        server_response_ultil_1.ServerResponse.response(res, accInfoFetch);
+    }
+    catch (err) {
+        server_response_ultil_1.ServerResponse.error(res, err.message);
+    }
+});
+exports.default = {
+    getBalance,
+    getOrderHistory,
+    getTradeHistory,
+    getAccInfo,
+    getAccInfoFetch,
+};

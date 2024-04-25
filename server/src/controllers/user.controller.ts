@@ -50,4 +50,19 @@ const getAccInfo: IController = async (req, res) => {
   }
 };
 
-export default { getBalance, getOrderHistory, getTradeHistory, getAccInfo };
+const getAccInfoFetch: IController = async (req, res) => {
+  try {
+    const accInfoFetch = await binanceService.getAccountFetch();
+    ServerResponse.response(res, accInfoFetch);
+  } catch (err) {
+    ServerResponse.error(res, err.message);
+  }
+};
+
+export default {
+  getBalance,
+  getOrderHistory,
+  getTradeHistory,
+  getAccInfo,
+  getAccInfoFetch,
+};

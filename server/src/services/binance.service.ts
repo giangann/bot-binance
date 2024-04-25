@@ -47,6 +47,22 @@ const getAccountInfo = async (): Promise<TAccount> => {
   const accInfo = response.data;
   return accInfo;
 };
+
+const getAccountFetch = async (): Promise<TAccount> => {
+  const endpoint = "/fapi/v2/account";
+  const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+  const queryString = paramsToQueryWithSignature(secret, paramsNow);
+  const url = `${baseUrl}${endpoint}?${queryString}`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "X-MBX-APIKEY": apiKey,
+      "Content-Type": "application/json",
+    },
+  });
+  const accInfo = await response.json();
+  return accInfo;
+};
 const test = async () => {
   const data = await getAccountInfo();
   console.log("getAccountInfo", data);
@@ -148,4 +164,5 @@ export default {
   getPositions,
   getAccountInfo,
   getOrdersFromToday1Am,
+  getAccountFetch
 };

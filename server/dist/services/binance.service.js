@@ -50,6 +50,21 @@ const getAccountInfo = () => __awaiter(void 0, void 0, void 0, function* () {
     const accInfo = response.data;
     return accInfo;
 });
+const getAccountFetch = () => __awaiter(void 0, void 0, void 0, function* () {
+    const endpoint = "/fapi/v2/account";
+    const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+    const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
+    const url = `${baseUrl}${endpoint}?${queryString}`;
+    const response = yield fetch(url, {
+        method: "GET",
+        headers: {
+            "X-MBX-APIKEY": apiKey,
+            "Content-Type": "application/json",
+        },
+    });
+    const accInfo = yield response.json();
+    return accInfo;
+});
 const test = () => __awaiter(void 0, void 0, void 0, function* () {
     const data = yield getAccountInfo();
     console.log("getAccountInfo", data);
@@ -130,4 +145,5 @@ exports.default = {
     getPositions,
     getAccountInfo,
     getOrdersFromToday1Am,
+    getAccountFetch
 };
