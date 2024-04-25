@@ -106,6 +106,11 @@ const createInterval = () => {
       );
     } catch (err) {
       console.log("err", err);
+      logService.create({
+        market_order_chains_id: 0,
+        message: JSON.stringify(err),
+        type: "app-err",
+      });
       global.wsServerGlob.emit("app-err", err.message);
     }
 
