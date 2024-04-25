@@ -55,9 +55,13 @@ const createInterval = () => {
                 global.wsServerGlob.emit("bot-tick", orderParams.length, successOrders.length, failureOrders.length);
             }
             // fetch balance in account
-            const accInfo = yield binance_service_1.default.getAccountInfo();
-            const { totalWalletBalance, availableBalance } = accInfo;
-            global.wsServerGlob.emit("ws-balance", totalWalletBalance, availableBalance);
+            // const accInfo = await binanceService.getAccountInfo();
+            // const { totalWalletBalance, availableBalance } = accInfo;
+            // global.wsServerGlob.emit(
+            //   "ws-balance",
+            //   totalWalletBalance,
+            //   availableBalance
+            // );
         }
         catch (err) {
             console.log("err", err);

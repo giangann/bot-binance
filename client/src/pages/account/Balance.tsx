@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Box, Skeleton, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../../context/SocketContext";
@@ -21,8 +22,7 @@ export const Balance = () => {
   }, []);
   return (
     <Box>
-      <Typography variant="h6">Your balance</Typography>
-      {/* total, coin avaiable */}
+      {/* <Typography variant="h6">Your balance</Typography>
       {balance.totalWalletBalance ? (
         <>
           <Typography>
@@ -37,7 +37,7 @@ export const Balance = () => {
           variant="text"
           sx={{ fontSize: "1rem", width: "100px", height: "30px" }}
         />
-      )}
+      )} */}
     </Box>
   );
 };
