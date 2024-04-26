@@ -66,7 +66,7 @@ const createInterval = () => {
                 message: JSON.stringify(err),
                 type: "app-err",
             });
-            global.wsServerGlob.emit("app-err", err.message);
+            global.wsServerGlob.emit("app-err", JSON.stringify(err));
         }
         console.log("emit and end tick");
     }), 10000);

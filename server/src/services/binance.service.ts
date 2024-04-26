@@ -17,10 +17,6 @@ const secret = process.env.BINANCE_SECRET;
 const apiKey = process.env.BINANCE_API_KEY;
 
 // CONSTANT
-const commonParams = {
-  recvWindow: 5000,
-  // timestamp: Date.now(),
-};
 const commonHeader = {
   "X-MBX-APIKEY": apiKey,
 };
@@ -29,7 +25,7 @@ const commonAxiosOpt: AxiosRequestConfig = {
 };
 
 const getPositions = async (): Promise<TPosition[]> => {
-  const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+  const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
   const queryString = paramsToQueryWithSignature(secret, paramsNow);
   const endpoint = "/fapi/v2/positionRisk";
   const url = `${baseUrl}${endpoint}?${queryString}`;
@@ -40,7 +36,7 @@ const getPositions = async (): Promise<TPosition[]> => {
 
 const getAccountInfo = async (): Promise<TAccount> => {
   const endpoint = "/fapi/v2/account";
-  const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+  const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
   const queryString = paramsToQueryWithSignature(secret, paramsNow);
   const url = `${baseUrl}${endpoint}?${queryString}`;
   const response = await axios.get(url, commonAxiosOpt);
@@ -50,7 +46,7 @@ const getAccountInfo = async (): Promise<TAccount> => {
 
 const getAccountFetch = async (): Promise<TAccount> => {
   const endpoint = "/fapi/v2/account";
-  const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+  const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
   const queryString = paramsToQueryWithSignature(secret, paramsNow);
   const url = `${baseUrl}${endpoint}?${queryString}`;
   const response = await fetch(url, {
@@ -98,7 +94,7 @@ const getSymbolPriceTickers = async (): Promise<TSymbolPriceTicker[]> => {
 
 const getOrdersFromToday1Am = async (): Promise<TOrder[]> => {
   const endpoint = "/fapi/v1/allOrders";
-  const paramsNow = { ...commonParams, timestamp: Date.now() };
+  const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
   const params = {
     ...paramsNow,
     startTime: getTimestampOfToday1AM(),
@@ -120,7 +116,7 @@ const createMarketOrder = async (
 ): Promise<TResponse<TNewOrder>> => {
   try {
     const endpoint = "/fapi/v1/order";
-    const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
     let orderParams = {
       symbol,
       type,

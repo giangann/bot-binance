@@ -4,6 +4,7 @@ import { Box, IconButton, Skeleton, Stack, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../../context/SocketContext";
 import { getApi } from "../../request/request";
+import { toast } from "react-toastify";
 export type TUnknownObj = Record<string, string | number>;
 // type TCoin = { coin: string; amount: number; price: number; total: number };
 export const Balance = () => {

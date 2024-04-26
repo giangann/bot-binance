@@ -9,8 +9,11 @@ import { toast } from "react-toastify";
 const wsServer = io(baseURL);
 export const Layout = () => {
   useEffect(() => {
-    wsServer?.on("app-err", (errMsg: string) => {
+    wsServer?.on("app-err", (err: string) => {
+      const error = JSON.parse(err);
+      const errMsg = error.message;
       toast.error(errMsg);
+      console.log(error);
     });
     return () => {
       wsServer?.off("app-err");

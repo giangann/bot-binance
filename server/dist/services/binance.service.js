@@ -22,10 +22,6 @@ const baseUrl = process.env.BINANCE_BASE_URL;
 const secret = process.env.BINANCE_SECRET;
 const apiKey = process.env.BINANCE_API_KEY;
 // CONSTANT
-const commonParams = {
-    recvWindow: 5000,
-    // timestamp: Date.now(),
-};
 const commonHeader = {
     "X-MBX-APIKEY": apiKey,
 };
@@ -33,7 +29,7 @@ const commonAxiosOpt = {
     headers: Object.assign({}, commonHeader),
 };
 const getPositions = () => __awaiter(void 0, void 0, void 0, function* () {
-    const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
     const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
     const endpoint = "/fapi/v2/positionRisk";
     const url = `${baseUrl}${endpoint}?${queryString}`;
@@ -43,7 +39,7 @@ const getPositions = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 const getAccountInfo = () => __awaiter(void 0, void 0, void 0, function* () {
     const endpoint = "/fapi/v2/account";
-    const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
     const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
     const url = `${baseUrl}${endpoint}?${queryString}`;
     const response = yield axios_1.default.get(url, commonAxiosOpt);
@@ -52,7 +48,7 @@ const getAccountInfo = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 const getAccountFetch = () => __awaiter(void 0, void 0, void 0, function* () {
     const endpoint = "/fapi/v2/account";
-    const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
     const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
     const url = `${baseUrl}${endpoint}?${queryString}`;
     const response = yield fetch(url, {
@@ -93,7 +89,7 @@ const getSymbolPriceTickers = () => __awaiter(void 0, void 0, void 0, function* 
 });
 const getOrdersFromToday1Am = () => __awaiter(void 0, void 0, void 0, function* () {
     const endpoint = "/fapi/v1/allOrders";
-    const paramsNow = Object.assign(Object.assign({}, commonParams), { timestamp: Date.now() });
+    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
     const params = Object.assign(Object.assign({}, paramsNow), { startTime: (0, helper_ultil_1.getTimestampOfToday1AM)() });
     const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, params);
     const url = `${baseUrl}${endpoint}?${queryString}`;
@@ -104,7 +100,7 @@ const getOrdersFromToday1Am = () => __awaiter(void 0, void 0, void 0, function* 
 const createMarketOrder = (symbol, side, quantity, type = "market", _price) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const endpoint = "/fapi/v1/order";
-        const paramsNow = { recvWindow: 5000, timestamp: Date.now() };
+        const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
         let orderParams = Object.assign({ symbol,
             type,
             quantity,
