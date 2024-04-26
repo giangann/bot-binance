@@ -4,6 +4,7 @@ import { blue, grey } from "@mui/material/colors";
 import dayjs from "dayjs";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { BotContext } from "../../context/BotContext";
 import { SocketContext } from "../../context/SocketContext";
 import { getApi } from "../../request/request";
 import {
@@ -17,7 +18,7 @@ import { NewOrderChain } from "./NewOrderChain";
 export const ListOrderChain = () => {
   const [orderChains, setOrderChains] = useState<IMarketOrderChainRecord[]>([]);
   const socket = useContext(SocketContext);
-
+  const bot = useContext(BotContext);
   const fetchOrderChains = useCallback(async () => {
     const response = await getApi<IMarketOrderChainRecord[]>("order-chain");
     if (response.success) setOrderChains(response.data);
@@ -62,6 +63,7 @@ export const ListOrderChain = () => {
   useEffect(() => {
     socket?.on("bot-quit", (msg) => {
       toast.info(msg);
+      bot.onToggle(false);
       fetchOrderChains();
     });
     return () => {

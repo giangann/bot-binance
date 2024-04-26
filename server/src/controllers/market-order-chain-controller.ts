@@ -13,6 +13,17 @@ const list: IController = async (req, res) => {
   }
 };
 
+const isBotActive: IController = async (req, res) => {
+  try {
+    const openChain = await marketOrderChainService.list({ status: "open" });
+
+    ServerResponse.response(res, openChain.length);
+  } catch (err) {
+    console.log("err", err);
+    ServerResponse.error(res, err.message);
+  }
+};
+
 const getLogs: IController = async (req, res) => {
   try {
     const chainId = parseInt(req.params?.chainId);
@@ -24,4 +35,4 @@ const getLogs: IController = async (req, res) => {
   }
 };
 
-export default { list, getLogs };
+export default { list, getLogs, isBotActive };

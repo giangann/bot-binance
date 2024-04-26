@@ -8,4 +8,5 @@ const market_order_chain_controller_1 = __importDefault(require("../controllers/
 const orderChainRoute = (0, express_1.Router)();
 orderChainRoute.get("/", market_order_chain_controller_1.default.list);
 orderChainRoute.get("/log/:chainId", market_order_chain_controller_1.default.getLogs);
+orderChainRoute.get("/is-bot-active", market_order_chain_controller_1.default.isBotActive);
 exports.default = orderChainRoute;

@@ -8,10 +8,11 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { BaseInput } from "../../components/Input";
-import { getApi, postApi } from "../../request/request";
 import { toast } from "react-toastify";
+import { BaseInput } from "../../components/Input";
+import { BotContext } from "../../context/BotContext";
 import { SocketContext } from "../../context/SocketContext";
+import { getApi, postApi } from "../../request/request";
 
 type TNewOrderChain = {
   transaction_size: string;
@@ -27,9 +28,8 @@ const defaultValue: TNewOrderChain = {
 
 export const NewOrderChain = () => {
   const [open, setOpen] = useState(false);
-  const [disabled, setDisabled] = useState(false);
   const socket = useContext(SocketContext);
-
+  const bot = useContext(BotContext);
   const {
     register,
     handleSubmit,
@@ -41,23 +41,25 @@ export const NewOrderChain = () => {
     console.log("values ", values);
     try {
       const response = await postApi<TNewOrderChain>("bot/active", values);
-      if (response.success)
+      if (response.success) {
         toast.success("Bot kích hoạt thành công, check point mỗi 10s");
-      else toast.error(response.error.message);
+        bot.onToggle(true);
+      } else toast.error(response.error.message);
     } catch (err) {
       console.log(err);
     } finally {
       setOpen(false);
-      setDisabled(true);
     }
   };
 
   const onQuit = async () => {
     const response = await getApi("bot/quit");
-    if (response.success)
-      toast.info("Bot đã được dừng lại và thoát, hãy load lại trang");
-    else toast.error(response.error.message);
+    if (response.success) {
+      bot.onToggle(false);
+    } else toast.error(response.error.message);
   };
+
+  console.log("is active", bot.active);
 
   useEffect(() => {
     socket?.on("bot-running", (msg) => {
@@ -81,13 +83,20 @@ export const NewOrderChain = () => {
       <Button
         variant="contained"
         onClick={() => setOpen(true)}
-        disabled={disabled}
-        endIcon={disabled && <CircularProgress color="inherit" size={14} />}
+        disabled={bot.active}
+        endIcon={
+          bot.active ? <CircularProgress color="inherit" size={14} /> : ""
+        }
       >
         + Kích hoạt BOT
       </Button>
 
-      <Button variant="outlined" color="error" onClick={onQuit}>
+      <Button
+        disabled={!bot.active}
+        variant="outlined"
+        color="error"
+        onClick={onQuit}
+      >
         x Quit
       </Button>
 

@@ -25,6 +25,16 @@ const list = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         server_response_ultil_1.ServerResponse.error(res, err.message);
     }
 });
+const isBotActive = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const openChain = yield market_order_chain_service_1.default.list({ status: "open" });
+        server_response_ultil_1.ServerResponse.response(res, openChain.length);
+    }
+    catch (err) {
+        console.log("err", err);
+        server_response_ultil_1.ServerResponse.error(res, err.message);
+    }
+});
 const getLogs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -37,4 +47,4 @@ const getLogs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         server_response_ultil_1.ServerResponse.error(res, err.message);
     }
 });
-exports.default = { list, getLogs };
+exports.default = { list, getLogs, isBotActive };

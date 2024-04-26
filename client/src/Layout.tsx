@@ -2,12 +2,19 @@ import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { SocketContext } from "./context/SocketContext";
 import { io } from "socket.io-client";
-import { baseURL } from "./request/request";
-import { useEffect } from "react";
+import { baseURL, getApi } from "./request/request";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { BotContext } from "./context/BotContext";
 
 const wsServer = io(baseURL);
 export const Layout = () => {
+  const [botActive, setBotActive] = useState(false);
+
+  const onToggle = (active: boolean) => {
+    setBotActive(active);
+  };
+
   useEffect(() => {
     wsServer?.on("app-err", (err: string) => {
       const error = JSON.parse(err);
@@ -19,11 +26,24 @@ export const Layout = () => {
       wsServer?.off("app-err");
     };
   }, []);
+
+  useEffect(() => {
+    async function checkIsBotActive() {
+      const response = await getApi<boolean>("order-chain/is-bot-active");
+      if (response.success) setBotActive(response.data);
+      else {
+        toast.error(response.error.message);
+      }
+    }
+    checkIsBotActive()
+  }, []);
   return (
     <SocketContext.Provider value={wsServer}>
-      <Box sx={{ maxWidth: 1500, margin: "auto", padding: { xs: 1, sm: 2 } }}>
-        <Outlet />
-      </Box>
+      <BotContext.Provider value={{ active: botActive, onToggle }}>
+        <Box sx={{ maxWidth: 1500, margin: "auto", padding: { xs: 1, sm: 2 } }}>
+          <Outlet />
+        </Box>
+      </BotContext.Provider>
     </SocketContext.Provider>
   );
 };
