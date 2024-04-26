@@ -97,13 +97,13 @@ const createInterval = () => {
       }
 
       // fetch balance in account
-      // const accInfo = await binanceService.getAccountInfo();
-      // const { totalWalletBalance, availableBalance } = accInfo;
-      // global.wsServerGlob.emit(
-      //   "ws-balance",
-      //   totalWalletBalance,
-      //   availableBalance
-      // );
+      const accInfo = await binanceService.getAccountInfo();
+      const { totalWalletBalance, availableBalance } = accInfo;
+      global.wsServerGlob.emit(
+        "ws-balance",
+        totalWalletBalance,
+        availableBalance
+      );
     } catch (err) {
       console.log("err", err);
       logService.create({
