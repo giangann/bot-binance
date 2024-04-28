@@ -9,6 +9,7 @@ import {
   paramsToQueryWithSignature,
 } from "../ultils/helper.ultil";
 import coinService from "./coin.service";
+import { TSymbolMarkPrice } from "../types/symbol-mark-price";
 dotenv.config();
 
 // GET ENV
@@ -59,12 +60,7 @@ const getAccountFetch = async (): Promise<TAccount> => {
   const accInfo = await response.json();
   return accInfo;
 };
-const test = async () => {
-  const data = await getAccountInfo();
-  console.log("getAccountInfo", data);
-  console.log("some info", data.availableBalance, data.totalWalletBalance);
-};
-// test();
+
 const getSymbolPriceTickers1Am = async (): Promise<
   Omit<TSymbolPriceTicker, "time">[]
 > => {
@@ -91,6 +87,20 @@ const getSymbolPriceTickers = async (): Promise<TSymbolPriceTicker[]> => {
   const tickersPrice: TSymbolPriceTicker[] = response.data;
   return tickersPrice;
 };
+
+const getSymbolMarketPrices = async (): Promise<TSymbolMarkPrice[]> => {
+  const endpoint = "/fapi/v1/premiumIndex";
+  const url = `${baseUrl}${endpoint}`;
+  const response = await axios.get(url);
+  const markPrices: TSymbolMarkPrice[] = response.data;
+  return markPrices;
+};
+
+const test = async () => {
+  const data = await getSymbolPriceTickers();
+  console.log("some info", data.slice(0, 10));
+};
+// test();
 
 const getOrdersFromToday1Am = async (): Promise<TOrder[]> => {
   const endpoint = "/fapi/v1/allOrders";
@@ -155,10 +165,11 @@ const createMarketOrder = async (
 export default {
   getSymbolPriceTicker,
   getSymbolPriceTickers,
+  getSymbolMarketPrices,
   createMarketOrder,
   getSymbolPriceTickers1Am,
   getPositions,
   getAccountInfo,
   getOrdersFromToday1Am,
-  getAccountFetch
+  getAccountFetch,
 };

@@ -34,10 +34,21 @@ const create = async (params: ICoinPrice1AMCreate) => {
 };
 
 const update = async (params: ICoinPrice1AMUpdate) => {
-  const updatedAt = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
+  let filterParams = { symbol: params.symbol };
+
+  let updateParams: ICoinPrice1AMUpdate = {
+    updatedAt: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+  };
+  if (params.price) {
+    updateParams["price"] = params.price;
+  }
+  if (params.mark_price) {
+    updateParams["mark_price"] = params.mark_price;
+  }
+
   const updatedCoin = await getRepository(CoinPrice1AM).update(
-    { symbol: params.symbol },
-    { price: params.price, updatedAt }
+    filterParams,
+    updateParams
   );
   return updatedCoin;
 };
