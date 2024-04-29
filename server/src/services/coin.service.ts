@@ -45,6 +45,12 @@ const update = async (params: ICoinPrice1AMUpdate) => {
   if (params.mark_price) {
     updateParams["mark_price"] = params.mark_price;
   }
+  if (params.f_price) {
+    updateParams["f_price"] = params.f_price;
+  }
+  if (params.f_mark_price) {
+    updateParams["f_mark_price"] = params.f_mark_price;
+  }
 
   const updatedCoin = await getRepository(CoinPrice1AM).update(
     filterParams,

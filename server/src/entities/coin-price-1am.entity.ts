@@ -16,4 +16,10 @@ export class CoinPrice1AM extends BaseEntity {
 
   @Column()
   mark_price: string;
+
+  @Column()
+  f_price: string;
+
+  @Column()
+  f_mark_price: string;
 }
