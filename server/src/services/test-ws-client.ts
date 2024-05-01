@@ -8,8 +8,8 @@ import { WebSocket } from "ws";
 // const baseWs = "wss://testnet.binancefuture.com/ws-fapi/v1"
 // Websocket Market Streams-----------------------
 // const baseWs = "wss://fstream.binance.com"; (ex: wss://fstream.binance.com/ws/bnbusdt@aggTrade)
-// const baseWs = "wss://fstream.binance.com";
-const baseWs = "wss://fstream.binancefuture.com";
+const baseWs = "wss://fstream.binance.com";
+// const baseWs = "wss://fstream.binancefuture.com";
 
 const markPriceWs = () => {
   const wsURL = `${baseWs}/ws/btcusdt@markPrice`;
@@ -59,7 +59,12 @@ const allMarkPriceWs = () => {
 // allMarkPriceWs();
 
 const allTickerPriceWs = () => {
-  const wsURL = `${baseWs}/ws/!ticker@arr`; // default is 3s interval
+  // const wsURL = `${baseWs}/ws/!markPrice@arr`; // default is 3s interval
+
+  // const wsURL = `${baseWs}/ws/!ticker@arr`; // default is 3s interval
+  // const wsURL = `${baseWs}/stream?streams=!ticker@arr/!market@arr`; // default is 3s interval
+  const wsURL = `${baseWs}/stream?streams=!markPrice@arr/!ticker@arr`; // default is 3s interval
+
   const ws = new WebSocket(wsURL);
   ws.on("open", () => {
     console.log("WebSocket connection established.");
@@ -67,13 +72,45 @@ const allTickerPriceWs = () => {
   ws.on("message", (msg: any) => {
     //   console.log("Received message:", msg);
     const messageString = msg.toString(); // Convert buffer to string
-    const messageJSON: TSymbolPriceTickerWs[] = JSON.parse(messageString); // Parse string as JSON
+    const messageJSON:
+      | { stream: "!markPrice@arr"; data: TSymbolMarkPriceWs[] }
+      | { stream: "!ticker@arr"; data: TSymbolPriceTickerWs[] } =
+      JSON.parse(messageString); // Parse string as JSON
+    console.log(
+      "stream: ",
+      messageJSON.stream,
+      " total: ",
+      messageJSON.data.length,
+      "data overview:",
+      messageJSON.data.slice(0, 2)
+    );
+    // if (messageJSON.stream === "!markPrice@arr") {
+    //   console.log(
+    //     "stream: ",
+    //     messageJSON.stream,
+    //     " total: ",
+    //     messageJSON.data.length,
+    //     "data overview:",
+    //     messageJSON.data.slice(0, 2)
+    //   );
+    // }
 
-    for (let sym of messageJSON) {
-      if (sym.s === "BTCUSDT") {
-        console.log("lastPrice: ", sym.c);
-      }
-    }
+    // if (messageJSON.stream === "!ticker@arr") {
+    //   console.log(
+    //     "stream: ",
+    //     messageJSON.stream,
+    //     " total: ",
+    //     messageJSON.data.length,
+    //     "data overview:",
+    //     messageJSON.data.slice(0, 2)
+    //   );
+    // }
+    // for (let sym of messageJSON) {
+    //   if (sym.s === "BTCUSDT") {
+    //     if (sym.e === "24hrTicker") console.log("lastPrice: ", sym.c);
+    //     if (sym.e === "markPriceUpdate") console.log("marketPrice: ", sym.p);
+    //   }
+    // }
     // console.log("Received message:", messageJSON.slice(0, 2));
   });
   ws.on("error", (error: any) => {
@@ -83,4 +120,4 @@ const allTickerPriceWs = () => {
     console.log("WebSocket connection closed.");
   });
 };
-allTickerPriceWs()
+allTickerPriceWs();

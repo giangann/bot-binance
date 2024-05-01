@@ -3,8 +3,8 @@ import { BaseEntity } from "./base.entity";
 
 // Entities
 
-@Entity("coin_price_1am")
-export class CoinPrice1AM extends BaseEntity {
+@Entity("coin_price_1am_future")
+export class CoinPrice1AMFuture extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

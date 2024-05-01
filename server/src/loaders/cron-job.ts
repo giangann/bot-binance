@@ -1,6 +1,6 @@
 import axios from "axios";
 import cron from "node-cron";
-import coinService from "../services/coin.service";
+import CoinService from "../services/coin.service";
 import { TSymbolMarkPrice } from "../types/symbol-mark-price";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
 import { connectDatabase } from "./db-connect";
@@ -8,13 +8,21 @@ import { connectDatabase } from "./db-connect";
 const futureTestnetUrl = "https://testnet.binancefuture.com";
 const futureUrl = "https://fapi.binance.com";
 
+const coinTestnetService = new CoinService(true);
+const coinFutureService = new CoinService(false);
+
 export const cronJobSchedule = async () => {
   console.log("cron job file");
   const task = cron.schedule(
-    "0 15 0 * * *",
+    "0 0 1 * * *",
     () => {
       console.log("task run");
-      updateCoinTable();
+      // testnet
+      updateCoinTestnetTableMarkPriceCol();
+      updateCoinTestnetTableTickerPriceCol();
+      // future
+      updateCoinFutureTableTickerPriceCol();
+      updateCoinFutureTableMarkPriceCol();
     },
     {
       scheduled: false,
@@ -25,23 +33,12 @@ export const cronJobSchedule = async () => {
   task.start();
 };
 
-async function updateCoinTable() {
-  try {
-    await updateCoinTableTickerPrice();
-    await updateCoinTableMarkPrice();
-    await updateCoinTableFTickerPrice();
-    await updateCoinTableFMarkPrice();
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-async function updateCoinTableTickerPrice() {
+async function updateCoinTestnetTableTickerPriceCol() {
   try {
     const symbolPriceTickersNow = await getSymbolPriceTickers(futureTestnetUrl);
     const updatedCoins = await Promise.all(
       symbolPriceTickersNow.map((symbolPrice) => {
-        return coinService.update({
+        return coinTestnetService.update({
           symbol: symbolPrice.symbol,
           price: symbolPrice.price,
         });
@@ -53,12 +50,12 @@ async function updateCoinTableTickerPrice() {
   }
 }
 
-async function updateCoinTableMarkPrice() {
+async function updateCoinTestnetTableMarkPriceCol() {
   try {
     const symbolMarkPrice = await getSymbolMarketPrices(futureTestnetUrl);
     const updatedCoins = await Promise.all(
       symbolMarkPrice.map((symbolPrice) => {
-        return coinService.update({
+        return coinTestnetService.update({
           symbol: symbolPrice.symbol,
           mark_price: symbolPrice.markPrice,
         });
@@ -70,18 +67,14 @@ async function updateCoinTableMarkPrice() {
   }
 }
 
-async function updateCoinTableFTickerPrice() {
+async function updateCoinFutureTableTickerPriceCol() {
   try {
-    const futureSymbolTickerPrices = await getSymbolPriceTickers(futureUrl);
-    console.log(
-      "futureSymbolTickerPrices",
-      futureSymbolTickerPrices.slice(0, 5)
-    );
+    const symbolPriceTickersNow = await getSymbolPriceTickers(futureUrl);
     const updatedCoins = await Promise.all(
-      futureSymbolTickerPrices.map((symbolPrice) => {
-        return coinService.update({
+      symbolPriceTickersNow.map((symbolPrice) => {
+        return coinFutureService.update({
           symbol: symbolPrice.symbol,
-          f_price: symbolPrice.price,
+          price: symbolPrice.price,
         });
       })
     );
@@ -91,14 +84,14 @@ async function updateCoinTableFTickerPrice() {
   }
 }
 
-async function updateCoinTableFMarkPrice() {
+async function updateCoinFutureTableMarkPriceCol() {
   try {
     const symbolMarkPrice = await getSymbolMarketPrices(futureUrl);
     const updatedCoins = await Promise.all(
       symbolMarkPrice.map((symbolPrice) => {
-        return coinService.update({
+        return coinFutureService.update({
           symbol: symbolPrice.symbol,
-          f_mark_price: symbolPrice.markPrice,
+          mark_price: symbolPrice.markPrice,
         });
       })
     );
@@ -130,6 +123,11 @@ const getSymbolMarketPrices = async (
 
 const test = async () => {
   await connectDatabase();
-  await updateCoinTable();
+  // testnet
+  await updateCoinTestnetTableMarkPriceCol();
+  await updateCoinTestnetTableTickerPriceCol();
+  // future
+  await updateCoinFutureTableTickerPriceCol();
+  await updateCoinFutureTableMarkPriceCol();
 };
-test();
+// test();

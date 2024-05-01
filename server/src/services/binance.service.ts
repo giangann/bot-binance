@@ -8,7 +8,7 @@ import {
   getTimestampOfToday1AM,
   paramsToQueryWithSignature,
 } from "../ultils/helper.ultil";
-import coinService from "./coin.service";
+import CoinService from "./coin.service";
 import { TSymbolMarkPrice } from "../types/symbol-mark-price";
 dotenv.config();
 
@@ -24,6 +24,7 @@ const commonHeader = {
 const commonAxiosOpt: AxiosRequestConfig = {
   headers: { ...commonHeader },
 };
+const coinService = new CoinService(true)
 
 const getPositions = async (): Promise<TPosition[]> => {
   const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
