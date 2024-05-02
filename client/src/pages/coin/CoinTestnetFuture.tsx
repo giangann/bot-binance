@@ -5,19 +5,18 @@ import { ISymbolMarketPriceAPI } from "../../shared/types/symbol-mark-price";
 import { getApi } from "../../request/request";
 import { TData, mix } from "../../ultils/helper";
 import { CustomTable, StrictField } from "../../components/Table/Customtable";
-import { Box, Typography } from "@mui/material"; // coin testnet: ticker price, market price, %ticker price change, %market price change
-// coin future: ticker price, market price, % ticker_price_change, % market_price_change
+import { Box, Typography } from "@mui/material";
 
-// TABLE 1: (future api)
+// TABLE 2: (testnet future api)
 // symbol
-// f_price_1AM
-// f_mark_price_1AM
-// f_price
-// f_mark_price
-// f_price_percent_change
-// f_mark_price_percent_change
+// price_1AM
+// mark_price_1AM
+// price
+// mark_price
+// price_percent_change
+// mark_price_percent_change
 
-export const CoinFuture = () => {
+export const CoinTestnetFuture = () => {
   // testnet table
   const [symbolAllPrices, setSymbolAllPrices] = useState<
     ISymbolAllPriceDBRow[]
@@ -28,13 +27,12 @@ export const CoinFuture = () => {
   const [symbolMarkPrice, setSymbolMarkPrice] = useState<
     ISymbolMarketPriceAPI[]
   >([]);
-  const baseUrl = "https://fapi.binance.com";
+  const baseUrl = "https://testnet.binancefuture.com";
+  //   const baseUrl = "https://fapi.binance.com";
 
   useEffect(() => {
     async function fetchSymbolAllPrices() {
-      const response = await getApi<ISymbolAllPriceDBRow[]>(
-        "coin-price-1am?testnet=false"
-      );
+      const response = await getApi<ISymbolAllPriceDBRow[]>("coin-price-1am");
       if (response.success) setSymbolAllPrices(response.data);
     }
     fetchSymbolAllPrices();
@@ -121,7 +119,7 @@ export const CoinFuture = () => {
   return (
     <Box>
       <Typography fontSize={22} fontWeight={600}>
-        Coin future
+        Coin testnet 
       </Typography>
       <CustomTable data={dataTable} fields={fields} />
     </Box>
