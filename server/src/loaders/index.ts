@@ -2,12 +2,14 @@ import { createInterval } from "./create-interval";
 import { cronJobSchedule } from "./cron-job";
 import { connectDatabase } from "./db-connect";
 import { createHttpServer } from "./http-server";
+import { subcribeAndForwardBinanceStream } from "./subcribe-binance-stream";
 import { createWebSocket } from "./ws-server";
 
 export const loadApp = async () => {
   const httpServer = createHttpServer();
   const wsServer = createWebSocket(httpServer);
   global.wsServerGlob = wsServer;
+  subcribeAndForwardBinanceStream();
   cronJobSchedule();
   await connectDatabase();
   createInterval();

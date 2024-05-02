@@ -2,8 +2,7 @@
 // symbol,
 
 import { Grid } from "@mui/material";
-import { CoinFuture } from "./CoinFuture";
-import { CoinTestnetFuture } from "./CoinTestnetFuture";
+import { SymbolMarketTickerPriceAndPercentChange } from "./SymbolMarketTickerPriceAndPercentChange";
 
 // f_price_1AM
 // f_mark_price_1AM
@@ -23,13 +22,27 @@ import { CoinTestnetFuture } from "./CoinTestnetFuture";
 // OPTION 2 : -------------- 2 TABLE
 
 export const CoinMixTable = () => {
+  const baseUrlTestNet = "https://testnet.binancefuture.com";
+  const baseUrlFuture = "https://fapi.binance.com";
+
+  const connectionTestnet = "testnet-binance-stream-forward";
+  const connectionFuture = "future-binance-stream-forward";
+  
   return (
     <Grid container>
-      <Grid item xs={6}>
-        <CoinTestnetFuture />
+      <Grid item xs={12}>
+        <SymbolMarketTickerPriceAndPercentChange
+          title={"Coin testnet"}
+          baseUrl={baseUrlTestNet}
+          connection={connectionTestnet}
+        />
       </Grid>
-      <Grid item xs={6}>
-        <CoinFuture />
+      <Grid item xs={12}>
+        <SymbolMarketTickerPriceAndPercentChange
+          title={"Coin future"}
+          baseUrl={baseUrlFuture}
+          connection={connectionFuture}
+        />
       </Grid>
     </Grid>
   );

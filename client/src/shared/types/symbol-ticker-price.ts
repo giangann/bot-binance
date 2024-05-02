@@ -2,7 +2,7 @@
 export interface ISymbolTickerPriceAPI {
     symbol:string,
     price: string,
-    time: number
+    time?: number
 }
 
 

@@ -119,6 +119,7 @@ export function CustomTable<TData extends UnknownObj>({
         )}
       </TableContainer>
       <CustomPagi
+        totalItems={rows}
         totalPage={totalPage}
         perpage={perpage}
         currPage={currPage}

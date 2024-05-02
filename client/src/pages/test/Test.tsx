@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { getApi } from "../request/request";
-import { ISymbolAllPriceDBRow } from "../shared/types/symbol-all-price";
-import { ISymbolTickerPriceAPI } from "../shared/types/symbol-ticker-price";
-import { ISymbolMarketPriceAPI } from "../shared/types/symbol-mark-price";
+import { getApi } from "../../request/request";
+import { ISymbolAllPriceDBRow } from "../../shared/types/symbol-all-price";
+import { ISymbolTickerPriceAPI } from "../../shared/types/symbol-ticker-price";
+import { ISymbolMarketPriceAPI } from "../../shared/types/symbol-mark-price";
 
 export const Test = () => {
   const [symbolAllPrices, setSymbolAllPrices] = useState<

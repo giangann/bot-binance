@@ -3,7 +3,7 @@ import { Home } from "../Home";
 import { Layout } from "../Layout";
 import { ListOrderChain } from "../pages/account/ListOrderChain";
 import { ChainLog } from "../pages/account/ChainLog";
-import { Test } from "../pages/Test";
+import { Test } from "../pages/test/Test";
 import { CoinMixTable } from "../pages/coin/CoinMixTable";
 
 const routes: RouteObject[] = [
@@ -25,12 +25,12 @@ const routes: RouteObject[] = [
       },
       {
         path: "/test",
-        element:  <Test/>
+        element: <Test />,
       },
       {
-        path:'/mix-table',
-        element:<CoinMixTable/>
-      }
+        path: "/mix-table",
+        element: <CoinMixTable />,
+      },
     ],
   },
 ];

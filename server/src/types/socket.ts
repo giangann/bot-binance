@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { TSymbolPrice } from "./symbol-price";
+import { TBinanceMarkPriceStreamToWs } from "./binance-stream";
 
 export interface ServerToClientEvents {
   noArg: () => void;
@@ -26,6 +27,9 @@ export interface ServerToClientEvents {
     num_of_error_order: number
   ) => void;
   "symbols-price": (symbolPrices: TSymbolPrice[]) => void;
+  "testnet-binance-stream-forward": (msg: TBinanceMarkPriceStreamToWs) => void;
+  "future-binance-stream-forward": (msg: TBinanceMarkPriceStreamToWs) => void;
+
 }
 
 export interface ClientToServerEvents {

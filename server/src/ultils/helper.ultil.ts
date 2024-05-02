@@ -1,7 +1,10 @@
 import { createHmac } from "crypto";
+import { TTickerPriceStream } from "../types/binance-stream";
+import { TMarkPriceStream } from "../types/binance-stream";
+import { TSymbolPriceTickerWs } from "../types/symbol-price-ticker";
+import { TSymbolMarkPriceWs } from "../types/symbol-mark-price";
 
 export function priceToPercent(p1: number, p2: number) {
-  console.log("prev", p1, "curr", p2);
   if (p1 < p2) return (p2 / p1 - 1) * 100;
   else return -(p1 / p2 - 1) * 100;
 }
@@ -53,4 +56,34 @@ export function getTimestampOfToday1AM() {
   return today1AM.getTime(); // Get timestamp in milliseconds
 }
 
-console.log(getTimestampOfToday1AM());
+// take TMarketStream or TTickerStream
+// return TSymbolMarkPrice or TSYmbolTickerPrice
+export function binanceStreamToSymbolPrice(
+  streamResponse: TMarkPriceStream | TTickerPriceStream
+) {
+  let event = streamResponse.stream;
+
+  // if tickerPrice then return (symbol, price)[]
+  if (event === "!ticker@arr") {
+    let stremDataArrayOfObj = streamResponse.data as TSymbolPriceTickerWs[]; // Narrow down the type
+    let data = stremDataArrayOfObj.map((obj) => {
+      return {
+        symbol: obj.s,
+        price: obj.c,
+      };
+    });
+    return { event, data };
+  }
+
+  // if markPrice then return (symbol, markPrice)[]
+  if (event === "!markPrice@arr") {
+    let stremDataArrayOfObj = streamResponse.data as TSymbolMarkPriceWs[]; // Narrow down the type
+    let data = stremDataArrayOfObj.map((obj) => {
+      return {
+        symbol: obj.s,
+        markPrice: obj.p,
+      };
+    });
+    return { event, data };
+  }
+}
