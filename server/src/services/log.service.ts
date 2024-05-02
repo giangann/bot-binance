@@ -16,13 +16,17 @@ const list = async (params: ILogList) => {
 };
 
 const create = async (params: ILogCreate) => {
-  const paramsWithDateTime: ILogCreate = {
-    ...params,
-    createdAt: moment().format("YYYY-MM-DD hh:mm:ss"),
-    updatedAt: moment().format("YYYY-MM-DD hh:mm:ss"),
-  };
-  const createdRecord = await getRepository(Log).save(paramsWithDateTime);
-  return createdRecord;
+  try {
+    const paramsWithDateTime: ILogCreate = {
+      ...params,
+      createdAt: moment().format("YYYY-MM-DD hh:mm:ss"),
+      updatedAt: moment().format("YYYY-MM-DD hh:mm:ss"),
+    };
+    const createdRecord = await getRepository(Log).save(paramsWithDateTime);
+    return createdRecord;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export default { list, create };

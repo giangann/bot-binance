@@ -106,11 +106,6 @@ const createInterval = () => {
       );
     } catch (err) {
       console.log("err", err);
-      logService.create({
-        market_order_chains_id: 0,
-        message: JSON.stringify(err),
-        type: "app-err",
-      });
       global.wsServerGlob.emit("app-err", JSON.stringify(err));
     }
 
@@ -119,84 +114,6 @@ const createInterval = () => {
 
   global.tickInterval = interval;
 };
-
-const test = async () => {
-  await connectDatabase();
-
-  try {
-    // fetch chain open
-    const openChain = await getChainOpen();
-    if (openChain) {
-      // fetch symbolPriceTickers now
-      const symbolPriceTickers = await binanceService.getSymbolPriceTickers();
-      const symbolPriceTickersMap = symbolPriceTickersToMap(symbolPriceTickers);
-
-      // fetch symbolPriceTickers 1AM from DB
-      const symbolPriceTickers1Am =
-        await binanceService.getSymbolPriceTickers1Am();
-      const symbolPriceTickers1AmMap = symbolPriceTickersToMap(
-        symbolPriceTickers1Am
-      );
-
-      // // fetch list position
-      const positions = await binanceService.getPositions();
-      const positionsMap = positionsToMap(positions);
-
-      // // fetch list Orders Today
-      const ordersFrom1Am = await binanceService.getOrdersFromToday1Am();
-      const ordersFrom1AmMap = ordersToMap(ordersFrom1Am); // last order of each symbol
-
-      // gen order params
-      const orderParams = genMarketOrderParams(
-        symbolPriceTickersMap,
-        symbolPriceTickers1AmMap,
-        positionsMap,
-        ordersFrom1AmMap,
-        openChain
-      );
-
-      const createdOrders = await makeOrders(orderParams);
-      const successOrders = filterOrder(
-        createdOrders,
-        true
-      ) as TResponSuccess<TNewOrder>[];
-      const failureOrders = filterOrder(
-        createdOrders,
-        false
-      ) as TResponseFailure[];
-
-      console.log(
-        "success orders: ",
-        successOrders,
-        " failedOrders: ",
-        failureOrders
-      );
-      console.log(
-        "success orders: ",
-        successOrders.length,
-        " failedOrders: ",
-        failureOrders.length
-      );
-      const successOrdersData = successOrders.map((order) => {
-        return order.data;
-      });
-
-      const logParmas = genLogParams(failureOrders, openChain.id);
-      await saveLogs(logParmas);
-
-      const orderPieceParams = genOrderPieceParams(
-        successOrdersData,
-        orderParams,
-        openChain.id
-      );
-      await saveOrderPieces(orderPieceParams);
-    }
-  } catch (err) {
-    console.log("err", err);
-    // global.wsServerGlob.emit("app-err", err.message);
-  }
-};
-// test();
 
 type TOrderParams = {
   symbol: string;
