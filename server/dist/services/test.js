@@ -12,39 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = __importDefault(require("axios"));
-const dotenv_1 = __importDefault(require("dotenv"));
-const crypto_1 = require("crypto");
-dotenv_1.default.config();
-const baseUrl = process.env.BINANCE_BASE_URL;
-const secret = process.env.BINANCE_SECRET;
-const apiKey = process.env.BINANCE_API_KEY;
-const sandBoxMode = process.env.BINANCE_SANDBOX_MODE;
-const getAccInfo = () => __awaiter(void 0, void 0, void 0, function* () {
-    let params = {
-        recvWindow: 5000,
-        timestamp: Date.now(),
-    };
-    const queryString = paramsToQueryWithSignature(secret, params);
-    const response = yield axios_1.default.get(`${baseUrl}/fapi/v2/account?${queryString}`, {
-        headers: { "X-MBX-APIKEY": apiKey },
-    });
-    console.log("data", response.data);
+const db_connect_1 = require("../loaders/db-connect");
+const coin_service_1 = __importDefault(require("./coin.service"));
+const coinService = new coin_service_1.default(true);
+const test = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, db_connect_1.connectDatabase)();
+    const data = yield coinService.list();
+    console.log("data", data);
 });
-getAccInfo();
-const streamAccInfo = () => __awaiter(void 0, void 0, void 0, function* () {
-});
-//----------------------------------------------------//
-function paramsToQueryWithSignature(binance_api_secret, paramsObject) {
-    const keys = Object.keys(paramsObject).sort();
-    let queryString = keys
-        .map((key) => {
-        return `${encodeURIComponent(key)}=${encodeURIComponent(paramsObject[key])}`;
-    })
-        .join("&");
-    const hmac = (0, crypto_1.createHmac)("sha256", binance_api_secret);
-    hmac.update(queryString);
-    const signature = hmac.digest("hex");
-    queryString += `&signature=${signature}`;
-    return queryString;
-}
+test();
+const message = '{"message":"read ECONNRESET","name":"Error","stack":"Error: read ECONNRESET\\n    at Function.AxiosError.from (/home/ann/Documents/freelancer/bot-binance/server/node_modules/axios/lib/core/AxiosError.js:89:14)\\n    at RedirectableRequest.handleRequestError (/home/ann/Documents/freelancer/bot-binance/server/node_modules/axios/lib/adapters/http.js:610:25)\\n    at RedirectableRequest.emit (node:events:517:28)\\n    at RedirectableRequest.emit (node:domain:489:12)\\n    at ClientRequest.eventHandlers.<computed> (/home/ann/Documents/freelancer/bot-binance/server/node_modules/follow-redirects/index.js:38:24)\\n    at ClientRequest.emit (node:events:517:28)\\n    at ClientRequest.emit (node:domain:489:12)\\n    at TLSSocket.socketErrorListener (node:_http_client:501:9)\\n    at TLSSocket.emit (node:events:517:28)\\n    at TLSSocket.emit (node:domain:489:12)\\n    at Axios.request (/home/ann/Documents/freelancer/bot-binance/server/node_modules/axios/lib/core/Axios.js:45:41)\\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)","config":{"transitional":{"silentJSONParsing":true,"forcedJSONParsing":true,"clarifyTimeoutError":false},"adapter":["xhr","http"],"transformRequest":[null],"transformResponse":[null],"timeout":0,"xsrfCookieName":"XSRF-TOKEN","xsrfHeaderName":"X-XSRF-TOKEN","maxContentLength":-1,"maxBodyLength":-1,"env":{},"headers":{"Accept":"application/json, text/plain, */*","User-Agent":"axios/1.6.8","Accept-Encoding":"gzip, compress, deflate, br"},"method":"get","url":"https://testnet.binancefuture.com/fapi/v2/ticker/price"},"code":"ECONNRESET","status":null}';

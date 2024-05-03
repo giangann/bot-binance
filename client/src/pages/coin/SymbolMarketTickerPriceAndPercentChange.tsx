@@ -104,13 +104,12 @@ export const SymbolMarketTickerPriceAndPercentChange: React.FC<Props> = ({
         if (symbolTickerPrices.length > 0)
           setSymbolTickerPrices(newTickerPrices(msg.data, symbolTickerPrices));
     });
-  }, []);
+  }, [symbolMarkPrices, symbolTickerPrices]);
 
   const dataTable: TData[] = useMemo(
     () => mix(symbolAllPrices, symbolTickerPrices, symbolMarkPrices),
     [symbolAllPrices, symbolTickerPrices, symbolMarkPrices]
   );
-  
 
   const dataTableFilterd = filterDataTable(filterBy, dataTable);
   const sortTable = sortDataTableSingleKey(

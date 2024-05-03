@@ -8,7 +8,6 @@ import { TestApi } from "./pages/account/TestApi";
 export const Home = () => {
   return (
     <Box>
-      <TestApi/>
       <Coin />
       <Balance />
 

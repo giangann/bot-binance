@@ -25,8 +25,13 @@ const list = (params) => __awaiter(void 0, void 0, void 0, function* () {
     return data;
 });
 const create = (params) => __awaiter(void 0, void 0, void 0, function* () {
-    const paramsWithDateTime = Object.assign(Object.assign({}, params), { createdAt: (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss"), updatedAt: (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss") });
-    const createdRecord = yield (0, typeorm_1.getRepository)(log_entity_1.Log).save(paramsWithDateTime);
-    return createdRecord;
+    try {
+        const paramsWithDateTime = Object.assign(Object.assign({}, params), { createdAt: (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss"), updatedAt: (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss") });
+        const createdRecord = yield (0, typeorm_1.getRepository)(log_entity_1.Log).save(paramsWithDateTime);
+        return createdRecord;
+    }
+    catch (error) {
+        throw error;
+    }
 });
 exports.default = { list, create };

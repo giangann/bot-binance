@@ -1,10 +1,11 @@
-import { Grid } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import { createContext, useEffect, useState } from "react";
 import { getApi } from "../../request/request";
 import { ICoinPrice, TCoinPriceMap } from "../../shared/types/coin";
 import { CoinPriceFixedTime } from "./CoinPriceFIxedTime";
 import { CoinPriceRealTime } from "./CoinPriceRealTime";
 import data from "./data.json";
+import { useNavigate } from "react-router-dom";
 
 export const CoinContext = createContext<{
   coinPricesArr: ICoinPrice[];
@@ -39,7 +40,8 @@ export const Coin = () => {
         coinPricesArr: coinPrices,
       }}
     >
-      <Grid container spacing={{ xs: 3, sm: 6 }}>
+      <GoToFullTable />
+      <Grid container columnSpacing={{ xs: 3, sm: 6 }}>
         <CoinPriceFixedTime />
         <CoinPriceRealTime />
       </Grid>
@@ -55,3 +57,13 @@ function coinArrayToMap(coinArr: ICoinPrice[]) {
   }
   return coinMap;
 }
+
+const GoToFullTable = () => {
+  return (
+    <a href="/mix-table" target="_blank">
+      <Typography fontSize={22} fontWeight={600}>
+        Xem bảng đầy đủ
+      </Typography>
+    </a>
+  );
+};

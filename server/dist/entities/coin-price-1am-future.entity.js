@@ -9,29 +9,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CoinPrice1AM = void 0;
+exports.CoinPrice1AMFuture = void 0;
 const typeorm_1 = require("typeorm");
 const base_entity_1 = require("./base.entity");
 // Entities
-let CoinPrice1AM = class CoinPrice1AM extends base_entity_1.BaseEntity {
+let CoinPrice1AMFuture = class CoinPrice1AMFuture extends base_entity_1.BaseEntity {
 };
-exports.CoinPrice1AM = CoinPrice1AM;
+exports.CoinPrice1AMFuture = CoinPrice1AMFuture;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], CoinPrice1AM.prototype, "id", void 0);
+], CoinPrice1AMFuture.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], CoinPrice1AM.prototype, "symbol", void 0);
+], CoinPrice1AMFuture.prototype, "symbol", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], CoinPrice1AM.prototype, "price", void 0);
+], CoinPrice1AMFuture.prototype, "price", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], CoinPrice1AM.prototype, "mark_price", void 0);
-exports.CoinPrice1AM = CoinPrice1AM = __decorate([
-    (0, typeorm_1.Entity)("coin_price_1am")
-], CoinPrice1AM);
+], CoinPrice1AMFuture.prototype, "mark_price", void 0);
+exports.CoinPrice1AMFuture = CoinPrice1AMFuture = __decorate([
+    (0, typeorm_1.Entity)("coin_price_1am_future")
+], CoinPrice1AMFuture);

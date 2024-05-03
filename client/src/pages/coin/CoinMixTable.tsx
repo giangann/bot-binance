@@ -1,5 +1,3 @@
-// OPTION 1: -------------- 1 TABLE
-// symbol,
 
 import { Grid } from "@mui/material";
 import { SymbolMarketTickerPriceAndPercentChange } from "./SymbolMarketTickerPriceAndPercentChange";
@@ -29,7 +27,7 @@ export const CoinMixTable = () => {
   const connectionFuture = "future-binance-stream-forward";
   
   return (
-    <Grid container>
+    <Grid container rowSpacing={8}>
       <Grid item xs={12}>
         <SymbolMarketTickerPriceAndPercentChange
           title={"Coin testnet"}

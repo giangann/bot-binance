@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
+exports.binanceStreamToSymbolPrice = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
 const crypto_1 = require("crypto");
 function priceToPercent(p1, p2) {
-    console.log("prev", p1, "curr", p2);
     if (p1 < p2)
         return (p2 / p1 - 1) * 100;
     else
@@ -43,4 +42,31 @@ function getTimestampOfToday1AM() {
     return today1AM.getTime(); // Get timestamp in milliseconds
 }
 exports.getTimestampOfToday1AM = getTimestampOfToday1AM;
-console.log(getTimestampOfToday1AM());
+// take TMarketStream or TTickerStream
+// return TSymbolMarkPrice or TSYmbolTickerPrice
+function binanceStreamToSymbolPrice(streamResponse) {
+    let event = streamResponse.stream;
+    // if tickerPrice then return (symbol, price)[]
+    if (event === "!ticker@arr") {
+        let stremDataArrayOfObj = streamResponse.data; // Narrow down the type
+        let data = stremDataArrayOfObj.map((obj) => {
+            return {
+                symbol: obj.s,
+                price: obj.c,
+            };
+        });
+        return { event, data };
+    }
+    // if markPrice then return (symbol, markPrice)[]
+    if (event === "!markPrice@arr") {
+        let stremDataArrayOfObj = streamResponse.data; // Narrow down the type
+        let data = stremDataArrayOfObj.map((obj) => {
+            return {
+                symbol: obj.s,
+                markPrice: obj.p,
+            };
+        });
+        return { event, data };
+    }
+}
+exports.binanceStreamToSymbolPrice = binanceStreamToSymbolPrice;

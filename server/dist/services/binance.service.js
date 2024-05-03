@@ -28,6 +28,7 @@ const commonHeader = {
 const commonAxiosOpt = {
     headers: Object.assign({}, commonHeader),
 };
+const coinService = new coin_service_1.default(true);
 const getPositions = () => __awaiter(void 0, void 0, void 0, function* () {
     const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
     const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
@@ -61,14 +62,8 @@ const getAccountFetch = () => __awaiter(void 0, void 0, void 0, function* () {
     const accInfo = yield response.json();
     return accInfo;
 });
-const test = () => __awaiter(void 0, void 0, void 0, function* () {
-    const data = yield getAccountInfo();
-    console.log("getAccountInfo", data);
-    console.log("some info", data.availableBalance, data.totalWalletBalance);
-});
-// test();
 const getSymbolPriceTickers1Am = () => __awaiter(void 0, void 0, void 0, function* () {
-    const price1Am = yield coin_service_1.default.list();
+    const price1Am = yield coinService.list();
     return price1Am;
 });
 const getSymbolPriceTicker = (symbol) => __awaiter(void 0, void 0, void 0, function* () {
@@ -87,6 +82,18 @@ const getSymbolPriceTickers = () => __awaiter(void 0, void 0, void 0, function* 
     const tickersPrice = response.data;
     return tickersPrice;
 });
+const getSymbolMarketPrices = () => __awaiter(void 0, void 0, void 0, function* () {
+    const endpoint = "/fapi/v1/premiumIndex";
+    const url = `${baseUrl}${endpoint}`;
+    const response = yield axios_1.default.get(url);
+    const markPrices = response.data;
+    return markPrices;
+});
+const test = () => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield getSymbolPriceTickers();
+    console.log("some info", data.slice(0, 10));
+});
+// test();
 const getOrdersFromToday1Am = () => __awaiter(void 0, void 0, void 0, function* () {
     const endpoint = "/fapi/v1/allOrders";
     const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
@@ -136,10 +143,11 @@ const createMarketOrder = (symbol, side, quantity, type = "market", _price) => _
 exports.default = {
     getSymbolPriceTicker,
     getSymbolPriceTickers,
+    getSymbolMarketPrices,
     createMarketOrder,
     getSymbolPriceTickers1Am,
     getPositions,
     getAccountInfo,
     getOrdersFromToday1Am,
-    getAccountFetch
+    getAccountFetch,
 };
