@@ -1,10 +1,10 @@
 import { RouteObject, createBrowserRouter } from "react-router-dom";
 import { Home } from "../Home";
 import { Layout } from "../Layout";
-import { ListOrderChain } from "../pages/account/ListOrderChain";
 import { ChainLog } from "../pages/account/ChainLog";
-import { Test } from "../pages/test/Test";
+import { ListOrderChain } from "../pages/account/ListOrderChain";
 import { CoinMixTable } from "../pages/coin/CoinMixTable";
+import { Test } from "../pages/test/Test";
 
 const routes: RouteObject[] = [
   {

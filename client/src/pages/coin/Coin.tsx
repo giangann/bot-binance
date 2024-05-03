@@ -1,11 +1,10 @@
-import { Button, Grid, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import { createContext, useEffect, useState } from "react";
 import { getApi } from "../../request/request";
 import { ICoinPrice, TCoinPriceMap } from "../../shared/types/coin";
 import { CoinPriceFixedTime } from "./CoinPriceFIxedTime";
 import { CoinPriceRealTime } from "./CoinPriceRealTime";
 import data from "./data.json";
-import { useNavigate } from "react-router-dom";
 
 export const CoinContext = createContext<{
   coinPricesArr: ICoinPrice[];
