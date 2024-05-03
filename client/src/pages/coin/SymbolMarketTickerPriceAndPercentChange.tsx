@@ -104,6 +104,10 @@ export const SymbolMarketTickerPriceAndPercentChange: React.FC<Props> = ({
         if (symbolTickerPrices.length > 0)
           setSymbolTickerPrices(newTickerPrices(msg.data, symbolTickerPrices));
     });
+
+    return () => {
+      socket?.off(connection);
+    };
   }, [symbolMarkPrices, symbolTickerPrices]);
 
   const dataTable: TData[] = useMemo(
@@ -123,14 +127,18 @@ export const SymbolMarketTickerPriceAndPercentChange: React.FC<Props> = ({
     {
       fieldKey: "symbol",
       header: "Symbol",
+      width: 300,
     },
     {
       fieldKey: "price_1AM",
       header: "Ticker price 1AM",
+      width: 300,
     },
     {
       fieldKey: "price",
       header: "Ticker price now",
+      width: 300,
+
       render: ({ price }) => {
         return (
           <Box>
@@ -142,6 +150,8 @@ export const SymbolMarketTickerPriceAndPercentChange: React.FC<Props> = ({
     {
       fieldKey: "percentPriceChange",
       header: "Ticker price change",
+      width: 300,
+
       render: ({ percentPriceChange }) => {
         let percentText: string = "";
         let prefix: string = "";
@@ -163,10 +173,13 @@ export const SymbolMarketTickerPriceAndPercentChange: React.FC<Props> = ({
     {
       fieldKey: "mark_price_1AM",
       header: "Market price 1AM",
+      width: 300,
     },
     {
       fieldKey: "mark_price",
       header: "Market price",
+      width: 300,
+
       render: ({ mark_price }) => {
         return <Typography fontWeight={600}>{mark_price}</Typography>;
       },
@@ -174,6 +187,8 @@ export const SymbolMarketTickerPriceAndPercentChange: React.FC<Props> = ({
     {
       fieldKey: "percentMarkPriceChange",
       header: "Market price change",
+      width: 300,
+
       render: ({ percentMarkPriceChange }) => {
         let percentText: string = "";
         let prefix: string = "";
