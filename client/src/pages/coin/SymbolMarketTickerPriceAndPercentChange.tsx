@@ -66,7 +66,12 @@ export const SymbolMarketTickerPriceAndPercentChange: React.FC<Props> = ({
 
   useEffect(() => {
     async function fetchSymbolAllPrices() {
-      const response = await getApi<ISymbolAllPriceDBRow[]>("coin-price-1am");
+      const query = baseUrl.includes("testnet")
+        ? "testnet=true"
+        : "testnet=false";
+      const response = await getApi<ISymbolAllPriceDBRow[]>(
+        `coin-price-1am?${query}`
+      );
       if (response.success) setSymbolAllPrices(response.data);
     }
     fetchSymbolAllPrices();
