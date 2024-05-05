@@ -1,3 +1,7 @@
 1. sửa cronjob:
   logic hiện tại: call api symbols price, loop từng symbol, nếu tìm thấy trong db thì chỉ update
   mong muốn: nếu record không tìm thấy trong database thì tạo mới. Nếu tìm thấy thì chỉ update
+
+2. Việc testnet và future có số lượng symbol không giống nhau
+  Do testnet trả về ít symbol hơn (ticker api và mark api)
+

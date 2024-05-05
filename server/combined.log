@@ -1,0 +1,1 @@
+{"level":"info","message":"The connection to database was failed with error: Error: ER_ACCESS_DENIED_ERROR: Access denied for user 'root'@'localhost' (using password: YES)","timestamp":"2024-05-04T14:30:14.357Z"}
