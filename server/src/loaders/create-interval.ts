@@ -1,3 +1,4 @@
+import { ILogCreate } from "log.interface";
 import { IMarketOrderChainEntity } from "market-order-chain.interface";
 import { IMarketOrderPieceCreate } from "market-order-piece.interface";
 import binanceService from "../services/binance.service";
@@ -13,8 +14,6 @@ import {
 } from "../types/order";
 import { TPosition } from "../types/position";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
-import { connectDatabase } from "./db-connect";
-import { ILogCreate } from "log.interface";
 
 const createInterval = () => {
   const interval = setInterval(async () => {

@@ -3,10 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.binanceStreamToSymbolPrice = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
 const crypto_1 = require("crypto");
 function priceToPercent(p1, p2) {
-    if (p1 < p2)
-        return (p2 / p1 - 1) * 100;
-    else
-        return -(p1 / p2 - 1) * 100;
+    return (p2 / p1 - 1) * 100;
 }
 exports.priceToPercent = priceToPercent;
 function compareDate(date1, date2) {

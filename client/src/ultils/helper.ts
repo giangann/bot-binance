@@ -90,10 +90,7 @@ export function priceToPercent(
   const p1 = parseFloat(before as unknown as string);
   const p2 = parseFloat(after as unknown as string);
 
-  let percent = 0;
-  if (p1 < p2) percent = (p2 / p1 - 1) * 100;
-  else percent = -(p1 / p2 - 1) * 100;
-  return percent;
+  return (p2 / p1 - 1) * 100;
 }
 
 export function filterDataTable(
@@ -181,7 +178,6 @@ export function newTickerPrices(
   const bStreamFowardTickerPricesMap = symbolPriceToMap(
     bStreamFowardTickerPrices
   );
-  
 
   let newTickerPricesArr = tickerPrices.map((tickerPrice) => {
     let symbolKey = tickerPrice.symbol;

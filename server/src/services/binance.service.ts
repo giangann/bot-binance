@@ -24,7 +24,7 @@ const commonHeader = {
 const commonAxiosOpt: AxiosRequestConfig = {
   headers: { ...commonHeader },
 };
-const coinService = new CoinService(true)
+const coinService = new CoinService(baseUrl.includes("testnet") ? true : false);
 
 const getPositions = async (): Promise<TPosition[]> => {
   const paramsNow = { recvWindow: 10000, timestamp: Date.now() };

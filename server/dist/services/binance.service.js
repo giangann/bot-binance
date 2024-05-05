@@ -28,7 +28,7 @@ const commonHeader = {
 const commonAxiosOpt = {
     headers: Object.assign({}, commonHeader),
 };
-const coinService = new coin_service_1.default(true);
+const coinService = new coin_service_1.default(baseUrl.includes("testnet") ? true : false);
 const getPositions = () => __awaiter(void 0, void 0, void 0, function* () {
     const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
     const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
