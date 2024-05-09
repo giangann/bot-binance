@@ -43,10 +43,44 @@ export function queryStringToSignature(
 }
 export function getTimestampOfToday1AM() {
   const now = new Date(); // Get current date and time
+
+  // Check if the current time is between midnight and 1 AM
+  if (
+    now.getHours() === 0 &&
+    now.getMinutes() >= 0 &&
+    now.getMinutes() <= 59 &&
+    now.getSeconds() >= 1 &&
+    now.getSeconds() <= 59
+  ) {
+    // If it is, get yesterday's date
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+
+    // Set time to yesterday 1 AM
+    yesterday.setHours(1, 0, 0, 0);
+
+    return yesterday.getTime(); // Get timestamp in milliseconds for yesterday 1 AM
+  } else {
+    // If not, get today's date and set time to 1 AM
+    const today1AM = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      1,
+      0,
+      0,
+      0
+    );
+    return today1AM.getTime(); // Get timestamp in milliseconds for today 1 AM
+  }
+}
+
+export function getTimestampOfYesterday1AM() {
+  const now = new Date(); // Get current date and time
   const today1AM = new Date(
     now.getFullYear(),
     now.getMonth(),
-    now.getDate(),
+    now.getDate() - 1,
     1,
     0,
     0,
@@ -54,7 +88,6 @@ export function getTimestampOfToday1AM() {
   ); // Set time to 1 AM
   return today1AM.getTime(); // Get timestamp in milliseconds
 }
-
 // take TMarketStream or TTickerStream
 // return TSymbolMarkPrice or TSYmbolTickerPrice
 export function binanceStreamToSymbolPrice(

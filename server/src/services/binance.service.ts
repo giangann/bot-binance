@@ -3,13 +3,13 @@ import dotenv from "dotenv";
 import { TAccount } from "../types/account";
 import { TCreateOrderErr, TNewOrder, TOrder, TResponse } from "../types/order";
 import { TPosition } from "../types/position";
+import { TSymbolMarkPrice } from "../types/symbol-mark-price";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
 import {
   getTimestampOfToday1AM,
   paramsToQueryWithSignature,
 } from "../ultils/helper.ultil";
 import CoinService from "./coin.service";
-import { TSymbolMarkPrice } from "../types/symbol-mark-price";
 dotenv.config();
 
 // GET ENV
@@ -27,46 +27,61 @@ const commonAxiosOpt: AxiosRequestConfig = {
 const coinService = new CoinService(baseUrl.includes("testnet") ? true : false);
 
 const getPositions = async (): Promise<TPosition[]> => {
-  const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
-  const queryString = paramsToQueryWithSignature(secret, paramsNow);
-  const endpoint = "/fapi/v2/positionRisk";
-  const url = `${baseUrl}${endpoint}?${queryString}`;
-  const response = await axios.get(url, commonAxiosOpt);
-  const positions = response.data;
-  return positions;
+  try {
+    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
+    const queryString = paramsToQueryWithSignature(secret, paramsNow);
+    const endpoint = "/fapi/v2/positionRisk";
+    const url = `${baseUrl}${endpoint}?${queryString}`;
+    const response = await axios.get(url, commonAxiosOpt);
+    const positions = response.data;
+    return positions;
+  } catch (err) {
+    throw err;
+  }
 };
-
 const getAccountInfo = async (): Promise<TAccount> => {
-  const endpoint = "/fapi/v2/account";
-  const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
-  const queryString = paramsToQueryWithSignature(secret, paramsNow);
-  const url = `${baseUrl}${endpoint}?${queryString}`;
-  const response = await axios.get(url, commonAxiosOpt);
-  const accInfo = response.data;
-  return accInfo;
+  try {
+    const endpoint = "/fapi/v2/account";
+    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
+    const queryString = paramsToQueryWithSignature(secret, paramsNow);
+    const url = `${baseUrl}${endpoint}?${queryString}`;
+    const response = await axios.get(url, commonAxiosOpt);
+    const accInfo = response.data;
+    return accInfo;
+  } catch (err) {
+    throw err;
+  }
 };
 
 const getAccountFetch = async (): Promise<TAccount> => {
-  const endpoint = "/fapi/v2/account";
-  const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
-  const queryString = paramsToQueryWithSignature(secret, paramsNow);
-  const url = `${baseUrl}${endpoint}?${queryString}`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "X-MBX-APIKEY": apiKey,
-      "Content-Type": "application/json",
-    },
-  });
-  const accInfo = await response.json();
-  return accInfo;
+  try {
+    const endpoint = "/fapi/v2/account";
+    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
+    const queryString = paramsToQueryWithSignature(secret, paramsNow);
+    const url = `${baseUrl}${endpoint}?${queryString}`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "X-MBX-APIKEY": apiKey,
+        "Content-Type": "application/json",
+      },
+    });
+    const accInfo = await response.json();
+    return accInfo;
+  } catch (err) {
+    throw err;
+  }
 };
 
 const getSymbolPriceTickers1Am = async (): Promise<
   Omit<TSymbolPriceTicker, "time">[]
 > => {
-  const price1Am = await coinService.list();
-  return price1Am;
+  try {
+    const price1Am = await coinService.list();
+    return price1Am;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const getSymbolPriceTicker = async (
@@ -97,25 +112,25 @@ const getSymbolMarketPrices = async (): Promise<TSymbolMarkPrice[]> => {
   return markPrices;
 };
 
-const test = async () => {
-  const data = await getSymbolPriceTickers();
-  console.log("some info", data.slice(0, 10));
-};
-// test();
-
 const getOrdersFromToday1Am = async (): Promise<TOrder[]> => {
-  const endpoint = "/fapi/v1/allOrders";
-  const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
-  const params = {
-    ...paramsNow,
-    startTime: getTimestampOfToday1AM(),
-  };
-  const queryString = paramsToQueryWithSignature(secret, params);
-  const url = `${baseUrl}${endpoint}?${queryString}`;
-  const response = await axios.get(url, commonAxiosOpt);
-  const orders = response.data;
+  try {
+    const endpoint = "/fapi/v1/allOrders";
+    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
+    const params = {
+      ...paramsNow,
+      startTime: getTimestampOfToday1AM(),
+    };
+    const queryString = paramsToQueryWithSignature(secret, params);
+    const url = `${baseUrl}${endpoint}?${queryString}`;
+    const response = await axios.get(url, commonAxiosOpt);
 
-  return orders;
+    const orders = response.data;
+
+    return orders;
+  } catch (error) {
+    // Handle the error here
+    throw error; // Re-throw the error if necessary
+  }
 };
 
 const createMarketOrder = async (
@@ -159,7 +174,7 @@ const createMarketOrder = async (
       };
     }
   } catch (err) {
-    console.log("err msg", err);
+    throw err;
   }
 };
 

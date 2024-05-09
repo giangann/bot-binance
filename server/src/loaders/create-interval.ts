@@ -14,6 +14,7 @@ import {
 } from "../types/order";
 import { TPosition } from "../types/position";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
+import { logger } from "./logger.config";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
@@ -106,6 +107,7 @@ const createInterval = () => {
     } catch (err) {
       console.log("err", err);
       global.wsServerGlob.emit("app-err", JSON.stringify(err));
+      logger.error(err.response?.data || err);
     }
 
     console.log("emit and end tick");
