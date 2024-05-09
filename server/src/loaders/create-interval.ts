@@ -15,6 +15,12 @@ import {
 import { TPosition } from "../types/position";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
 import { logger } from "./logger.config";
+import {
+  ordersToMap,
+  positionsToMap,
+  symbolPriceTickersToMap,
+  validateAmount,
+} from "../ultils/helper.ultil";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
@@ -124,130 +130,6 @@ type TOrderParams = {
   order_size?: number;
   price_ticker?: number;
 };
-async function makeOrders(orderParams: TOrderParams[]) {
-  const promises = orderParams.map(async (param) => {
-    const { symbol, amount, direction } = param;
-    try {
-      return await binanceService.createMarketOrder(symbol, direction, amount);
-    } catch (error) {
-      console.log("error", error);
-    }
-  });
-
-  return Promise.all(promises);
-}
-function genOrderPieceParams(
-  newOrders: TNewOrder[],
-  orderParams: TOrderParams[],
-  chainId: number
-): IMarketOrderPieceCreate[] {
-  let orderPieceParams: IMarketOrderPieceCreate[] = [];
-
-  for (let newOrder of newOrders) {
-    for (let orderParam of orderParams) {
-      if (newOrder?.symbol === orderParam.symbol) {
-        let orderPiceParam: IMarketOrderPieceCreate = {
-          id: newOrder.orderId.toString(),
-          market_order_chains_id: chainId,
-          amount: orderParam.amount.toString(),
-          direction: orderParam.direction,
-          percent_change: orderParam.percent.toFixed(5),
-          symbol: orderParam.symbol,
-          price: orderParam.price_ticker.toString(),
-          total_balance: "0.00", // can't defined
-          transaction_size: orderParam.order_size.toString(),
-        };
-        orderPieceParams.push(orderPiceParam);
-      }
-    }
-  }
-
-  return orderPieceParams;
-}
-async function saveOrderPieces(orderPieceParams: IMarketOrderPieceCreate[]) {
-  return Promise.all(
-    orderPieceParams.map(async (param) => {
-      return await marketOrderPieceService.create(param);
-    })
-  );
-}
-
-function genLogParams(
-  failedOrders: TResponseFailure[],
-  chainId: number
-): ILogCreate[] {
-  let params: ILogCreate[] = [];
-  for (let failedOrder of failedOrders) {
-    let {
-      error: { code, msg },
-    } = failedOrder;
-    let orderInfo = failedOrder?.payload;
-    params.push({
-      message: `code: ${code}, message: ${msg}, ${JSON.stringify(orderInfo)}`,
-      market_order_chains_id: chainId,
-      type: "order-err",
-    });
-  }
-  return params;
-}
-async function saveLogs(logParams: ILogCreate[]) {
-  return Promise.all(
-    logParams.map(async (param) => {
-      return await logService.create(param);
-    })
-  );
-}
-
-function filterOrder(newOrders: TResponse<TNewOrder>[], success: boolean) {
-  return newOrders.filter((newOrder) => newOrder.success === success);
-}
-
-// if order with same symbol, get only 1 latest order
-async function getChainOpen(): Promise<IMarketOrderChainEntity | null> {
-  const openChain = await marketOrderChainService.list({ status: "open" });
-  if (openChain.length) return openChain[0];
-  else return null;
-}
-
-function symbolPriceTickersToMap<T extends Omit<TSymbolPriceTicker, "time">>(
-  symbolPriceTickers: T[]
-) {
-  let res: Record<string, T> = {};
-
-  for (let symbolPrice of symbolPriceTickers) {
-    let key = symbolPrice.symbol;
-    if (!(key in res)) {
-      res[key] = symbolPrice;
-    }
-  }
-  return res;
-}
-
-function positionsToMap(positions: TPosition[]) {
-  let res: Record<string, TPosition> = {};
-  for (let position of positions) {
-    let key = position.symbol;
-    if (!(key in res)) {
-      res[key] = position;
-    }
-  }
-  return res;
-}
-
-function ordersToMap(orders: TOrder[]): Record<string, TOrder> {
-  let res: Record<string, TOrder> = {};
-
-  // lastest order first
-  const sortOrders = orders.sort((a, b) => b.time - a.time);
-  for (let order of sortOrders) {
-    let key = order.symbol;
-    if (!(key in res)) {
-      res[key] = order;
-    }
-  }
-  return res;
-}
-
 function genMarketOrderParams(
   symbolPriceTickersMap: Record<string, TSymbolPriceTicker>,
   symbolPriceTickers1AmMap: Record<string, Omit<TSymbolPriceTicker, "time">>,
@@ -348,9 +230,89 @@ function genMarketOrderParams(
     console.log(err);
   }
 }
+async function makeOrders(orderParams: TOrderParams[]) {
+  const promises = orderParams.map(async (param) => {
+    const { symbol, amount, direction } = param;
+    try {
+      return await binanceService.createMarketOrder(symbol, direction, amount);
+    } catch (error) {
+      console.log("error", error);
+    }
+  });
 
-function validateAmount(amount: number) {
-  if (amount >= 1) return Math.round(amount);
-  if (amount < 1) return Math.round(amount * 1e3) / 1e3;
+  return Promise.all(promises);
 }
+function genOrderPieceParams(
+  newOrders: TNewOrder[],
+  orderParams: TOrderParams[],
+  chainId: number
+): IMarketOrderPieceCreate[] {
+  let orderPieceParams: IMarketOrderPieceCreate[] = [];
+
+  for (let newOrder of newOrders) {
+    for (let orderParam of orderParams) {
+      if (newOrder?.symbol === orderParam.symbol) {
+        let orderPiceParam: IMarketOrderPieceCreate = {
+          id: newOrder.orderId.toString(),
+          market_order_chains_id: chainId,
+          amount: orderParam.amount.toString(),
+          direction: orderParam.direction,
+          percent_change: orderParam.percent.toFixed(5),
+          symbol: orderParam.symbol,
+          price: orderParam.price_ticker.toString(),
+          total_balance: "0.00", // can't defined
+          transaction_size: orderParam.order_size.toString(),
+        };
+        orderPieceParams.push(orderPiceParam);
+      }
+    }
+  }
+
+  return orderPieceParams;
+}
+async function saveOrderPieces(orderPieceParams: IMarketOrderPieceCreate[]) {
+  return Promise.all(
+    orderPieceParams.map(async (param) => {
+      return await marketOrderPieceService.create(param);
+    })
+  );
+}
+
+function genLogParams(
+  failedOrders: TResponseFailure[],
+  chainId: number
+): ILogCreate[] {
+  let params: ILogCreate[] = [];
+  for (let failedOrder of failedOrders) {
+    let {
+      error: { code, msg },
+    } = failedOrder;
+    let orderInfo = failedOrder?.payload;
+    params.push({
+      message: `code: ${code}, message: ${msg}, ${JSON.stringify(orderInfo)}`,
+      market_order_chains_id: chainId,
+      type: "order-err",
+    });
+  }
+  return params;
+}
+async function saveLogs(logParams: ILogCreate[]) {
+  return Promise.all(
+    logParams.map(async (param) => {
+      return await logService.create(param);
+    })
+  );
+}
+
+function filterOrder(newOrders: TResponse<TNewOrder>[], success: boolean) {
+  return newOrders.filter((newOrder) => newOrder.success === success);
+}
+
+// if order with same symbol, get only 1 latest order
+async function getChainOpen(): Promise<IMarketOrderChainEntity | null> {
+  const openChain = await marketOrderChainService.list({ status: "open" });
+  if (openChain.length) return openChain[0];
+  else return null;
+}
+
 export { createInterval };

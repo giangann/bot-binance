@@ -1,8 +1,13 @@
 import { createHmac } from "crypto";
 import { TTickerPriceStream } from "../types/binance-stream";
 import { TMarkPriceStream } from "../types/binance-stream";
-import { TSymbolPriceTickerWs } from "../types/symbol-price-ticker";
+import {
+  TSymbolPriceTicker,
+  TSymbolPriceTickerWs,
+} from "../types/symbol-price-ticker";
 import { TSymbolMarkPriceWs } from "../types/symbol-mark-price";
+import { TPosition } from "../types/position";
+import { TOrder } from "../types/order";
 
 export function priceToPercent(p1: number, p2: number) {
   return (p2 / p1 - 1) * 100;
@@ -118,4 +123,49 @@ export function binanceStreamToSymbolPrice(
     });
     return { event, data };
   }
+}
+
+export function symbolPriceTickersToMap<
+  T extends Omit<TSymbolPriceTicker, "time">
+>(symbolPriceTickers: T[]) {
+  let res: Record<string, T> = {};
+
+  for (let symbolPrice of symbolPriceTickers) {
+    let key = symbolPrice.symbol;
+    if (!(key in res)) {
+      res[key] = symbolPrice;
+    }
+  }
+  return res;
+}
+
+export function positionsToMap(positions: TPosition[]) {
+  let res: Record<string, TPosition> = {};
+  for (let position of positions) {
+    let key = position.symbol;
+    if (!(key in res)) {
+      res[key] = position;
+    }
+  }
+  return res;
+}
+
+export function ordersToMap(orders: TOrder[]): Record<string, TOrder> {
+  let res: Record<string, TOrder> = {};
+
+  // lastest order first
+  const sortOrders = orders.sort((a, b) => b.time - a.time);
+  for (let order of sortOrders) {
+    let key = order.symbol;
+    if (!(key in res)) {
+      res[key] = order;
+    }
+  }
+  return res;
+}
+
+
+export function validateAmount(amount: number) {
+  if (amount >= 1) return Math.round(amount);
+  if (amount < 1) return Math.round(amount * 1e3) / 1e3;
 }
