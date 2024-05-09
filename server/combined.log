@@ -1,1 +1,63 @@
 {"level":"info","message":"The connection to database was failed with error: Error: ER_ACCESS_DENIED_ERROR: Access denied for user 'root'@'localhost' (using password: YES)","timestamp":"2024-05-04T14:30:14.357Z"}
+{"level":"error","timestamp":"2024-05-09T15:51:00.033Z"}
+{"level":"error","timestamp":"2024-05-09T15:51:00.033Z"}
+{"level":"error","message":"{}","timestamp":"2024-05-09T15:52:22.947Z"}
+{"level":"error","message":"{}","timestamp":"2024-05-09T15:52:22.947Z"}
+{"level":"error","message":"{}","timestamp":"2024-05-09T15:54:15.652Z"}
+{"level":"error","message":"{}","timestamp":"2024-05-09T15:56:02.669Z"}
+{"level":"error","message":"{}","timestamp":"2024-05-09T15:56:02.669Z"}
+{"level":"error","message":"{}","timestamp":"2024-05-09T15:56:02.669Z"}
+{"level":"error","message":"{}","timestamp":"2024-05-09T15:56:02.669Z"}
+{"level":"error","message":"\"{\\\"code\\\":-2015,\\\"msg\\\":\\\"Invalid API-key, IP, or permissions for action\\\"}\"","timestamp":"2024-05-09T15:57:13.783Z"}
+{"level":"error","message":"\"{\\\"code\\\":-2015,\\\"msg\\\":\\\"Invalid API-key, IP, or permissions for action\\\"}\"","timestamp":"2024-05-09T15:57:13.783Z"}
+{"level":"error","message":"\"{\\\"code\\\":-2015,\\\"msg\\\":\\\"Invalid API-key, IP, or permissions for action\\\"}\"","timestamp":"2024-05-09T15:57:13.783Z"}
+{"level":"error","message":"\"{\\\"code\\\":-2015,\\\"msg\\\":\\\"Invalid API-key, IP, or permissions for action\\\"}\"","timestamp":"2024-05-09T15:57:13.783Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:00:39.742Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:02:39.289Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:05:20.368Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:05:20.368Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:05:20.368Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:06:19.041Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:06:19.041Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:06:19.041Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:06:19.041Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:15.273Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:15.273Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:15.273Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:53.485Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:53.485Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:53.485Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:53.485Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:53.485Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:53.485Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:53.485Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:53.485Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:53.485Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:07:53.485Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:10:18.051Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:16:44.118Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:16:44.118Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:16:44.118Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:16:44.118Z"}
+{"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action\"}","timestamp":"2024-05-09T16:16:44.118Z"}

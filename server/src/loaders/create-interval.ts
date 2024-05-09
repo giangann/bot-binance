@@ -68,18 +68,6 @@ const createInterval = () => {
           false
         ) as TResponseFailure[];
 
-        console.log(
-          "success orders: ",
-          successOrders,
-          " failedOrders: ",
-          failureOrders
-        );
-        console.log(
-          "success orders: ",
-          successOrders.length,
-          " failedOrders: ",
-          failureOrders.length
-        );
         const successOrdersData = successOrders.map((order) => {
           return order.data;
         });
@@ -111,9 +99,9 @@ const createInterval = () => {
         availableBalance
       );
     } catch (err) {
-      console.log("err", err);
-      global.wsServerGlob.emit("app-err", JSON.stringify(err));
-      logger.error(err.response?.data || err);
+      const appErr = { name: err.name, message: err.message };
+      global.wsServerGlob.emit("app-err", JSON.stringify(appErr));
+      logger.error(err.message);
     }
 
     console.log("emit and end tick");

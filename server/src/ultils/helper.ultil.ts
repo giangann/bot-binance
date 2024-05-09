@@ -8,6 +8,8 @@ import {
 import { TSymbolMarkPriceWs } from "../types/symbol-mark-price";
 import { TPosition } from "../types/position";
 import { TOrder } from "../types/order";
+import binanceService from "../services/binance.service";
+import moment from "moment";
 
 export function priceToPercent(p1: number, p2: number) {
   return (p2 / p1 - 1) * 100;
@@ -164,8 +166,12 @@ export function ordersToMap(orders: TOrder[]): Record<string, TOrder> {
   return res;
 }
 
-
 export function validateAmount(amount: number) {
   if (amount >= 1) return Math.round(amount);
   if (amount < 1) return Math.round(amount * 1e3) / 1e3;
+}
+
+export function isSuccess(status: number) {
+  const successStatuss = [200, 201];
+  return successStatuss.includes(status) ? true : false;
 }

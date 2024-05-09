@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import dotenv from "dotenv";
 import { TAccount } from "../types/account";
 import { TCreateOrderErr, TNewOrder, TOrder, TResponse } from "../types/order";
@@ -7,6 +7,7 @@ import { TSymbolMarkPrice } from "../types/symbol-mark-price";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
 import {
   getTimestampOfToday1AM,
+  isSuccess,
   paramsToQueryWithSignature,
 } from "../ultils/helper.ultil";
 import CoinService from "./coin.service";
@@ -23,6 +24,7 @@ const commonHeader = {
 };
 const commonAxiosOpt: AxiosRequestConfig = {
   headers: { ...commonHeader },
+  validateStatus: (_status) => isSuccess(_status),
 };
 const coinService = new CoinService(baseUrl.includes("testnet") ? true : false);
 
@@ -36,7 +38,11 @@ const getPositions = async (): Promise<TPosition[]> => {
     const positions = response.data;
     return positions;
   } catch (err) {
-    throw err;
+    if (err instanceof AxiosError) {
+      throw new Error(JSON.stringify(err.response.data));
+    } else {
+      throw err;
+    }
   }
 };
 const getAccountInfo = async (): Promise<TAccount> => {
@@ -46,10 +52,15 @@ const getAccountInfo = async (): Promise<TAccount> => {
     const queryString = paramsToQueryWithSignature(secret, paramsNow);
     const url = `${baseUrl}${endpoint}?${queryString}`;
     const response = await axios.get(url, commonAxiosOpt);
+
     const accInfo = response.data;
     return accInfo;
   } catch (err) {
-    throw err;
+    if (err instanceof AxiosError) {
+      throw new Error(JSON.stringify(err.response.data));
+    } else {
+      throw err;
+    }
   }
 };
 
@@ -69,7 +80,11 @@ const getAccountFetch = async (): Promise<TAccount> => {
     const accInfo = await response.json();
     return accInfo;
   } catch (err) {
-    throw err;
+    if (err instanceof AxiosError) {
+      throw new Error(JSON.stringify(err.response.data));
+    } else {
+      throw err;
+    }
   }
 };
 
