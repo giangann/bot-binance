@@ -1,15 +1,14 @@
 import { createHmac } from "crypto";
-import { TTickerPriceStream } from "../types/binance-stream";
-import { TMarkPriceStream } from "../types/binance-stream";
+import { IMarketOrderPieceRecord } from "market-order-piece.interface";
+import marketOrderChainService from "../services/market-order-chain.service";
+import { TMarkPriceStream, TTickerPriceStream } from "../types/binance-stream";
+import { TOrder } from "../types/order";
+import { TPosition } from "../types/position";
+import { TSymbolMarkPriceWs } from "../types/symbol-mark-price";
 import {
   TSymbolPriceTicker,
   TSymbolPriceTickerWs,
 } from "../types/symbol-price-ticker";
-import { TSymbolMarkPriceWs } from "../types/symbol-mark-price";
-import { TPosition } from "../types/position";
-import { TOrder } from "../types/order";
-import binanceService from "../services/binance.service";
-import moment from "moment";
 
 export function priceToPercent(p1: number, p2: number) {
   return (p2 / p1 - 1) * 100;
@@ -157,6 +156,22 @@ export function ordersToMap(orders: TOrder[]): Record<string, TOrder> {
 
   // lastest order first
   const sortOrders = orders.sort((a, b) => b.time - a.time);
+  for (let order of sortOrders) {
+    let key = order.symbol;
+    if (!(key in res)) {
+      res[key] = order;
+    }
+  }
+  return res;
+}
+
+export function orderPiecesToMap(orderPieces: IMarketOrderPieceRecord[]) {
+  let res: Record<string, IMarketOrderPieceRecord> = {};
+
+  // lastest order first
+  const sortOrders = orderPieces.sort((a, b) =>
+    compareDate(a.createdAt, b.createdAt)
+  );
   for (let order of sortOrders) {
     let key = order.symbol;
     if (!(key in res)) {

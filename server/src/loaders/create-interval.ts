@@ -1,6 +1,9 @@
 import { ILogCreate } from "log.interface";
 import { IMarketOrderChainEntity } from "market-order-chain.interface";
-import { IMarketOrderPieceCreate } from "market-order-piece.interface";
+import {
+  IMarketOrderPieceCreate,
+  IMarketOrderPieceRecord,
+} from "market-order-piece.interface";
 import binanceService from "../services/binance.service";
 import logService from "../services/log.service";
 import marketOrderChainService from "../services/market-order-chain.service";
@@ -16,6 +19,7 @@ import { TPosition } from "../types/position";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
 import { logger } from "./logger.config";
 import {
+  orderPiecesToMap,
   ordersToMap,
   positionsToMap,
   symbolPriceTickersToMap,
@@ -45,16 +49,15 @@ const createInterval = () => {
         const positions = await binanceService.getPositions();
         const positionsMap = positionsToMap(positions);
 
-        // // fetch list Orders Today
-        const ordersFrom1Am = await binanceService.getOrdersFromToday1Am();
-        const ordersFrom1AmMap = ordersToMap(ordersFrom1Am); // last order of each symbol
+        // orderPieces of current order chain
+        const orderPiecesMap = orderPiecesToMap(openChain.order_pieces);
 
         // gen order params
         const orderParams = genMarketOrderParams(
           symbolPriceTickersMap,
           symbolPriceTickers1AmMap,
           positionsMap,
-          ordersFrom1AmMap,
+          orderPiecesMap,
           openChain
         );
 
@@ -122,7 +125,7 @@ function genMarketOrderParams(
   symbolPriceTickersMap: Record<string, TSymbolPriceTicker>,
   symbolPriceTickers1AmMap: Record<string, Omit<TSymbolPriceTicker, "time">>,
   positionsMap: Record<string, TPosition>,
-  ordersFrom1AmMap: Record<string, TOrder>,
+  orderPiecesMap: Record<string, IMarketOrderPieceRecord>,
   openChain: IMarketOrderChainEntity
 ) {
   try {
@@ -135,9 +138,9 @@ function genMarketOrderParams(
       // get prev price
       let prevPrice = parseFloat(symbolPriceTickers1AmMap[symbol]?.price);
       // check to day has order
-      let todayLatestOrder = ordersFrom1AmMap[symbol];
+      let todayLatestOrder = orderPiecesMap[symbol];
       if (todayLatestOrder) {
-        prevPrice = parseFloat(todayLatestOrder.avgPrice);
+        prevPrice = parseFloat(todayLatestOrder.price);
       }
       // get current price
       let currPrice = parseFloat(symbolPriceTickersMap[symbol]?.price);
@@ -156,18 +159,14 @@ function genMarketOrderParams(
       if (percent_change <= parseFloat(percent_to_sell)) {
         direction = "SELL";
         if (todayLatestOrder) {
-          let prevSize =
-            parseFloat(todayLatestOrder.avgPrice) *
-            parseFloat(todayLatestOrder.origQty);
+          let prevSize = parseFloat(todayLatestOrder.transaction_size);
           order_size = prevSize / 2;
         }
       }
       if (percent_change >= parseFloat(percent_to_buy)) {
         direction = "BUY";
         if (todayLatestOrder) {
-          let prevSize =
-            parseFloat(todayLatestOrder.avgPrice) *
-            parseFloat(todayLatestOrder.origQty);
+          let prevSize = parseFloat(todayLatestOrder.transaction_size);
           order_size = prevSize * 2;
         }
       }
@@ -182,7 +181,6 @@ function genMarketOrderParams(
             if (positionAmt < amount) amount = positionAmt;
           }
         }
-
         orderParams.push({
           amount: validateAmount(amount),
           direction,
@@ -191,28 +189,9 @@ function genMarketOrderParams(
           order_size,
           price_ticker: currPrice,
         });
-
-        console.log(
-          "symbol: ",
-          symbol,
-          " today has order: ",
-          Boolean(todayLatestOrder),
-          " prevPrice: ",
-          prevPrice.toFixed(3),
-          " currPrice: ",
-          currPrice.toFixed(3),
-          " percentChange: ",
-          percent_change,
-          " direction: ",
-          direction,
-          " size: ",
-          order_size,
-          " amont: ",
-          amount
-        );
       }
     }
-    console.log("total", orderParams.length, " orders");
+    console.log("total generated params: ", orderParams.length, " orders");
     return orderParams;
   } catch (err) {
     console.log(err);

@@ -17,33 +17,32 @@ const binance_service_1 = __importDefault(require("../services/binance.service")
 const log_service_1 = __importDefault(require("../services/log.service"));
 const market_order_chain_service_1 = __importDefault(require("../services/market-order-chain.service"));
 const market_order_piece_service_1 = __importDefault(require("../services/market-order-piece.service"));
+const logger_config_1 = require("./logger.config");
+const helper_ultil_1 = require("../ultils/helper.ultil");
 const createInterval = () => {
     const interval = setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         console.log("start tick");
         try {
             // fetch symbolPriceTickers now
             const symbolPriceTickers = yield binance_service_1.default.getSymbolPriceTickers();
-            const symbolPriceTickersMap = symbolPriceTickersToMap(symbolPriceTickers);
+            const symbolPriceTickersMap = (0, helper_ultil_1.symbolPriceTickersToMap)(symbolPriceTickers);
             global.wsServerGlob.emit("symbols-price", symbolPriceTickers);
             // fetch chain open
             const openChain = yield getChainOpen();
             if (openChain) {
                 // fetch symbolPriceTickers 1AM from DB
                 const symbolPriceTickers1Am = yield binance_service_1.default.getSymbolPriceTickers1Am();
-                const symbolPriceTickers1AmMap = symbolPriceTickersToMap(symbolPriceTickers1Am);
+                const symbolPriceTickers1AmMap = (0, helper_ultil_1.symbolPriceTickersToMap)(symbolPriceTickers1Am);
                 // // fetch list position
                 const positions = yield binance_service_1.default.getPositions();
-                const positionsMap = positionsToMap(positions);
-                // // fetch list Orders Today
-                const ordersFrom1Am = yield binance_service_1.default.getOrdersFromToday1Am();
-                const ordersFrom1AmMap = ordersToMap(ordersFrom1Am); // last order of each symbol
+                const positionsMap = (0, helper_ultil_1.positionsToMap)(positions);
+                // orderPieces of current order chain
+                const orderPiecesMap = (0, helper_ultil_1.orderPiecesToMap)(openChain.order_pieces);
                 // gen order params
-                const orderParams = genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, ordersFrom1AmMap, openChain);
+                const orderParams = genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, orderPiecesMap, openChain);
                 const createdOrders = yield makeOrders(orderParams);
                 const successOrders = filterOrder(createdOrders, true);
                 const failureOrders = filterOrder(createdOrders, false);
-                console.log("success orders: ", successOrders, " failedOrders: ", failureOrders);
-                console.log("success orders: ", successOrders.length, " failedOrders: ", failureOrders.length);
                 const successOrdersData = successOrders.map((order) => {
                     return order.data;
                 });
@@ -59,14 +58,85 @@ const createInterval = () => {
             global.wsServerGlob.emit("ws-balance", totalWalletBalance, availableBalance);
         }
         catch (err) {
-            console.log("err", err);
-            global.wsServerGlob.emit("app-err", JSON.stringify(err));
+            const appErr = { name: err.name, message: err.message };
+            global.wsServerGlob.emit("app-err", JSON.stringify(appErr));
+            logger_config_1.logger.error(err.message);
         }
         console.log("emit and end tick");
     }), 10000);
     global.tickInterval = interval;
 };
 exports.createInterval = createInterval;
+function genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, orderPiecesMap, openChain) {
+    var _a, _b;
+    try {
+        const { percent_to_buy, percent_to_sell, transaction_size_start } = openChain;
+        let orderParams = [];
+        // loop through symbolPriceTickers
+        const symbols = Object.keys(symbolPriceTickersMap);
+        for (let symbol of symbols) {
+            // get prev price
+            let prevPrice = parseFloat((_a = symbolPriceTickers1AmMap[symbol]) === null || _a === void 0 ? void 0 : _a.price);
+            // check to day has order
+            let todayLatestOrder = orderPiecesMap[symbol];
+            if (todayLatestOrder) {
+                prevPrice = parseFloat(todayLatestOrder.price);
+            }
+            // get current price
+            let currPrice = parseFloat((_b = symbolPriceTickersMap[symbol]) === null || _b === void 0 ? void 0 : _b.price);
+            // check if need to skip, continue to next symbol
+            if (!prevPrice || !currPrice) {
+                continue;
+            }
+            // calculate percentChange
+            const percent_change = (currPrice / prevPrice - 1) * 100;
+            // direction and order_size
+            let direction = "";
+            let order_size = transaction_size_start;
+            if (percent_change <= parseFloat(percent_to_sell)) {
+                direction = "SELL";
+                if (todayLatestOrder) {
+                    let prevSize = parseFloat(todayLatestOrder.transaction_size);
+                    order_size = prevSize / 2;
+                }
+            }
+            if (percent_change >= parseFloat(percent_to_buy)) {
+                direction = "BUY";
+                if (todayLatestOrder) {
+                    let prevSize = parseFloat(todayLatestOrder.transaction_size);
+                    order_size = prevSize * 2;
+                }
+            }
+            let amount = order_size / currPrice;
+            if (direction !== "") {
+                // check if amount able
+                if (direction === "SELL") {
+                    const currPosition = positionsMap[symbol];
+                    if (currPosition) {
+                        const positionAmt = parseFloat(currPosition.positionAmt);
+                        if (!positionAmt)
+                            continue; // if don't have this position so skip
+                        if (positionAmt < amount)
+                            amount = positionAmt;
+                    }
+                }
+                orderParams.push({
+                    amount: (0, helper_ultil_1.validateAmount)(amount),
+                    direction,
+                    symbol,
+                    percent: percent_change,
+                    order_size,
+                    price_ticker: currPrice,
+                });
+            }
+        }
+        console.log("total generated params: ", orderParams.length, " orders");
+        return orderParams;
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
 function makeOrders(orderParams) {
     return __awaiter(this, void 0, void 0, function* () {
         const promises = orderParams.map((param) => __awaiter(this, void 0, void 0, function* () {
@@ -142,115 +212,4 @@ function getChainOpen() {
         else
             return null;
     });
-}
-function symbolPriceTickersToMap(symbolPriceTickers) {
-    let res = {};
-    for (let symbolPrice of symbolPriceTickers) {
-        let key = symbolPrice.symbol;
-        if (!(key in res)) {
-            res[key] = symbolPrice;
-        }
-    }
-    return res;
-}
-function positionsToMap(positions) {
-    let res = {};
-    for (let position of positions) {
-        let key = position.symbol;
-        if (!(key in res)) {
-            res[key] = position;
-        }
-    }
-    return res;
-}
-function ordersToMap(orders) {
-    let res = {};
-    // lastest order first
-    const sortOrders = orders.sort((a, b) => b.time - a.time);
-    for (let order of sortOrders) {
-        let key = order.symbol;
-        if (!(key in res)) {
-            res[key] = order;
-        }
-    }
-    return res;
-}
-function genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, ordersFrom1AmMap, openChain) {
-    var _a, _b;
-    try {
-        const { percent_to_buy, percent_to_sell, transaction_size_start } = openChain;
-        let orderParams = [];
-        // loop through symbolPriceTickers
-        const symbols = Object.keys(symbolPriceTickersMap);
-        for (let symbol of symbols) {
-            // get prev price
-            let prevPrice = parseFloat((_a = symbolPriceTickers1AmMap[symbol]) === null || _a === void 0 ? void 0 : _a.price);
-            // check to day has order
-            let todayLatestOrder = ordersFrom1AmMap[symbol];
-            if (todayLatestOrder) {
-                prevPrice = parseFloat(todayLatestOrder.avgPrice);
-            }
-            // get current price
-            let currPrice = parseFloat((_b = symbolPriceTickersMap[symbol]) === null || _b === void 0 ? void 0 : _b.price);
-            // check if need to skip, continue to next symbol
-            if (!prevPrice || !currPrice) {
-                continue;
-            }
-            // calculate percentChange
-            const percent_change = (currPrice / prevPrice - 1) * 100;
-            // direction and order_size
-            let direction = "";
-            let order_size = transaction_size_start;
-            if (percent_change <= parseFloat(percent_to_sell)) {
-                direction = "SELL";
-                if (todayLatestOrder) {
-                    let prevSize = parseFloat(todayLatestOrder.avgPrice) *
-                        parseFloat(todayLatestOrder.origQty);
-                    order_size = prevSize / 2;
-                }
-            }
-            if (percent_change >= parseFloat(percent_to_buy)) {
-                direction = "BUY";
-                if (todayLatestOrder) {
-                    let prevSize = parseFloat(todayLatestOrder.avgPrice) *
-                        parseFloat(todayLatestOrder.origQty);
-                    order_size = prevSize * 2;
-                }
-            }
-            let amount = order_size / currPrice;
-            if (direction !== "") {
-                // check if amount able
-                if (direction === "SELL") {
-                    const currPosition = positionsMap[symbol];
-                    if (currPosition) {
-                        const positionAmt = parseFloat(currPosition.positionAmt);
-                        if (!positionAmt)
-                            continue; // if don't have this position so skip
-                        if (positionAmt < amount)
-                            amount = positionAmt;
-                    }
-                }
-                orderParams.push({
-                    amount: validateAmount(amount),
-                    direction,
-                    symbol,
-                    percent: percent_change,
-                    order_size,
-                    price_ticker: currPrice,
-                });
-                console.log("symbol: ", symbol, " today has order: ", Boolean(todayLatestOrder), " prevPrice: ", prevPrice.toFixed(3), " currPrice: ", currPrice.toFixed(3), " percentChange: ", percent_change, " direction: ", direction, " size: ", order_size, " amont: ", amount);
-            }
-        }
-        console.log("total", orderParams.length, " orders");
-        return orderParams;
-    }
-    catch (err) {
-        console.log(err);
-    }
-}
-function validateAmount(amount) {
-    if (amount >= 1)
-        return Math.round(amount);
-    if (amount < 1)
-        return Math.round(amount * 1e3) / 1e3;
 }
