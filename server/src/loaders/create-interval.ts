@@ -129,8 +129,12 @@ function genMarketOrderParams(
   openChain: IMarketOrderChainEntity
 ) {
   try {
-    const { percent_to_buy, percent_to_sell, transaction_size_start } =
-      openChain;
+    const {
+      percent_to_first_buy,
+      percent_to_buy,
+      percent_to_sell,
+      transaction_size_start,
+    } = openChain;
     let orderParams: TOrderParams[] = [];
     // loop through symbolPriceTickers
     const symbols = Object.keys(symbolPriceTickersMap);
@@ -170,6 +174,15 @@ function genMarketOrderParams(
           order_size = prevSize * 2;
         }
       }
+      // for the first time
+      if (
+        !todayLatestOrder &&
+        percent_change >= parseFloat(percent_to_first_buy)
+      ) {
+        direction = "BUY";
+        order_size = transaction_size_start;
+      }
+      
       let amount = order_size / currPrice;
       if (direction !== "") {
         // check if amount able

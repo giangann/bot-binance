@@ -16,11 +16,13 @@ import { getApi, postApi } from "../../request/request";
 
 type TNewOrderChain = {
   transaction_size: string;
+  percent_to_first_buy: string;
   percent_to_buy: string;
   percent_to_sell: string;
 };
 
 const defaultValue: TNewOrderChain = {
+  percent_to_first_buy: "1",
   transaction_size: "100",
   percent_to_buy: "5",
   percent_to_sell: "-2.5",
@@ -115,7 +117,13 @@ export const NewOrderChain = () => {
                 placeholder="Nhập số"
               />
             </Grid>
-
+            <Grid item xs={12} sm={6}>
+              <BaseInput
+                {...register("percent_to_first_buy")}
+                label="Mua lần đầu khi lãi lớn hơn: (%)"
+                placeholder="vd: 1 hoặc 2 hoặc 3 ..."
+              />
+            </Grid>
             <Grid item xs={12} sm={6}>
               <BaseInput
                 {...register("percent_to_buy")}

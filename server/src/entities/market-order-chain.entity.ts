@@ -27,6 +27,9 @@ export class MarketOrderChain extends BaseEntity {
   transaction_size_start: number;
 
   @Column({ nullable: false })
+  percent_to_first_buy: string;
+  
+  @Column({ nullable: false })
   percent_to_buy: string;
 
   @Column({ nullable: false })

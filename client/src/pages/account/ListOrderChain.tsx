@@ -98,6 +98,7 @@ const OrderChain = (props: IMarketOrderChainRecord) => {
     id,
     status,
     transaction_size_start,
+    percent_to_first_buy,
     percent_to_buy,
     percent_to_sell,
   } = props;
@@ -133,6 +134,12 @@ const OrderChain = (props: IMarketOrderChainRecord) => {
               transaction_size_start:{" "}
               <Typography sx={{ fontWeight: 600 }} component={"span"}>
                 {transaction_size_start} USD
+              </Typography>
+            </Typography>
+            <Typography>
+              percent_to_first_buy:{" "}
+              <Typography sx={{ fontWeight: 600 }} component={"span"}>
+                {percent_to_first_buy}%
               </Typography>
             </Typography>
             <Typography>

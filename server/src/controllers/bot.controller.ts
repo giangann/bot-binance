@@ -7,6 +7,7 @@ const active: IController = async (req, res) => {
   try {
     let params = {
       transaction_size_start: req.body.transaction_size,
+      percent_to_first_buy: req.body.percent_to_first_buy,
       percent_to_buy: req.body.percent_to_buy,
       percent_to_sell: req.body.percent_to_sell,
     };

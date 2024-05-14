@@ -37,6 +37,10 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", String)
+], MarketOrderChain.prototype, "percent_to_first_buy", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
 ], MarketOrderChain.prototype, "percent_to_buy", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
