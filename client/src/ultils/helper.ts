@@ -1,3 +1,4 @@
+import { TPosition } from "../shared/types/position";
 import {
   TSymbolMarkPriceWs,
   TSymbolTickerPriceWs,
@@ -174,7 +175,6 @@ export function newTickerPrices(
   bStreamFowardTickerPrices: TSymbolTickerPriceWs[],
   tickerPrices: ISymbolTickerPriceAPI[]
 ): ISymbolTickerPriceAPI[] {
-  console.log("ticker prices", tickerPrices);
   const bStreamFowardTickerPricesMap = symbolPriceToMap(
     bStreamFowardTickerPrices
   );
@@ -189,7 +189,19 @@ export function newTickerPrices(
       };
     } else return tickerPrice;
   });
-  console.log("newTickerPricesArr", newTickerPricesArr);
 
   return newTickerPricesArr;
+}
+
+export function sortValueInStringFormat(val1: string, val2: string) {
+  let val1Float = parseFloat(val1);
+  let val2Float = parseFloat(val2);
+
+  return val1Float - val2Float;
+}
+
+export function sortPositionByPnl(positions: TPosition[]) {
+  return positions.sort((a, b) =>
+    sortValueInStringFormat(b.unRealizedProfit, a.unRealizedProfit)
+  );
 }

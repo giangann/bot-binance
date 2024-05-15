@@ -9,6 +9,7 @@ import {
   getTimestampOfToday1AM,
   isSuccess,
   paramsToQueryWithSignature,
+  filterAblePosition,
 } from "../ultils/helper.ultil";
 import CoinService from "./coin.service";
 dotenv.config();
@@ -35,8 +36,8 @@ const getPositions = async (): Promise<TPosition[]> => {
     const endpoint = "/fapi/v2/positionRisk";
     const url = `${baseUrl}${endpoint}?${queryString}`;
     const response = await axios.get(url, commonAxiosOpt);
-    const positions = response.data;
-    return positions;
+    const positions: TPosition[] = response.data;
+    return filterAblePosition(positions);
   } catch (err) {
     if (err instanceof AxiosError) {
       throw new Error(JSON.stringify(err.response.data));
@@ -45,6 +46,7 @@ const getPositions = async (): Promise<TPosition[]> => {
     }
   }
 };
+
 const getAccountInfo = async (): Promise<TAccount> => {
   try {
     const endpoint = "/fapi/v2/account";

@@ -10,26 +10,31 @@ import marketOrderChainService from "../services/market-order-chain.service";
 import marketOrderPieceService from "../services/market-order-piece.service";
 import {
   TNewOrder,
-  TOrder,
   TResponSuccess,
   TResponse,
   TResponseFailure,
 } from "../types/order";
 import { TPosition } from "../types/position";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
-import { logger } from "./logger.config";
 import {
   orderPiecesToMap,
-  ordersToMap,
   positionsToMap,
   symbolPriceTickersToMap,
   validateAmount,
 } from "../ultils/helper.ultil";
+import { logger } from "./logger.config";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
     console.log("start tick");
     try {
+      // fetch binance account info and emit to client
+      const accInfo = await binanceService.getAccountInfo();
+      global.wsServerGlob.emit("ws-account-info", accInfo);
+      // fetch position info and emit to client
+      const positions = await binanceService.getPositions();
+      global.wsServerGlob.emit("ws-position", positions);
+
       // fetch symbolPriceTickers now
       const symbolPriceTickers = await binanceService.getSymbolPriceTickers();
       const symbolPriceTickersMap = symbolPriceTickersToMap(symbolPriceTickers);
@@ -92,15 +97,6 @@ const createInterval = () => {
           failureOrders.length
         );
       }
-
-      // fetch balance in account
-      const accInfo = await binanceService.getAccountInfo();
-      const { totalWalletBalance, availableBalance } = accInfo;
-      global.wsServerGlob.emit(
-        "ws-balance",
-        totalWalletBalance,
-        availableBalance
-      );
     } catch (err) {
       const appErr = { name: err.name, message: err.message };
       global.wsServerGlob.emit("app-err", JSON.stringify(appErr));
@@ -182,7 +178,7 @@ function genMarketOrderParams(
         direction = "BUY";
         order_size = transaction_size_start;
       }
-      
+
       let amount = order_size / currPrice;
       if (direction !== "") {
         // check if amount able

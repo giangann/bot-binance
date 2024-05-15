@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.ordersToMap = exports.positionsToMap = exports.symbolPriceTickersToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
+exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.ordersToMap = exports.positionsToMap = exports.symbolPriceTickersToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
 const crypto_1 = require("crypto");
 function priceToPercent(p1, p2) {
     return (p2 / p1 - 1) * 100;
@@ -149,3 +149,7 @@ function isSuccess(status) {
     return successStatuss.includes(status) ? true : false;
 }
 exports.isSuccess = isSuccess;
+function filterAblePosition(positions) {
+    return positions.filter((pos) => parseFloat(pos.positionAmt) > 0);
+}
+exports.filterAblePosition = filterAblePosition;

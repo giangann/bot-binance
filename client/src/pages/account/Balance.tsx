@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../../context/SocketContext";
 import { getApi } from "../../request/request";
 import { toast } from "react-toastify";
+import { TAccount } from "../../shared/types/account";
 export type TUnknownObj = Record<string, string | number>;
 // type TCoin = { coin: string; amount: number; price: number; total: number };
 export const Balance = () => {
@@ -24,8 +25,8 @@ export const Balance = () => {
   };
 
   useEffect(() => {
-    socket?.on("ws-balance", (totalWalletBalance, availableBalance) => {
-      console.log("balance info", totalWalletBalance, availableBalance);
+    socket?.on("ws-account-info", (accInfo: TAccount) => {
+      const { totalWalletBalance, availableBalance } = accInfo;
       setBalance({
         ...balance,
         totalWalletBalance,
@@ -33,7 +34,7 @@ export const Balance = () => {
       });
     });
     return () => {
-      socket?.off("ws-balance");
+      socket?.off("ws-account-info");
     };
   }, []);
   return (

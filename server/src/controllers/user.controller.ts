@@ -2,26 +2,6 @@ import IController from "IController";
 import binanceService from "../services/binance.service";
 import { ServerResponse } from "../ultils/server-response.ultil";
 
-// constant
-const TRADE_SIZE_BY_USDT = 100;
-const DOUBLE_PERCENT = 5 / 100;
-const STOP_PERCENT = 2.5 / 100;
-
-const getBalance: IController = async (req, res) => {
-  try {
-    // const balance = await binanceService.fetchMyBalance();
-    // update balance realtime each 5s
-    // setInterval(async () => {
-    //   const balance = await binanceService.getMyBalance();
-    //   const { total, btc, usdt } = balance;
-    //   global.wsServerGlob.emit("ws-balance", total, btc, usdt);
-    // }, 5000);
-    // ServerResponse.response(res, balance);
-  } catch (err) {
-    console.log(err.message);
-  }
-};
-
 const getOrderHistory: IController = async (req, res) => {
   try {
     // get list order id from order service in database
@@ -59,10 +39,20 @@ const getAccInfoFetch: IController = async (req, res) => {
   }
 };
 
+const getPosition: IController = async (req, res) => {
+  // get position from binance service
+  const positions = await binanceService.getPositions();
+  ServerResponse.response(res, positions);
+  try {
+  } catch (err) {
+    ServerResponse.error(res, err.message);
+  }
+};
+
 export default {
-  getBalance,
   getOrderHistory,
   getTradeHistory,
   getAccInfo,
   getAccInfoFetch,
+  getPosition,
 };

@@ -17,12 +17,18 @@ const binance_service_1 = __importDefault(require("../services/binance.service")
 const log_service_1 = __importDefault(require("../services/log.service"));
 const market_order_chain_service_1 = __importDefault(require("../services/market-order-chain.service"));
 const market_order_piece_service_1 = __importDefault(require("../services/market-order-piece.service"));
-const logger_config_1 = require("./logger.config");
 const helper_ultil_1 = require("../ultils/helper.ultil");
+const logger_config_1 = require("./logger.config");
 const createInterval = () => {
     const interval = setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         console.log("start tick");
         try {
+            // fetch binance account info and emit to client
+            const accInfo = yield binance_service_1.default.getAccountInfo();
+            global.wsServerGlob.emit("ws-account-info", accInfo);
+            // fetch position info and emit to client
+            const positions = yield binance_service_1.default.getPositions();
+            global.wsServerGlob.emit("ws-position", positions);
             // fetch symbolPriceTickers now
             const symbolPriceTickers = yield binance_service_1.default.getSymbolPriceTickers();
             const symbolPriceTickersMap = (0, helper_ultil_1.symbolPriceTickersToMap)(symbolPriceTickers);
@@ -52,10 +58,6 @@ const createInterval = () => {
                 yield saveOrderPieces(orderPieceParams);
                 global.wsServerGlob.emit("bot-tick", orderParams.length, successOrders.length, failureOrders.length);
             }
-            // fetch balance in account
-            const accInfo = yield binance_service_1.default.getAccountInfo();
-            const { totalWalletBalance, availableBalance } = accInfo;
-            global.wsServerGlob.emit("ws-balance", totalWalletBalance, availableBalance);
         }
         catch (err) {
             const appErr = { name: err.name, message: err.message };

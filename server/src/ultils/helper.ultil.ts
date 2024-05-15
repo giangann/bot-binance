@@ -190,3 +190,7 @@ export function isSuccess(status: number) {
   const successStatuss = [200, 201];
   return successStatuss.includes(status) ? true : false;
 }
+
+export function filterAblePosition(positions: TPosition[]) {
+  return positions.filter((pos) => parseFloat(pos.positionAmt) > 0);
+}

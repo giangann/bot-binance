@@ -1,5 +1,5 @@
 import ArticleIcon from "@mui/icons-material/Article";
-import { Box, Stack, Typography, styled } from "@mui/material";
+import { Box, Grid, Stack, Typography, styled } from "@mui/material";
 import { blue, grey } from "@mui/material/colors";
 import dayjs from "dayjs";
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -14,6 +14,7 @@ import {
 import { CenterBox } from "../../styled/styled";
 import { Balance } from "./Balance";
 import { NewOrderChain } from "./NewOrderChain";
+import { Position } from "./Position";
 
 export const ListOrderChain = () => {
   const [orderChains, setOrderChains] = useState<IMarketOrderChainRecord[]>([]);
@@ -72,7 +73,14 @@ export const ListOrderChain = () => {
   }, []);
   return (
     <Box>
-      <Balance />
+      <Grid container columnSpacing={2}>
+        <Grid xs={12} sm={4}>
+          <Balance />
+        </Grid>
+        <Grid xs={12} sm={8}>
+          <Position />
+        </Grid>
+      </Grid>
       <Stack direction={"row"} spacing={2} my={2}>
         <Typography variant="h5">BOT - danh sách hoạt động</Typography>
         <NewOrderChain />

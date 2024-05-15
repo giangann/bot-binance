@@ -61,7 +61,7 @@ const getPositions = () => __awaiter(void 0, void 0, void 0, function* () {
         const url = `${baseUrl}${endpoint}?${queryString}`;
         const response = yield axios_1.default.get(url, commonAxiosOpt);
         const positions = response.data;
-        return positions;
+        return (0, helper_ultil_1.filterAblePosition)(positions);
     }
     catch (err) {
         if (err instanceof axios_1.AxiosError) {
