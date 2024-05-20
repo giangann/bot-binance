@@ -36,7 +36,7 @@ const quit: IController = async (req, res) => {
     // make promises and fullfilled
     const orderPromises = positions.map((position) => {
       let symbol = position.symbol;
-      let quantity = parseInt(position.positionAmt);
+      let quantity = parseFloat(position.positionAmt);
       let side: "SELL" | "BUY" = "SELL";
       return binanceService.createMarketOrder(symbol, side, quantity);
     });

@@ -14,6 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const moment_1 = __importDefault(require("moment"));
 const market_order_chain_service_1 = __importDefault(require("./market-order-chain.service"));
+const binance_service_1 = __importDefault(require("./binance.service"));
+const helper_ultil_1 = require("../ultils/helper.ultil");
+const logger_config_1 = require("../loaders/logger.config");
 function getChainOpen() {
     return __awaiter(this, void 0, void 0, function* () {
         const listOpenOrder = yield market_order_chain_service_1.default.list({ status: "open" });
@@ -39,11 +42,37 @@ function updateOrderChain() {
         }
     });
 }
+// return a promise {symbol, id, }
+function createOrder(chainId, ...args) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const positions = yield binance_service_1.default.getPositions();
+        const positionsMap = (0, helper_ultil_1.positionsToMap)(positions);
+        const positionAmtOfSymbol = parseFloat((_a = positionsMap[args[0]]) === null || _a === void 0 ? void 0 : _a.positionAmt);
+        const newOrderResponse = yield binance_service_1.default.createMarketOrder(...args);
+        let newDebugLog = "";
+        if (newOrderResponse.success === true) {
+            const newOrder = newOrderResponse.data;
+            const { orderId, symbol, origQty, side } = newOrder;
+            newDebugLog = `create new order: ${orderId} ${side} ${origQty} ${symbol}`;
+            if (side === "SELL")
+                newDebugLog += ` before order has ${positionAmtOfSymbol} ${symbol}`;
+        }
+        else {
+            const response = newOrderResponse;
+            const { code, msg } = response.error;
+            newDebugLog = `error when create new order: ${code} - ${msg}`;
+        }
+        console.log(newDebugLog);
+        logger_config_1.logger.debug(newDebugLog);
+    });
+}
 const quit = () => __awaiter(void 0, void 0, void 0, function* () {
     yield updateOrderChain();
     //   ws emit quit bot
-    wsServerGlob.emit("bot-quit", "bot was quited");
+    global.wsServerGlob.emit("bot-quit", "bot was quited");
 });
 exports.default = {
     quit,
+    createOrder
 };

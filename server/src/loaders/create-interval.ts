@@ -17,12 +17,14 @@ import {
 import { TPosition } from "../types/position";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
 import {
+  exchangeInfoSymbolsToMap,
   orderPiecesToMap,
   positionsToMap,
   symbolPriceTickersToMap,
   validateAmount,
 } from "../ultils/helper.ultil";
 import { logger } from "./logger.config";
+import { TExchangeInfoSymbol } from "../types/exchange-info";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
@@ -39,6 +41,12 @@ const createInterval = () => {
       const symbolPriceTickers = await binanceService.getSymbolPriceTickers();
       const symbolPriceTickersMap = symbolPriceTickersToMap(symbolPriceTickers);
       global.wsServerGlob.emit("symbols-price", symbolPriceTickers);
+
+      // fetch exchange info
+      const exchangeInfo = await binanceService.getExchangeInfo();
+      const exchangeInfoSymbolsMap = exchangeInfoSymbolsToMap(
+        exchangeInfo.symbols
+      );
 
       // fetch chain open
       const openChain = await getChainOpen();
@@ -62,7 +70,8 @@ const createInterval = () => {
           symbolPriceTickers1AmMap,
           positionsMap,
           orderPiecesMap,
-          openChain
+          openChain,
+          exchangeInfoSymbolsMap
         );
 
         const createdOrders = await makeOrders(orderParams);
@@ -125,7 +134,8 @@ function genMarketOrderParams(
   symbolPriceTickers1AmMap: Record<string, Omit<TSymbolPriceTicker, "time">>,
   positionsMap: Record<string, TPosition>,
   orderPiecesMap: Record<string, IMarketOrderPieceRecord>,
-  openChain: IMarketOrderChainEntity
+  openChain: IMarketOrderChainEntity,
+  exchangeInfoSymbolsMap: Record<string, TExchangeInfoSymbol>
 ) {
   try {
     const {
@@ -135,12 +145,14 @@ function genMarketOrderParams(
       transaction_size_start,
     } = openChain;
     let orderParams: TOrderParams[] = [];
+
     // loop through symbolPriceTickers
     const symbols = Object.keys(symbolPriceTickersMap);
     for (let symbol of symbols) {
       // get prev price and current price
       let prevPrice = parseFloat(symbolPriceTickers1AmMap[symbol]?.price);
       let todayLatestOrder = orderPiecesMap[symbol];
+      const hasOrderToday = Boolean(todayLatestOrder);
       if (todayLatestOrder) {
         prevPrice = parseFloat(todayLatestOrder.price);
       }
@@ -164,7 +176,8 @@ function genMarketOrderParams(
 
       // direction calculate
       const isFirstBuy =
-        percent_change >= parseFloat(percent_to_first_buy) && todayLatestOrder;
+        percent_change >= parseFloat(percent_to_first_buy) &&
+        hasOrderToday === false;
       if (percent_change <= parseFloat(percent_to_sell)) direction = "SELL";
       if (percent_change >= parseFloat(percent_to_buy) || isFirstBuy)
         direction = "BUY";
@@ -182,8 +195,12 @@ function genMarketOrderParams(
         }
         if (position && positionAmt) amount = positionAmt;
       }
+
+      // amount precision
+      const quantityPrecision =
+        exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
       orderParams.push({
-        amount: validateAmount(amount),
+        amount: validateAmount(amount, quantityPrecision),
         direction,
         symbol,
         percent: percent_change,

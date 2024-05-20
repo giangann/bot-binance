@@ -33,6 +33,9 @@ const createInterval = () => {
             const symbolPriceTickers = yield binance_service_1.default.getSymbolPriceTickers();
             const symbolPriceTickersMap = (0, helper_ultil_1.symbolPriceTickersToMap)(symbolPriceTickers);
             global.wsServerGlob.emit("symbols-price", symbolPriceTickers);
+            // fetch exchange info
+            const exchangeInfo = yield binance_service_1.default.getExchangeInfo();
+            const exchangeInfoSymbolsMap = (0, helper_ultil_1.exchangeInfoSymbolsToMap)(exchangeInfo.symbols);
             // fetch chain open
             const openChain = yield getChainOpen();
             if (openChain) {
@@ -40,12 +43,11 @@ const createInterval = () => {
                 const symbolPriceTickers1Am = yield binance_service_1.default.getSymbolPriceTickers1Am();
                 const symbolPriceTickers1AmMap = (0, helper_ultil_1.symbolPriceTickersToMap)(symbolPriceTickers1Am);
                 // // fetch list position
-                const positions = yield binance_service_1.default.getPositions();
                 const positionsMap = (0, helper_ultil_1.positionsToMap)(positions);
                 // orderPieces of current order chain
                 const orderPiecesMap = (0, helper_ultil_1.orderPiecesToMap)(openChain.order_pieces);
                 // gen order params
-                const orderParams = genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, orderPiecesMap, openChain);
+                const orderParams = genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, orderPiecesMap, openChain, exchangeInfoSymbolsMap);
                 const createdOrders = yield makeOrders(orderParams);
                 const successOrders = filterOrder(createdOrders, true);
                 const failureOrders = filterOrder(createdOrders, false);
@@ -56,6 +58,8 @@ const createInterval = () => {
                 yield saveLogs(logParmas);
                 const orderPieceParams = genOrderPieceParams(successOrdersData, orderParams, openChain.id);
                 yield saveOrderPieces(orderPieceParams);
+                // save success order to debug log
+                saveOrderDebugLog(successOrdersData, orderParams, openChain.id);
                 global.wsServerGlob.emit("bot-tick", orderParams.length, successOrders.length, failureOrders.length);
             }
         }
@@ -69,22 +73,21 @@ const createInterval = () => {
     global.tickInterval = interval;
 };
 exports.createInterval = createInterval;
-function genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, orderPiecesMap, openChain) {
-    var _a, _b;
+function genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, orderPiecesMap, openChain, exchangeInfoSymbolsMap) {
+    var _a, _b, _c;
     try {
         const { percent_to_first_buy, percent_to_buy, percent_to_sell, transaction_size_start, } = openChain;
         let orderParams = [];
         // loop through symbolPriceTickers
         const symbols = Object.keys(symbolPriceTickersMap);
         for (let symbol of symbols) {
-            // get prev price
+            // get prev price and current price
             let prevPrice = parseFloat((_a = symbolPriceTickers1AmMap[symbol]) === null || _a === void 0 ? void 0 : _a.price);
-            // check to day has order
             let todayLatestOrder = orderPiecesMap[symbol];
+            const hasOrderToday = Boolean(todayLatestOrder);
             if (todayLatestOrder) {
                 prevPrice = parseFloat(todayLatestOrder.price);
             }
-            // get current price
             let currPrice = parseFloat((_b = symbolPriceTickersMap[symbol]) === null || _b === void 0 ? void 0 : _b.price);
             // check if need to skip, continue to next symbol
             if (!prevPrice || !currPrice) {
@@ -92,51 +95,48 @@ function genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, p
             }
             // calculate percentChange
             const percent_change = (currPrice / prevPrice - 1) * 100;
-            // direction and order_size
+            // get position
+            let position = positionsMap[symbol]; // positions just have symbol that positionAmt > 0
+            let positionAmt = parseFloat(position === null || position === void 0 ? void 0 : position.positionAmt);
+            // direction and order_size intitial
             let direction = "";
-            let order_size = transaction_size_start;
-            if (percent_change <= parseFloat(percent_to_sell)) {
+            let amount = transaction_size_start / currPrice;
+            // direction calculate
+            const isFirstBuy = percent_change >= parseFloat(percent_to_first_buy) &&
+                hasOrderToday === false;
+            if (percent_change <= parseFloat(percent_to_sell))
                 direction = "SELL";
-                if (todayLatestOrder) {
-                    let prevSize = parseFloat(todayLatestOrder.transaction_size);
-                    order_size = prevSize / 2;
-                }
-            }
-            if (percent_change >= parseFloat(percent_to_buy)) {
+            if (percent_change >= parseFloat(percent_to_buy) || isFirstBuy)
                 direction = "BUY";
-                if (todayLatestOrder) {
-                    let prevSize = parseFloat(todayLatestOrder.transaction_size);
-                    order_size = prevSize * 2;
+            if (direction === "")
+                continue;
+            // order_size calculate
+            if (direction === "SELL") {
+                if (!position || !positionAmt)
+                    continue;
+                amount = positionAmt / 2;
+            }
+            if (direction === "BUY") {
+                if (!position || !positionAmt) {
+                    if (isFirstBuy)
+                        amount = transaction_size_start / currPrice;
+                    else
+                        continue;
                 }
+                if (position && positionAmt)
+                    amount = positionAmt;
             }
-            // for the first time
-            if (!todayLatestOrder &&
-                percent_change >= parseFloat(percent_to_first_buy)) {
-                direction = "BUY";
-                order_size = transaction_size_start;
-            }
-            let amount = order_size / currPrice;
-            if (direction !== "") {
-                // check if amount able
-                if (direction === "SELL") {
-                    const currPosition = positionsMap[symbol];
-                    if (currPosition) {
-                        const positionAmt = parseFloat(currPosition.positionAmt);
-                        if (!positionAmt)
-                            continue; // if don't have this position so skip
-                        if (positionAmt < amount)
-                            amount = positionAmt;
-                    }
-                }
-                orderParams.push({
-                    amount: (0, helper_ultil_1.validateAmount)(amount),
-                    direction,
-                    symbol,
-                    percent: percent_change,
-                    order_size,
-                    price_ticker: currPrice,
-                });
-            }
+            // amount precision
+            const quantityPrecision = (_c = exchangeInfoSymbolsMap[symbol]) === null || _c === void 0 ? void 0 : _c.quantityPrecision;
+            orderParams.push({
+                amount: (0, helper_ultil_1.validateAmount)(amount, quantityPrecision),
+                direction,
+                symbol,
+                percent: percent_change,
+                order_size: Math.round(amount * currPrice),
+                price_ticker: currPrice,
+                positionAmt,
+            });
         }
         console.log("total generated params: ", orderParams.length, " orders");
         return orderParams;
@@ -207,6 +207,23 @@ function saveLogs(logParams) {
             return yield log_service_1.default.create(param);
         })));
     });
+}
+// log success order
+function saveOrderDebugLog(...args) {
+    const [newOrders, orderParams, chainId] = args;
+    for (let newOrder of newOrders) {
+        for (let orderParam of orderParams) {
+            if ((newOrder === null || newOrder === void 0 ? void 0 : newOrder.symbol) === orderParam.symbol) {
+                const { orderId, side, origQty, symbol } = newOrder;
+                const { positionAmt } = orderParam;
+                let newDebugLog = `chainId: ${chainId}; `;
+                newDebugLog = `create new order: ${orderId} ${side} ${origQty} ${symbol}`;
+                if (side === "SELL")
+                    newDebugLog += ` before order has ${positionAmt} ${symbol}`;
+                logger_config_1.logger.debug(newDebugLog);
+            }
+        }
+    }
 }
 function filterOrder(newOrders, success) {
     return newOrders.filter((newOrder) => newOrder.success === success);

@@ -53,6 +53,23 @@ const commonAxiosOpt = {
     validateStatus: (_status) => (0, helper_ultil_1.isSuccess)(_status),
 };
 const coinService = new coin_service_1.default(baseUrl.includes("testnet") ? true : false);
+const getExchangeInfo = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const endpoint = "/fapi/v1/exchangeInfo";
+        const url = `${baseUrl}${endpoint}`;
+        const response = yield axios_1.default.get(url, commonAxiosOpt);
+        const exchangeInfo = response.data;
+        return exchangeInfo;
+    }
+    catch (err) {
+        if (err instanceof axios_1.AxiosError) {
+            throw new Error(JSON.stringify(err.response.data));
+        }
+        else {
+            throw err;
+        }
+    }
+});
 const getPositions = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
@@ -207,6 +224,7 @@ exports.default = {
     createMarketOrder,
     getSymbolPriceTickers1Am,
     getPositions,
+    getExchangeInfo,
     getAccountInfo,
     getOrdersFromToday1Am,
     getAccountFetch,

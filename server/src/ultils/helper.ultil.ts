@@ -9,6 +9,7 @@ import {
   TSymbolPriceTicker,
   TSymbolPriceTickerWs,
 } from "../types/symbol-price-ticker";
+import { TExchangeInfoSymbol } from "../types/exchange-info";
 
 export function priceToPercent(p1: number, p2: number) {
   return (p2 / p1 - 1) * 100;
@@ -126,6 +127,20 @@ export function binanceStreamToSymbolPrice(
   }
 }
 
+export function exchangeInfoSymbolsToMap(
+  exchangeInfoSymbols: TExchangeInfoSymbol[]
+): Record<string, TExchangeInfoSymbol> {
+  let res: Record<string, TExchangeInfoSymbol> = {};
+
+  for (let exchangeInfoSymbol of exchangeInfoSymbols) {
+    let key = exchangeInfoSymbol.symbol;
+    if (!(key in res)) {
+      res[key] = exchangeInfoSymbol;
+    }
+  }
+  return res;
+}
+
 export function symbolPriceTickersToMap<
   T extends Omit<TSymbolPriceTicker, "time">
 >(symbolPriceTickers: T[]) {
@@ -181,9 +196,26 @@ export function orderPiecesToMap(orderPieces: IMarketOrderPieceRecord[]) {
   return res;
 }
 
-export function validateAmount(amount: number) {
-  if (amount >= 1) return Math.round(amount);
-  if (amount < 1) return Math.round(amount * 1e3) / 1e3;
+export function validateAmount(amount: number, precision: number) {
+  switch (precision) {
+    case 0:
+      return Math.round(amount);
+      break;
+    case 1:
+      return Math.round(amount * 1e1) / 1e1;
+      break;
+    case 2:
+      return Math.round(amount * 1e2) / 1e2;
+      break;
+    case 3:
+      return Math.round(amount * 1e3) / 1e3;
+      break;
+    default:
+      return Math.round(amount * 1e1) / 1e1;
+      break;
+  }
+  // if (amount >= 1) return Math.round(amount);
+  // if (amount < 1) return Math.round(amount * 1e2) / 1e2;
 }
 
 export function isSuccess(status: number) {

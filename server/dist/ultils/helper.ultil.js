@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.ordersToMap = exports.positionsToMap = exports.symbolPriceTickersToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
+exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.ordersToMap = exports.positionsToMap = exports.symbolPriceTickersToMap = exports.exchangeInfoSymbolsToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
 const crypto_1 = require("crypto");
 function priceToPercent(p1, p2) {
     return (p2 / p1 - 1) * 100;
@@ -89,6 +89,17 @@ function binanceStreamToSymbolPrice(streamResponse) {
     }
 }
 exports.binanceStreamToSymbolPrice = binanceStreamToSymbolPrice;
+function exchangeInfoSymbolsToMap(exchangeInfoSymbols) {
+    let res = {};
+    for (let exchangeInfoSymbol of exchangeInfoSymbols) {
+        let key = exchangeInfoSymbol.symbol;
+        if (!(key in res)) {
+            res[key] = exchangeInfoSymbol;
+        }
+    }
+    return res;
+}
+exports.exchangeInfoSymbolsToMap = exchangeInfoSymbolsToMap;
 function symbolPriceTickersToMap(symbolPriceTickers) {
     let res = {};
     for (let symbolPrice of symbolPriceTickers) {
@@ -137,11 +148,26 @@ function orderPiecesToMap(orderPieces) {
     return res;
 }
 exports.orderPiecesToMap = orderPiecesToMap;
-function validateAmount(amount) {
-    if (amount >= 1)
-        return Math.round(amount);
-    if (amount < 1)
-        return Math.round(amount * 1e3) / 1e3;
+function validateAmount(amount, precision) {
+    switch (precision) {
+        case 0:
+            return Math.round(amount);
+            break;
+        case 1:
+            return Math.round(amount * 1e1) / 1e1;
+            break;
+        case 2:
+            return Math.round(amount * 1e2) / 1e2;
+            break;
+        case 3:
+            return Math.round(amount * 1e3) / 1e3;
+            break;
+        default:
+            return Math.round(amount * 1e1) / 1e1;
+            break;
+    }
+    // if (amount >= 1) return Math.round(amount);
+    // if (amount < 1) return Math.round(amount * 1e2) / 1e2;
 }
 exports.validateAmount = validateAmount;
 function isSuccess(status) {

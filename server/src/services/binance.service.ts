@@ -12,6 +12,7 @@ import {
   filterAblePosition,
 } from "../ultils/helper.ultil";
 import CoinService from "./coin.service";
+import { TExchangeInfo } from "../types/exchange-info";
 dotenv.config();
 
 // GET ENV
@@ -28,6 +29,22 @@ const commonAxiosOpt: AxiosRequestConfig = {
   validateStatus: (_status) => isSuccess(_status),
 };
 const coinService = new CoinService(baseUrl.includes("testnet") ? true : false);
+
+const getExchangeInfo = async (): Promise<TExchangeInfo> => {
+  try {
+    const endpoint = "/fapi/v1/exchangeInfo";
+    const url = `${baseUrl}${endpoint}`;
+    const response = await axios.get(url, commonAxiosOpt);
+    const exchangeInfo: TExchangeInfo = response.data;
+    return exchangeInfo;
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      throw new Error(JSON.stringify(err.response.data));
+    } else {
+      throw err;
+    }
+  }
+};
 
 const getPositions = async (): Promise<TPosition[]> => {
   try {
@@ -202,6 +219,7 @@ export default {
   createMarketOrder,
   getSymbolPriceTickers1Am,
   getPositions,
+  getExchangeInfo,
   getAccountInfo,
   getOrdersFromToday1Am,
   getAccountFetch,
