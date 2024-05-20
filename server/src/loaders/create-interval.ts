@@ -89,6 +89,9 @@ const createInterval = () => {
         );
         await saveOrderPieces(orderPieceParams);
 
+        // save success order to debug log
+        saveOrderDebugLog(successOrdersData, orderParams, openChain.id);
+
         global.wsServerGlob.emit(
           "bot-tick",
           orderParams.length,
@@ -115,6 +118,7 @@ type TOrderParams = {
   percent?: number;
   order_size?: number;
   price_ticker?: number;
+  positionAmt?: number;
 };
 function genMarketOrderParams(
   symbolPriceTickersMap: Record<string, TSymbolPriceTicker>,
@@ -134,14 +138,12 @@ function genMarketOrderParams(
     // loop through symbolPriceTickers
     const symbols = Object.keys(symbolPriceTickersMap);
     for (let symbol of symbols) {
-      // get prev price
+      // get prev price and current price
       let prevPrice = parseFloat(symbolPriceTickers1AmMap[symbol]?.price);
-      // check to day has order
       let todayLatestOrder = orderPiecesMap[symbol];
       if (todayLatestOrder) {
         prevPrice = parseFloat(todayLatestOrder.price);
       }
-      // get current price
       let currPrice = parseFloat(symbolPriceTickersMap[symbol]?.price);
 
       // check if need to skip, continue to next symbol
@@ -178,13 +180,15 @@ function genMarketOrderParams(
         order_size = transaction_size_start;
       }
 
+      // check if symbol avaiable to make order
       let amount = order_size / currPrice;
+      let position = positionsMap[symbol];
+      let positionAmt = parseFloat(position?.positionAmt);
       if (direction !== "") {
         // check if amount able
         if (direction === "SELL") {
-          const currPosition = positionsMap[symbol];
-          if (currPosition) {
-            const positionAmt = parseFloat(currPosition.positionAmt);
+          if (!position) continue;
+          if (position) {
             if (!positionAmt) continue; // if don't have this position so skip
             if (positionAmt < amount) amount = positionAmt;
           }
@@ -196,6 +200,7 @@ function genMarketOrderParams(
           percent: percent_change,
           order_size,
           price_ticker: currPrice,
+          positionAmt,
         });
       }
     }
@@ -277,6 +282,25 @@ async function saveLogs(logParams: ILogCreate[]) {
       return await logService.create(param);
     })
   );
+}
+
+// log success order
+function saveOrderDebugLog(...args: Parameters<typeof genOrderPieceParams>) {
+  const [newOrders, orderParams, chainId] = args;
+  for (let newOrder of newOrders) {
+    for (let orderParam of orderParams) {
+      if (newOrder?.symbol === orderParam.symbol) {
+        const { orderId, side, origQty, symbol } = newOrder;
+        const { positionAmt } = orderParam;
+        let newDebugLog = `chainId: ${chainId}; `;
+        newDebugLog = `create new order: ${orderId} ${side} ${origQty} ${symbol}`;
+        if (side === "SELL")
+          newDebugLog += ` before order has ${positionAmt} ${symbol}`;
+
+        logger.debug(newDebugLog);
+      }
+    }
+  }
 }
 
 function filterOrder(newOrders: TResponse<TNewOrder>[], success: boolean) {

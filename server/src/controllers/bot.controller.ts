@@ -46,16 +46,23 @@ const quit: IController = async (req, res) => {
     let numOfSuccess = 0;
     let numOfFailure = 0;
     for (let res of orderResult) {
-      if (res.success) {
+      if (res.success === true) {
         const { orderId, side, origQty, symbol } = res.data;
         numOfSuccess += 1;
 
-        const msg = `orderId: ${orderId}, symbol: ${symbol}, quantity: ${origQty}, side: ${side}`;
-        logger.info(msg)
         // log order info
+        const msg = `orderId: ${orderId}, symbol: ${symbol}, quantity: ${origQty}, side: ${side}`;
+        logger.info(msg);
       } else {
         numOfFailure += 1;
         // log error message
+        const {
+          error: { code, msg },
+          payload,
+        } = res;
+        const { symbol, quantity, side } = payload;
+        const logMsg = `${code} - ${msg}, symbol: ${symbol}, quantity: ${quantity}, side: ${side}`;
+        logger.info(logMsg);
       }
     }
 

@@ -92,3 +92,6 @@
 {"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action, request ip: 27.79.135.171\"}","timestamp":"2024-05-17T04:36:12.368Z"}
 {"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action, request ip: 27.79.135.171\"}","timestamp":"2024-05-17T04:36:12.368Z"}
 {"level":"error","message":"{\"code\":-2015,\"msg\":\"Invalid API-key, IP, or permissions for action, request ip: 27.79.135.171\"}","timestamp":"2024-05-17T04:36:12.368Z"}
+{"level":"error","message":"connect ECONNREFUSED 13.224.163.77:443","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"error","message":"Cannot read properties of undefined (reading 'success')","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"error","message":"{\"code\":-1021,\"msg\":\"Timestamp for this request is outside of the recvWindow.\"}","timestamp":"2024-05-20T10:18:32.606Z"}

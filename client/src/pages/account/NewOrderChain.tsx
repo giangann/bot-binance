@@ -57,6 +57,10 @@ export const NewOrderChain = () => {
   const onQuit = async () => {
     const response = await getApi("bot/quit");
     if (response.success) {
+      // @ts-ignore
+      const {numOfSuccess, numOfFailure} = response.data
+      const msg = `close: ${numOfSuccess} and failure: ${numOfFailure}`
+      toast.success(msg)
       bot.onToggle(false);
     } else toast.error(response.error.message);
   };

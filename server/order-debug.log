@@ -11,3 +11,26 @@
 {"level":"debug","message":"create new order: 4038552991 SELL 0.010 BTCUSDT before order has 0.01 BTCUSDT","timestamp":"2024-05-20T07:40:09.851Z"}
 {"level":"debug","message":"create new order: 4038571757 BUY 0.010 BTCUSDT","timestamp":"2024-05-20T08:19:47.519Z"}
 {"level":"debug","message":"create new order: 4038571965 SELL 0.050 BTCUSDT before order has NaN BTCUSDT","timestamp":"2024-05-20T08:20:08.056Z"}
+{"level":"debug","message":"create new order: 22087170 BUY 25 MASKUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 231849951 BUY 127.0 EOSUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 48983572 BUY 104 FTMUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 40545 SELL 8858 BOMEUSDT before order has NaN BOMEUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 110286 BUY 34.0 BONDUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 127392615 SELL 7.00 LINKUSDT before order has NaN LINKUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 12649173 SELL 180 LUNA2USDT before order has NaN LUNA2USDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 32670686 SELL 17.0 FILUSDT before order has NaN FILUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 1379348489 SELL 0.016 ETHUSDT before order has 0.016 ETHUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 60394054 SELL 14 UNIUSDT before order has NaN UNIUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 213940 BUY 20 JTOUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 19082453 SELL 13 AXSUSDT before order has 14 AXSUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 41681259 SELL 3 AVAXUSDT before order has NaN AVAXUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 258108648 SELL 211.0 XRPUSDT before order has NaN XRPUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 669629082 BUY 1.000 LTCUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 134983 SELL 42.0 WIFUSDT before order has NaN WIFUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 19082454 SELL 1 AXSUSDT before order has 1 AXSUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 1379348518 BUY 0.064 ETHUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 1379348562 SELL 0.034 ETHUSDT before order has 0.064 ETHUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 1379348570 BUY 0.063 ETHUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 3262997 BUY 10204 1000PEPEUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 1038586516 SELL 0.181 BCHUSDT before order has 0.181 BCHUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 4038635735 SELL 0.002 BTCUSDT before order has NaN BTCUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
