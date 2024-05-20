@@ -2,6 +2,8 @@ import IController from "IController";
 import botService from "../services/bot.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import { ServerResponse } from "../ultils/server-response.ultil";
+import binanceService from "../services/binance.service";
+import { logger } from "../loaders/logger.config";
 
 const active: IController = async (req, res) => {
   try {
@@ -27,10 +29,41 @@ const active: IController = async (req, res) => {
   }
 };
 
-const quit: IController = (req, res) => {
+const quit: IController = async (req, res) => {
   try {
-    botService.quit();
-    ServerResponse.response(res, {});
+    const positions = await binanceService.getPositions();
+
+    // make promises and fullfilled
+    const orderPromises = positions.map((position) => {
+      let symbol = position.symbol;
+      let quantity = parseInt(position.positionAmt);
+      let side: "SELL" | "BUY" = "SELL";
+      return binanceService.createMarketOrder(symbol, side, quantity);
+    });
+    const orderResult = await Promise.all(orderPromises);
+
+    // log and error
+    let numOfSuccess = 0;
+    let numOfFailure = 0;
+    for (let res of orderResult) {
+      if (res.success) {
+        const { orderId, side, origQty, symbol } = res.data;
+        numOfSuccess += 1;
+
+        const msg = `orderId: ${orderId}, symbol: ${symbol}, quantity: ${origQty}, side: ${side}`;
+        logger.info(msg)
+        // log order info
+      } else {
+        numOfFailure += 1;
+        // log error message
+      }
+    }
+
+    const data = { numOfSuccess, numOfFailure };
+
+    await botService.quit();
+
+    ServerResponse.response(res, data);
   } catch (err) {
     ServerResponse.error(res, err.message);
   }

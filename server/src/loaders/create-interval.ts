@@ -51,7 +51,6 @@ const createInterval = () => {
         );
 
         // // fetch list position
-        const positions = await binanceService.getPositions();
         const positionsMap = positionsToMap(positions);
 
         // orderPieces of current order chain

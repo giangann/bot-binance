@@ -1,0 +1,13 @@
+{"level":"debug","message":"error when create new order: -2015 - Invalid API-key, IP, or permissions for action, request ip: 27.79.135.171","timestamp":"2024-05-19T12:42:24.459Z"}
+{"level":"debug","message":"error when create new order: -2015 - Invalid API-key, IP, or permissions for action, request ip: 27.79.135.171","timestamp":"2024-05-19T12:43:16.080Z"}
+{"level":"debug","message":"create new order: BUY 0.010 BTCUSDT","timestamp":"2024-05-19T12:43:43.271Z"}
+{"level":"debug","message":"create new order: 4038549717 SELL 0.010 BTCUSDT before order has 0.01 BTCUSDT","timestamp":"2024-05-20T07:33:11.727Z"}
+{"level":"debug","message":"error when create new order: -1121 - Invalid symbol.","timestamp":"2024-05-20T07:34:58.687Z"}
+{"level":"debug","message":"error when create new order: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit.","timestamp":"2024-05-20T07:35:30.426Z"}
+{"level":"debug","message":"error when create new order: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit.","timestamp":"2024-05-20T07:36:01.728Z"}
+{"level":"debug","message":"create new order: 4038551339 BUY 0.010 BTCUSDT","timestamp":"2024-05-20T07:36:47.534Z"}
+{"level":"debug","message":"create new order: 4038551533 SELL 0.020 BTCUSDT before order has 0.01 BTCUSDT","timestamp":"2024-05-20T07:37:12.260Z"}
+{"level":"debug","message":"create new order: 4038552418 BUY 0.010 BTCUSDT","timestamp":"2024-05-20T07:39:02.321Z"}
+{"level":"debug","message":"create new order: 4038552991 SELL 0.010 BTCUSDT before order has 0.01 BTCUSDT","timestamp":"2024-05-20T07:40:09.851Z"}
+{"level":"debug","message":"create new order: 4038571757 BUY 0.010 BTCUSDT","timestamp":"2024-05-20T08:19:47.519Z"}
+{"level":"debug","message":"create new order: 4038571965 SELL 0.050 BTCUSDT before order has NaN BTCUSDT","timestamp":"2024-05-20T08:20:08.056Z"}
