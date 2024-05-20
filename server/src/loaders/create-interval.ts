@@ -154,55 +154,43 @@ function genMarketOrderParams(
       // calculate percentChange
       const percent_change = (currPrice / prevPrice - 1) * 100;
 
-      // direction and order_size
-      let direction: "BUY" | "SELL" | "" = "";
-      let order_size = transaction_size_start;
-      if (percent_change <= parseFloat(percent_to_sell)) {
-        direction = "SELL";
-        if (todayLatestOrder) {
-          let prevSize = parseFloat(todayLatestOrder.transaction_size);
-          order_size = prevSize / 2;
-        }
-      }
-      if (percent_change >= parseFloat(percent_to_buy)) {
-        direction = "BUY";
-        if (todayLatestOrder) {
-          let prevSize = parseFloat(todayLatestOrder.transaction_size);
-          order_size = prevSize * 2;
-        }
-      }
-      // for the first time
-      if (
-        !todayLatestOrder &&
-        percent_change >= parseFloat(percent_to_first_buy)
-      ) {
-        direction = "BUY";
-        order_size = transaction_size_start;
-      }
-
-      // check if symbol avaiable to make order
-      let amount = order_size / currPrice;
-      let position = positionsMap[symbol];
+      // get position
+      let position = positionsMap[symbol]; // positions just have symbol that positionAmt > 0
       let positionAmt = parseFloat(position?.positionAmt);
-      if (direction !== "") {
-        // check if amount able
-        if (direction === "SELL") {
-          if (!position) continue;
-          if (position) {
-            if (!positionAmt) continue; // if don't have this position so skip
-            if (positionAmt < amount) amount = positionAmt;
-          }
-        }
-        orderParams.push({
-          amount: validateAmount(amount),
-          direction,
-          symbol,
-          percent: percent_change,
-          order_size,
-          price_ticker: currPrice,
-          positionAmt,
-        });
+
+      // direction and order_size intitial
+      let direction: "BUY" | "SELL" | "" = "";
+      let amount = transaction_size_start / currPrice;
+
+      // direction calculate
+      const isFirstBuy =
+        percent_change >= parseFloat(percent_to_first_buy) && todayLatestOrder;
+      if (percent_change <= parseFloat(percent_to_sell)) direction = "SELL";
+      if (percent_change >= parseFloat(percent_to_buy) || isFirstBuy)
+        direction = "BUY";
+      if (direction === "") continue;
+
+      // order_size calculate
+      if (direction === "SELL") {
+        if (!position || !positionAmt) continue;
+        amount = positionAmt / 2;
       }
+      if (direction === "BUY") {
+        if (!position || !positionAmt) {
+          if (isFirstBuy) amount = transaction_size_start / currPrice;
+          else continue;
+        }
+        if (position && positionAmt) amount = positionAmt;
+      }
+      orderParams.push({
+        amount: validateAmount(amount),
+        direction,
+        symbol,
+        percent: percent_change,
+        order_size: Math.round(amount * currPrice),
+        price_ticker: currPrice,
+        positionAmt,
+      });
     }
     console.log("total generated params: ", orderParams.length, " orders");
     return orderParams;

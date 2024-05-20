@@ -34,3 +34,48 @@
 {"level":"debug","message":"create new order: 3262997 BUY 10204 1000PEPEUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
 {"level":"debug","message":"create new order: 1038586516 SELL 0.181 BCHUSDT before order has 0.181 BCHUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
 {"level":"debug","message":"create new order: 4038635735 SELL 0.002 BTCUSDT before order has NaN BTCUSDT","timestamp":"2024-05-20T10:18:32.606Z"}
+{"level":"debug","message":"create new order: 22087175 BUY 25 MASKUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 48983613 BUY 104 FTMUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 110317 BUY 34.0 BONDUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 1379349375 BUY 0.032 ETHUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 213945 BUY 20 JTOUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 669629151 BUY 1.000 LTCUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 1379349401 SELL 0.017 ETHUSDT before order has 0.125 ETHUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 1379349438 BUY 0.032 ETHUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 1379349458 SELL 0.017 ETHUSDT before order has 0.14 ETHUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 1379349474 BUY 0.032 ETHUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 3263124 BUY 10638 1000PEPEUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"debug","message":"create new order: 1379349488 SELL 0.017 ETHUSDT before order has 0.155 ETHUSDT","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: HIGHUSDT, quantity: 28, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XTZUSDT, quantity: 105, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 196426282, symbol: ETCUSDT, quantity: 9.00, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 31, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 11850441, symbol: ALICEUSDT, quantity: 84.0, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TRXUSDT, quantity: 1070, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 2973599, symbol: UMAUSDT, quantity: 12, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 736597026, symbol: DASHUSDT, quantity: 1.000, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-2020 - Unable to fill., symbol: GLMUSDT, quantity: 27, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: LTCUSDT, quantity: 5, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4003 - Quantity less than or equal to zero., symbol: RNDRUSDT, quantity: 0, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 20642605, symbol: GALAUSDT, quantity: 2093, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 5879, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ARUSDT, quantity: 3, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XVSUSDT, quantity: 288, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 110326, symbol: BONDUSDT, quantity: 102.0, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: JTOUSDT, quantity: 60, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: STEEMUSDT, quantity: 70, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4003 - Quantity less than or equal to zero., symbol: ETHUSDT, quantity: 0, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 138, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 135296, symbol: DYMUSDT, quantity: 25.0, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 22087176, symbol: MASKUSDT, quantity: 75, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 231849972, symbol: EOSUSDT, quantity: 252.0, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 2, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 29295, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 70258, symbol: ETHWUSDT, quantity: 12, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 25255, symbol: TONUSDT, quantity: 54.0, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MOVRUSDT, quantity: 6, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XVGUSDT, quantity: 14382, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 3263135, symbol: 1000PEPEUSDT, quantity: 20842, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 18261620, symbol: FETUSDT, quantity: 42, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
+{"level":"info","message":"orderId: 48983627, symbol: FTMUSDT, quantity: 533, side: SELL","timestamp":"2024-05-20T11:02:36.605Z"}
