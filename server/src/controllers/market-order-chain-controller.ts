@@ -55,7 +55,7 @@ const testLogs: IController = async (req, res) => {
       transaction_size: "0",
     };
     const createdPiece = await marketOrderPieceService.create(testPiece);
-    logger.debug("new test order created");
+    logger.debug(`new test order created in chain: ${idOfChainToSave}`);
 
     ServerResponse.response(res, createdPiece);
   } catch (err) {
