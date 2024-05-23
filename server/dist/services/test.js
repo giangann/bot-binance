@@ -13,12 +13,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const coin_service_1 = __importDefault(require("./coin.service"));
-const bot_service_1 = __importDefault(require("./bot.service"));
+const logger_config_1 = require("../loaders/logger.config");
 const coinService = new coin_service_1.default(true);
 const test = () => __awaiter(void 0, void 0, void 0, function* () {
-    const symbol = "BTCUSDT";
-    const direction = "SELL";
-    let amount = 0.05;
-    yield bot_service_1.default.createOrder(112, symbol, direction, amount);
+    // // const symbol = "TOKENUSDT";
+    // // const direction = "SELL";
+    // // let amount = 20;
+    // // const response = await binanceService.createMarketOrder(
+    // //   symbol,
+    // //   direction,
+    // //   amount
+    // // );
+    // console.log("response", response);
+    logger_config_1.logger.info('info level test');
+    // logger.error('error level test')
+    // logger.debug('debug level test')
 });
-// test();
+test();
