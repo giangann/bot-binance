@@ -8,10 +8,17 @@ import { positionsToMap } from "../ultils/helper.ultil";
 import botService from "./bot.service";
 const coinService = new CoinService(true);
 const test = async () => {
-  const symbol = "BTCUSDT";
-  const direction = "SELL";
-  let amount = 0.05;
-
-  await botService.createOrder(112, symbol, direction, amount);
+  // // const symbol = "TOKENUSDT";
+  // // const direction = "SELL";
+  // // let amount = 20;
+  // // const response = await binanceService.createMarketOrder(
+  // //   symbol,
+  // //   direction,
+  // //   amount
+  // // );
+  // console.log("response", response);
+  logger.info('info level test')
+  // logger.error('error level test')
+  // logger.debug('debug level test')
 };
-// test();
+test();

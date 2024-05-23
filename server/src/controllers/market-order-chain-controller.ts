@@ -2,6 +2,9 @@ import IController from "IController";
 import marketOrderChainService from "../services/market-order-chain.service";
 import { ServerResponse } from "../ultils/server-response.ultil";
 import logService from "../services/log.service";
+import { IMarketOrderPieceCreate } from "market-order-piece.interface";
+import marketOrderPieceService from "../services/market-order-piece.service";
+import { logger } from "../loaders/logger.config";
 
 const list: IController = async (req, res) => {
   try {
@@ -35,4 +38,29 @@ const getLogs: IController = async (req, res) => {
   }
 };
 
-export default { list, getLogs, isBotActive };
+const testLogs: IController = async (req, res) => {
+  try {
+    const listChain = await marketOrderChainService.list();
+    const idOfChainToSave = listChain[listChain.length - 1].id;
+
+    const testPiece: IMarketOrderPieceCreate = {
+      market_order_chains_id: idOfChainToSave,
+      amount: "0",
+      direction: "SELL",
+      id: "0",
+      percent_change: "0",
+      price: "0",
+      symbol: "0",
+      total_balance: "0",
+      transaction_size: "0",
+    };
+    const createdPiece = await marketOrderPieceService.create(testPiece);
+    logger.debug("new test order created");
+
+    ServerResponse.response(res, createdPiece);
+  } catch (err) {
+    ServerResponse.error(res, err.message);
+  }
+};
+
+export default { list, getLogs, isBotActive, testLogs };
