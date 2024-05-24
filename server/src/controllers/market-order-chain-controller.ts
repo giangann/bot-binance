@@ -38,29 +38,4 @@ const getLogs: IController = async (req, res) => {
   }
 };
 
-const testLogs: IController = async (req, res) => {
-  try {
-    const listChain = await marketOrderChainService.list();
-    const idOfChainToSave = listChain[listChain.length - 1].id;
-
-    const testPiece: IMarketOrderPieceCreate = {
-      market_order_chains_id: idOfChainToSave,
-      amount: "0",
-      direction: "SELL",
-      id: "0",
-      percent_change: "0",
-      price: "0",
-      symbol: "0",
-      total_balance: "0",
-      transaction_size: "0",
-    };
-    const createdPiece = await marketOrderPieceService.create(testPiece);
-    logger.debug(`new test order created in chain: ${idOfChainToSave}`);
-
-    ServerResponse.response(res, createdPiece);
-  } catch (err) {
-    ServerResponse.error(res, err.message);
-  }
-};
-
-export default { list, getLogs, isBotActive, testLogs };
+export default { list, getLogs, isBotActive };
