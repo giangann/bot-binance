@@ -208,7 +208,11 @@ const createMarketOrder = async (
       };
     }
   } catch (err) {
-    throw err;
+    if (err instanceof Error) {
+      throw new Error(err.message, {
+        cause: "binanceService createMarketOrder",
+      });
+    } else throw err;
   }
 };
 

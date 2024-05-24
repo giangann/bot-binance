@@ -2,7 +2,13 @@ import { createHmac } from "crypto";
 import { IMarketOrderPieceRecord } from "market-order-piece.interface";
 import marketOrderChainService from "../services/market-order-chain.service";
 import { TMarkPriceStream, TTickerPriceStream } from "../types/binance-stream";
-import { TOrder } from "../types/order";
+import {
+  TNewOrder,
+  TOrder,
+  TResponSuccess,
+  TResponse,
+  TResponseFailure,
+} from "../types/order";
 import { TPosition } from "../types/position";
 import { TSymbolMarkPriceWs } from "../types/symbol-mark-price";
 import {
@@ -225,4 +231,15 @@ export function isSuccess(status: number) {
 
 export function filterAblePosition(positions: TPosition[]) {
   return positions.filter((pos) => parseFloat(pos.positionAmt) > 0);
+}
+
+export function filterSuccessOrder(newOrders: TResponse<TNewOrder>[]) {
+  return newOrders.filter(
+    (newOrder) => newOrder.success === true
+  ) as TResponSuccess<TNewOrder>[];
+}
+export function filterFailOrder(newOrders: TResponse<TNewOrder>[]) {
+  return newOrders.filter(
+    (newOrder) => newOrder.success === false
+  ) as TResponseFailure[];
 }

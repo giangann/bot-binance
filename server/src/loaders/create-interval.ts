@@ -8,23 +8,23 @@ import binanceService from "../services/binance.service";
 import logService from "../services/log.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import marketOrderPieceService from "../services/market-order-piece.service";
+import { TExchangeInfoSymbol } from "../types/exchange-info";
 import {
   TNewOrder,
-  TResponSuccess,
-  TResponse,
-  TResponseFailure,
+  TResponseFailure
 } from "../types/order";
 import { TPosition } from "../types/position";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
 import {
   exchangeInfoSymbolsToMap,
+  filterFailOrder,
+  filterSuccessOrder,
   orderPiecesToMap,
   positionsToMap,
   symbolPriceTickersToMap,
-  validateAmount,
+  validateAmount
 } from "../ultils/helper.ultil";
 import { logger } from "./logger.config";
-import { TExchangeInfoSymbol } from "../types/exchange-info";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
@@ -75,19 +75,12 @@ const createInterval = () => {
         );
 
         const createdOrders = await makeOrders(orderParams);
-        const successOrders = filterOrder(
-          createdOrders,
-          true
-        ) as TResponSuccess<TNewOrder>[];
-        const failureOrders = filterOrder(
-          createdOrders,
-          false
-        ) as TResponseFailure[];
+        const successOrders = filterSuccessOrder(createdOrders);
+        const failureOrders = filterFailOrder(createdOrders);
 
-        const successOrdersData = successOrders.map((order) => {
-          return order.data;
-        });
+        const successOrdersData = successOrders.map((order) => order.data);
 
+        // save log database
         const logParmas = genLogParams(failureOrders, openChain.id);
         await saveLogs(logParmas);
 
@@ -99,7 +92,7 @@ const createInterval = () => {
         await saveOrderPieces(orderPieceParams);
 
         // save success order to debug log
-        saveOrderDebugLog(successOrdersData, orderParams, openChain.id);
+        // saveOrderDebugLog(successOrdersData, orderParams, openChain.id);
 
         global.wsServerGlob.emit(
           "bot-tick",
@@ -216,17 +209,13 @@ function genMarketOrderParams(
   }
 }
 async function makeOrders(orderParams: TOrderParams[]) {
-  const promises = orderParams.map(async (param) => {
+  const promises = orderParams.map((param) => {
     const { symbol, amount, direction } = param;
-    try {
-      return await binanceService.createMarketOrder(symbol, direction, amount);
-    } catch (error) {
-      console.log("error", error);
-    }
+    return binanceService.createMarketOrder(symbol, direction, amount);
   });
-
   return Promise.all(promises);
 }
+
 function genOrderPieceParams(
   newOrders: TNewOrder[],
   orderParams: TOrderParams[],
@@ -287,29 +276,6 @@ async function saveLogs(logParams: ILogCreate[]) {
       return await logService.create(param);
     })
   );
-}
-
-// log success order
-function saveOrderDebugLog(...args: Parameters<typeof genOrderPieceParams>) {
-  const [newOrders, orderParams, chainId] = args;
-  for (let newOrder of newOrders) {
-    for (let orderParam of orderParams) {
-      if (newOrder?.symbol === orderParam.symbol) {
-        const { orderId, side, origQty, symbol } = newOrder;
-        const { positionAmt } = orderParam;
-        let newDebugLog = `chainId: ${chainId}; `;
-        newDebugLog = `create new order: ${orderId} ${side} ${origQty} ${symbol}`;
-        if (side === "SELL")
-          newDebugLog += ` before order has ${positionAmt} ${symbol}`;
-
-        logger.debug(newDebugLog);
-      }
-    }
-  }
-}
-
-function filterOrder(newOrders: TResponse<TNewOrder>[], success: boolean) {
-  return newOrders.filter((newOrder) => newOrder.success === success);
 }
 
 // if order with same symbol, get only 1 latest order
