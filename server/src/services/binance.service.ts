@@ -167,6 +167,9 @@ const getOrdersFromToday1Am = async (): Promise<TOrder[]> => {
   }
 };
 
+// phep thu tren server
+// ghi 100 record vao database
+
 const createMarketOrder = async (
   symbol: string,
   side: "BUY" | "SELL",
