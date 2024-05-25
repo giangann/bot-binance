@@ -9,10 +9,7 @@ import logService from "../services/log.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import marketOrderPieceService from "../services/market-order-piece.service";
 import { TExchangeInfoSymbol } from "../types/exchange-info";
-import {
-  TNewOrder,
-  TResponseFailure
-} from "../types/order";
+import { TNewOrder, TResponseFailure } from "../types/order";
 import { TPosition } from "../types/position";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
 import {
@@ -22,7 +19,7 @@ import {
   orderPiecesToMap,
   positionsToMap,
   symbolPriceTickersToMap,
-  validateAmount
+  validateAmount,
 } from "../ultils/helper.ultil";
 import { logger } from "./logger.config";
 
@@ -30,65 +27,57 @@ const createInterval = () => {
   const interval = setInterval(async () => {
     console.log("start tick");
     try {
-      // fetch binance account info and emit to client
+      // fetch statistic
       const accInfo = await binanceService.getAccountInfo();
-      global.wsServerGlob.emit("ws-account-info", accInfo);
-      // fetch position info and emit to client
       const positions = await binanceService.getPositions();
+      const tickers = await binanceService.getSymbolPriceTickers();
+      const { symbols } = await binanceService.getExchangeInfo();
+
+      global.wsServerGlob.emit("ws-account-info", accInfo);
       global.wsServerGlob.emit("ws-position", positions);
-
-      // fetch symbolPriceTickers now
-      const symbolPriceTickers = await binanceService.getSymbolPriceTickers();
-      const symbolPriceTickersMap = symbolPriceTickersToMap(symbolPriceTickers);
-      global.wsServerGlob.emit("symbols-price", symbolPriceTickers);
-
-      // fetch exchange info
-      const exchangeInfo = await binanceService.getExchangeInfo();
-      const exchangeInfoSymbolsMap = exchangeInfoSymbolsToMap(
-        exchangeInfo.symbols
-      );
+      global.wsServerGlob.emit("symbols-price", tickers);
 
       // fetch chain open
       const openChain = await getChainOpen();
       if (openChain) {
         // fetch symbolPriceTickers 1AM from DB
-        const symbolPriceTickers1Am =
-          await binanceService.getSymbolPriceTickers1Am();
-        const symbolPriceTickers1AmMap = symbolPriceTickersToMap(
-          symbolPriceTickers1Am
-        );
+        const tickers1AM = await binanceService.getSymbolPriceTickers1Am();
 
-        // // fetch list position
+        // storage statistic in Object
+        const symbolPriceTickersMap = symbolPriceTickersToMap(tickers);
+        const exchangeInfoSymbolsMap = exchangeInfoSymbolsToMap(symbols);
+        const symbolPriceTickers1AmMap = symbolPriceTickersToMap(tickers1AM);
         const positionsMap = positionsToMap(positions);
-
-        // orderPieces of current order chain
         const orderPiecesMap = orderPiecesToMap(openChain.order_pieces);
 
         // gen order params
-        const orderParams = genMarketOrderParams(
+        const genOrderParamsArgs: Parameters<typeof genMarketOrderParams> = [
           symbolPriceTickersMap,
           symbolPriceTickers1AmMap,
           positionsMap,
           orderPiecesMap,
           openChain,
-          exchangeInfoSymbolsMap
-        );
+          exchangeInfoSymbolsMap,
+        ];
+        const orderParams = genMarketOrderParams(...genOrderParamsArgs);
 
+        // make order and handle response
         const createdOrders = await makeOrders(orderParams);
         const successOrders = filterSuccessOrder(createdOrders);
         const failureOrders = filterFailOrder(createdOrders);
-
         const successOrdersData = successOrders.map((order) => order.data);
 
         // save log database
         const logParmas = genLogParams(failureOrders, openChain.id);
         await saveLogs(logParmas);
 
-        const orderPieceParams = genOrderPieceParams(
+        // gen order pieces params and save to database
+        const orderPiecesInfo: Parameters<typeof genOrderPieceParams> = [
           successOrdersData,
           orderParams,
-          openChain.id
-        );
+          openChain.id,
+        ];
+        const orderPieceParams = genOrderPieceParams(...orderPiecesInfo);
         await saveOrderPieces(orderPieceParams);
 
         // save success order to debug log
@@ -102,9 +91,13 @@ const createInterval = () => {
         );
       }
     } catch (err) {
-      const appErr = { name: err.name, message: err.message };
-      global.wsServerGlob.emit("app-err", JSON.stringify(appErr));
-      logger.error(err.message);
+      if (err instanceof Error) {
+        const { name, message, cause } = err;
+        global.wsServerGlob.emit("app-err", JSON.stringify(err));
+        logger.error(`name: ${name}; message: ${message}; cause: ${cause}`);
+      } else {
+        
+      }
     }
 
     console.log("emit and end tick");
