@@ -22,15 +22,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -49,15 +40,15 @@ const commonHeader = {
     "X-MBX-APIKEY": apiKey,
 };
 const commonAxiosOpt = {
-    headers: Object.assign({}, commonHeader),
+    headers: { ...commonHeader },
     validateStatus: (_status) => (0, helper_ultil_1.isSuccess)(_status),
 };
 const coinService = new coin_service_1.default(baseUrl.includes("testnet") ? true : false);
-const getExchangeInfo = () => __awaiter(void 0, void 0, void 0, function* () {
+const getExchangeInfo = async () => {
     try {
         const endpoint = "/fapi/v1/exchangeInfo";
         const url = `${baseUrl}${endpoint}`;
-        const response = yield axios_1.default.get(url, commonAxiosOpt);
+        const response = await axios_1.default.get(url, commonAxiosOpt);
         const exchangeInfo = response.data;
         return exchangeInfo;
     }
@@ -69,14 +60,14 @@ const getExchangeInfo = () => __awaiter(void 0, void 0, void 0, function* () {
             throw err;
         }
     }
-});
-const getPositions = () => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getPositions = async () => {
     try {
         const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
         const endpoint = "/fapi/v2/positionRisk";
         const url = `${baseUrl}${endpoint}?${queryString}`;
-        const response = yield axios_1.default.get(url, commonAxiosOpt);
+        const response = await axios_1.default.get(url, commonAxiosOpt);
         const positions = response.data;
         return (0, helper_ultil_1.filterAblePosition)(positions);
     }
@@ -88,14 +79,14 @@ const getPositions = () => __awaiter(void 0, void 0, void 0, function* () {
             throw err;
         }
     }
-});
-const getAccountInfo = () => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getAccountInfo = async () => {
     try {
         const endpoint = "/fapi/v2/account";
         const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
         const url = `${baseUrl}${endpoint}?${queryString}`;
-        const response = yield axios_1.default.get(url, commonAxiosOpt);
+        const response = await axios_1.default.get(url, commonAxiosOpt);
         const accInfo = response.data;
         return accInfo;
     }
@@ -107,21 +98,21 @@ const getAccountInfo = () => __awaiter(void 0, void 0, void 0, function* () {
             throw err;
         }
     }
-});
-const getAccountFetch = () => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getAccountFetch = async () => {
     try {
         const endpoint = "/fapi/v2/account";
         const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
         const url = `${baseUrl}${endpoint}?${queryString}`;
-        const response = yield fetch(url, {
+        const response = await fetch(url, {
             method: "GET",
             headers: {
                 "X-MBX-APIKEY": apiKey,
                 "Content-Type": "application/json",
             },
         });
-        const accInfo = yield response.json();
+        const accInfo = await response.json();
         return accInfo;
     }
     catch (err) {
@@ -132,47 +123,50 @@ const getAccountFetch = () => __awaiter(void 0, void 0, void 0, function* () {
             throw err;
         }
     }
-});
-const getSymbolPriceTickers1Am = () => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getSymbolPriceTickers1Am = async () => {
     try {
-        const price1Am = yield coinService.list();
+        const price1Am = await coinService.list();
         return price1Am;
     }
     catch (error) {
         throw error;
     }
-});
-const getSymbolPriceTicker = (symbol) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getSymbolPriceTicker = async (symbol) => {
     const endpoint = "/fapi/v2/ticker/price";
     const url = `${baseUrl}${endpoint}`;
-    const response = yield axios_1.default.get(url, {
+    const response = await axios_1.default.get(url, {
         params: { symbol },
     });
     const tickerPrice = response.data;
     return tickerPrice;
-});
-const getSymbolPriceTickers = () => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getSymbolPriceTickers = async () => {
     const endpoint = "/fapi/v2/ticker/price";
     const url = `${baseUrl}${endpoint}`;
-    const response = yield axios_1.default.get(url);
+    const response = await axios_1.default.get(url);
     const tickersPrice = response.data;
     return tickersPrice;
-});
-const getSymbolMarketPrices = () => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getSymbolMarketPrices = async () => {
     const endpoint = "/fapi/v1/premiumIndex";
     const url = `${baseUrl}${endpoint}`;
-    const response = yield axios_1.default.get(url);
+    const response = await axios_1.default.get(url);
     const markPrices = response.data;
     return markPrices;
-});
-const getOrdersFromToday1Am = () => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getOrdersFromToday1Am = async () => {
     try {
         const endpoint = "/fapi/v1/allOrders";
         const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
-        const params = Object.assign(Object.assign({}, paramsNow), { startTime: (0, helper_ultil_1.getTimestampOfToday1AM)() });
+        const params = {
+            ...paramsNow,
+            startTime: (0, helper_ultil_1.getTimestampOfToday1AM)(),
+        };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, params);
         const url = `${baseUrl}${endpoint}?${queryString}`;
-        const response = yield axios_1.default.get(url, commonAxiosOpt);
+        const response = await axios_1.default.get(url, commonAxiosOpt);
         const orders = response.data;
         return orders;
     }
@@ -180,17 +174,22 @@ const getOrdersFromToday1Am = () => __awaiter(void 0, void 0, void 0, function* 
         // Handle the error here
         throw error; // Re-throw the error if necessary
     }
-});
-const createMarketOrder = (symbol, side, quantity, type = "market", _price) => __awaiter(void 0, void 0, void 0, function* () {
+};
+// phep thu tren server
+// ghi 100 record vao database
+const createMarketOrder = async (symbol, side, quantity, type = "market", _price) => {
     try {
         const endpoint = "/fapi/v1/order";
         const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
-        let orderParams = Object.assign({ symbol,
+        let orderParams = {
+            symbol,
             type,
             quantity,
-            side }, paramsNow);
+            side,
+            ...paramsNow,
+        };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, orderParams);
-        const response = yield fetch(`${baseUrl}${endpoint}?${queryString}`, {
+        const response = await fetch(`${baseUrl}${endpoint}?${queryString}`, {
             method: "POST",
             headers: {
                 "X-MBX-APIKEY": apiKey,
@@ -198,14 +197,14 @@ const createMarketOrder = (symbol, side, quantity, type = "market", _price) => _
             },
         });
         if (response.status === 200 || response.status === 201) {
-            const data = yield response.json();
+            const data = await response.json();
             return {
                 success: true,
                 data: data,
             };
         }
         else {
-            const err = yield response.json();
+            const err = await response.json();
             return {
                 success: false,
                 error: err,
@@ -214,9 +213,15 @@ const createMarketOrder = (symbol, side, quantity, type = "market", _price) => _
         }
     }
     catch (err) {
-        throw err;
+        if (err instanceof Error) {
+            throw new Error(err.message, {
+                cause: "binanceService createMarketOrder",
+            });
+        }
+        else
+            throw err;
     }
-});
+};
 exports.default = {
     getSymbolPriceTicker,
     getSymbolPriceTickers,

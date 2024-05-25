@@ -15,6 +15,11 @@ const base_entity_1 = require("./base.entity");
 const market_order_chain_entity_1 = require("./market-order-chain.entity");
 // Entities
 let Log = class Log extends base_entity_1.BaseEntity {
+    id;
+    message;
+    type;
+    market_order_chains_id;
+    order_chain;
 };
 exports.Log = Log;
 __decorate([

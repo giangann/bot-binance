@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -15,36 +6,40 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const market_order_chain_entity_1 = require("../entities/market-order-chain.entity");
 const moment_1 = __importDefault(require("moment"));
-const list = (params) => __awaiter(void 0, void 0, void 0, function* () {
-    const status = params === null || params === void 0 ? void 0 : params.status;
+const list = async (params) => {
+    const status = params?.status;
     const repo = (0, typeorm_1.getRepository)(market_order_chain_entity_1.MarketOrderChain)
         .createQueryBuilder("market_order_chains")
         .leftJoinAndSelect("market_order_chains.order_pieces", "pieces");
     if (status) {
         repo.andWhere("market_order_chains.status = :status", { status });
     }
-    const listRecords = yield repo.getMany();
+    const listRecords = await repo.getMany();
     return listRecords;
-});
-const detail = (id) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const detail = async (id) => {
     const repo = (0, typeorm_1.getRepository)(market_order_chain_entity_1.MarketOrderChain)
         .createQueryBuilder("market_order_chains")
         .leftJoinAndSelect("market_order_chains.order_pieces", "order_pieces")
         .where("market_order_chains.id = :id", { id });
-    const orderChain = yield repo.getOne();
+    const orderChain = await repo.getOne();
     return orderChain;
-});
-const create = (params) => __awaiter(void 0, void 0, void 0, function* () {
-    const paramsWithDateTime = Object.assign(Object.assign({}, params), { createdAt: (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss"), updatedAt: (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss") });
-    const createdRecord = yield (0, typeorm_1.getRepository)(market_order_chain_entity_1.MarketOrderChain).save(paramsWithDateTime);
+};
+const create = async (params) => {
+    const paramsWithDateTime = {
+        ...params,
+        createdAt: (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss"),
+        updatedAt: (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss"),
+    };
+    const createdRecord = await (0, typeorm_1.getRepository)(market_order_chain_entity_1.MarketOrderChain).save(paramsWithDateTime);
     return createdRecord;
-});
-const update = (params) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const update = async (params) => {
     const filtered = { id: params.id };
     delete params.id;
     params.updatedAt = (0, moment_1.default)().format("YYYY-MM-DD hh:mm:ss");
     const repo = (0, typeorm_1.getRepository)(market_order_chain_entity_1.MarketOrderChain);
-    const updateRes = yield repo.update(filtered, params);
+    const updateRes = await repo.update(filtered, params);
     return updateRes;
-});
+};
 exports.default = { create, list, update, detail };

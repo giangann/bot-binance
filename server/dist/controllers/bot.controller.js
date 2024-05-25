@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -17,7 +8,7 @@ const market_order_chain_service_1 = __importDefault(require("../services/market
 const server_response_ultil_1 = require("../ultils/server-response.ultil");
 const binance_service_1 = __importDefault(require("../services/binance.service"));
 const logger_config_1 = require("../loaders/logger.config");
-const active = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const active = async (req, res) => {
     try {
         let params = {
             transaction_size_start: req.body.transaction_size,
@@ -26,17 +17,22 @@ const active = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             percent_to_sell: req.body.percent_to_sell,
         };
         // create new chain
-        const newOrderChain = yield market_order_chain_service_1.default.create(Object.assign({ status: "open", price_start: "0.000", total_balance_start: "0.000" }, params));
+        const newOrderChain = await market_order_chain_service_1.default.create({
+            status: "open",
+            price_start: "0.000", // can't defined
+            total_balance_start: "0.000", // can't defined
+            ...params,
+        });
         server_response_ultil_1.ServerResponse.response(res, newOrderChain);
     }
     catch (err) {
         console.log(err);
         server_response_ultil_1.ServerResponse.error(res, err.message);
     }
-});
-const quit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const quit = async (req, res) => {
     try {
-        const positions = yield binance_service_1.default.getPositions();
+        const positions = await binance_service_1.default.getPositions();
         // make promises and fullfilled
         const orderPromises = positions.map((position) => {
             let symbol = position.symbol;
@@ -44,7 +40,7 @@ const quit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let side = "SELL";
             return binance_service_1.default.createMarketOrder(symbol, side, quantity);
         });
-        const orderResult = yield Promise.all(orderPromises);
+        const orderResult = await Promise.all(orderPromises);
         // log and error
         let numOfSuccess = 0;
         let numOfFailure = 0;
@@ -66,11 +62,11 @@ const quit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
         const data = { numOfSuccess, numOfFailure };
-        yield bot_service_1.default.quit();
+        await bot_service_1.default.quit();
         server_response_ultil_1.ServerResponse.response(res, data);
     }
     catch (err) {
         server_response_ultil_1.ServerResponse.error(res, err.message);
     }
-});
+};
 exports.default = { active, quit };

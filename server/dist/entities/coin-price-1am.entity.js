@@ -14,6 +14,10 @@ const typeorm_1 = require("typeorm");
 const base_entity_1 = require("./base.entity");
 // Entities
 let CoinPrice1AM = class CoinPrice1AM extends base_entity_1.BaseEntity {
+    id;
+    symbol;
+    price;
+    mark_price;
 };
 exports.CoinPrice1AM = CoinPrice1AM;
 __decorate([

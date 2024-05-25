@@ -15,6 +15,17 @@ const base_entity_1 = require("./base.entity");
 const market_order_chain_entity_1 = require("./market-order-chain.entity");
 // Entities
 let MarketOrderPiece = class MarketOrderPiece extends base_entity_1.BaseEntity {
+    id;
+    total_balance;
+    percent_change;
+    symbol;
+    direction;
+    price;
+    amount;
+    transaction_size;
+    timestamp;
+    market_order_chains_id;
+    order_chain;
 };
 exports.MarketOrderPiece = MarketOrderPiece;
 __decorate([

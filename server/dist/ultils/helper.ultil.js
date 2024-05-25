@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.ordersToMap = exports.positionsToMap = exports.symbolPriceTickersToMap = exports.exchangeInfoSymbolsToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
+exports.filterFailOrder = exports.filterSuccessOrder = exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.ordersToMap = exports.positionsToMap = exports.symbolPriceTickersToMap = exports.exchangeInfoSymbolsToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
 const crypto_1 = require("crypto");
 function priceToPercent(p1, p2) {
     return (p2 / p1 - 1) * 100;
@@ -179,3 +179,11 @@ function filterAblePosition(positions) {
     return positions.filter((pos) => parseFloat(pos.positionAmt) > 0);
 }
 exports.filterAblePosition = filterAblePosition;
+function filterSuccessOrder(newOrders) {
+    return newOrders.filter((newOrder) => newOrder.success === true);
+}
+exports.filterSuccessOrder = filterSuccessOrder;
+function filterFailOrder(newOrders) {
+    return newOrders.filter((newOrder) => newOrder.success === false);
+}
+exports.filterFailOrder = filterFailOrder;
