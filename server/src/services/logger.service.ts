@@ -1,5 +1,6 @@
 import { TNewOrder } from "../types/order";
 import { logger } from "../loaders/logger.config";
+import { errorToString } from "../ultils/error-handler.ultil";
 
 function saveTickLog(
   created: number,
@@ -31,4 +32,10 @@ function saveOrderLog(
   logger.debug(`${info} ${reason}`);
 }
 
-export default { saveOrderLog, saveTickLog };
+// get string content from Error object and save to error.log file
+function saveErrorLog(err: Error) {
+  const content = errorToString(err);
+  logger.error(content);
+}
+
+export default { saveOrderLog, saveTickLog, saveErrorLog };

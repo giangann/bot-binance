@@ -13,6 +13,7 @@ import {
 } from "../ultils/helper.ultil";
 import CoinService from "./coin.service";
 import { TExchangeInfo } from "../types/exchange-info";
+import { throwError } from "../ultils/error-handler.ultil";
 dotenv.config();
 
 // GET ENV
@@ -66,7 +67,7 @@ const getPositions = async (): Promise<TPosition[]> => {
 
 const getAccountInfo = async (): Promise<TAccount> => {
   try {
-    const endpoint = "/fapi/v2/account";
+    const endpoint = "/fapi/v2/accoun";
     const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
     const queryString = paramsToQueryWithSignature(secret, paramsNow);
     const url = `${baseUrl}${endpoint}?${queryString}`;
@@ -75,14 +76,9 @@ const getAccountInfo = async (): Promise<TAccount> => {
     const accInfo = response.data;
     return accInfo;
   } catch (err) {
-    if (err instanceof AxiosError) {
-      throw new Error(JSON.stringify(err.response.data));
-    } else {
-      throw err;
-    }
+    throwError(err);
   }
 };
-
 const getAccountFetch = async (): Promise<TAccount> => {
   try {
     const endpoint = "/fapi/v2/account";
@@ -99,11 +95,7 @@ const getAccountFetch = async (): Promise<TAccount> => {
     const accInfo = await response.json();
     return accInfo;
   } catch (err) {
-    if (err instanceof AxiosError) {
-      throw new Error(JSON.stringify(err.response.data));
-    } else {
-      throw err;
-    }
+    throwError(err);
   }
 };
 
@@ -113,37 +105,49 @@ const getSymbolPriceTickers1Am = async (): Promise<
   try {
     const price1Am = await coinService.list();
     return price1Am;
-  } catch (error) {
-    throw error;
+  } catch (err) {
+    throwError(err);
   }
 };
 
 const getSymbolPriceTicker = async (
   symbol: string
 ): Promise<TSymbolPriceTicker> => {
-  const endpoint = "/fapi/v2/ticker/price";
-  const url = `${baseUrl}${endpoint}`;
-  const response = await axios.get(url, {
-    params: { symbol },
-  });
-  const tickerPrice: TSymbolPriceTicker = response.data;
-  return tickerPrice;
+  try {
+    const endpoint = "/fapi/v2/ticker/price";
+    const url = `${baseUrl}${endpoint}`;
+    const response = await axios.get(url, {
+      params: { symbol },
+    });
+    const tickerPrice: TSymbolPriceTicker = response.data;
+    return tickerPrice;
+  } catch (err) {
+    throwError(err);
+  }
 };
 
 const getSymbolPriceTickers = async (): Promise<TSymbolPriceTicker[]> => {
-  const endpoint = "/fapi/v2/ticker/price";
-  const url = `${baseUrl}${endpoint}`;
-  const response = await axios.get(url);
-  const tickersPrice: TSymbolPriceTicker[] = response.data;
-  return tickersPrice;
+  try {
+    const endpoint = "/fapi/v2/ticker/price";
+    const url = `${baseUrl}${endpoint}`;
+    const response = await axios.get(url);
+    const tickersPrice: TSymbolPriceTicker[] = response.data;
+    return tickersPrice;
+  } catch (err) {
+    throwError(err);
+  }
 };
 
 const getSymbolMarketPrices = async (): Promise<TSymbolMarkPrice[]> => {
-  const endpoint = "/fapi/v1/premiumIndex";
-  const url = `${baseUrl}${endpoint}`;
-  const response = await axios.get(url);
-  const markPrices: TSymbolMarkPrice[] = response.data;
-  return markPrices;
+  try {
+    const endpoint = "/fapi/v1/premiumInde";
+    const url = `${baseUrl}${endpoint}`;
+    const response = await axios.get(url);
+    const markPrices: TSymbolMarkPrice[] = response.data;
+    return markPrices;
+  } catch (err) {
+    throwError(err);
+  }
 };
 
 const getOrdersFromToday1Am = async (): Promise<TOrder[]> => {
@@ -161,14 +165,10 @@ const getOrdersFromToday1Am = async (): Promise<TOrder[]> => {
     const orders = response.data;
 
     return orders;
-  } catch (error) {
-    // Handle the error here
-    throw error; // Re-throw the error if necessary
+  } catch (err) {
+    throwError(err);
   }
 };
-
-// phep thu tren server
-// ghi 100 record vao database
 
 const createMarketOrder = async (
   symbol: string,

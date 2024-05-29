@@ -243,3 +243,14 @@ export function filterFailOrder(newOrders: TResponse<TNewOrder>[]) {
     (newOrder) => newOrder.success === false
   ) as TResponseFailure[];
 }
+
+// make stackTrace of error shorter
+export function stackTraceShorter(trace: string): string {
+  const traceArr = trace.split("\n    ");
+
+  const firstTrace = traceArr[traceArr.length - 1];
+  const secondTrace = traceArr[traceArr.length - 2];
+  const thirdTrace = traceArr[traceArr.length - 3];
+
+  return `${firstTrace}  -  ${secondTrace}  -  ${thirdTrace}`;
+}
