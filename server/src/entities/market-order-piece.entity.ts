@@ -25,7 +25,7 @@ export class MarketOrderPiece extends BaseEntity {
   price: string;
 
   @Column({ nullable: false })
-  amount: string;
+  quantity: string;
 
   @Column({ nullable: false })
   transaction_size: string;

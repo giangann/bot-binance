@@ -1,13 +1,12 @@
 import { createHmac } from "crypto";
 import { IMarketOrderPieceRecord } from "market-order-piece.interface";
-import marketOrderChainService from "../services/market-order-chain.service";
 import { TMarkPriceStream, TTickerPriceStream } from "../types/binance-stream";
+import { TExchangeInfoSymbol } from "../types/exchange-info";
 import {
   TNewOrder,
-  TOrder,
   TResponSuccess,
   TResponse,
-  TResponseFailure,
+  TResponseFailure
 } from "../types/order";
 import { TPosition } from "../types/position";
 import { TSymbolMarkPriceWs } from "../types/symbol-mark-price";
@@ -15,7 +14,6 @@ import {
   TSymbolPriceTicker,
   TSymbolPriceTickerWs,
 } from "../types/symbol-price-ticker";
-import { TExchangeInfoSymbol } from "../types/exchange-info";
 
 export function priceToPercent(p1: number, p2: number) {
   return (p2 / p1 - 1) * 100;
@@ -167,20 +165,6 @@ export function positionsToMap(positions: TPosition[]) {
     let key = position.symbol;
     if (!(key in res)) {
       res[key] = position;
-    }
-  }
-  return res;
-}
-
-export function ordersToMap(orders: TOrder[]): Record<string, TOrder> {
-  let res: Record<string, TOrder> = {};
-
-  // lastest order first
-  const sortOrders = orders.sort((a, b) => b.time - a.time);
-  for (let order of sortOrders) {
-    let key = order.symbol;
-    if (!(key in res)) {
-      res[key] = order;
     }
   }
   return res;

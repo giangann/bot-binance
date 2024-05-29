@@ -1,19 +1,18 @@
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import dotenv from "dotenv";
 import { TAccount } from "../types/account";
-import { TCreateOrderErr, TNewOrder, TOrder, TResponse } from "../types/order";
+import { TExchangeInfo } from "../types/exchange-info";
+import { TCreateOrderErr, TNewOrder, TResponse } from "../types/order";
 import { TPosition } from "../types/position";
 import { TSymbolMarkPrice } from "../types/symbol-mark-price";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
+import { throwError } from "../ultils/error-handler.ultil";
 import {
-  getTimestampOfToday1AM,
-  isSuccess,
-  paramsToQueryWithSignature,
   filterAblePosition,
+  isSuccess,
+  paramsToQueryWithSignature
 } from "../ultils/helper.ultil";
 import CoinService from "./coin.service";
-import { TExchangeInfo } from "../types/exchange-info";
-import { throwError } from "../ultils/error-handler.ultil";
 dotenv.config();
 
 // GET ENV
@@ -39,11 +38,7 @@ const getExchangeInfo = async (): Promise<TExchangeInfo> => {
     const exchangeInfo: TExchangeInfo = response.data;
     return exchangeInfo;
   } catch (err) {
-    if (err instanceof AxiosError) {
-      throw new Error(JSON.stringify(err.response.data));
-    } else {
-      throw err;
-    }
+    throwError(err);
   }
 };
 
@@ -57,11 +52,7 @@ const getPositions = async (): Promise<TPosition[]> => {
     const positions: TPosition[] = response.data;
     return filterAblePosition(positions);
   } catch (err) {
-    if (err instanceof AxiosError) {
-      throw new Error(JSON.stringify(err.response.data));
-    } else {
-      throw err;
-    }
+    throwError(err);
   }
 };
 
@@ -150,26 +141,6 @@ const getSymbolMarketPrices = async (): Promise<TSymbolMarkPrice[]> => {
   }
 };
 
-const getOrdersFromToday1Am = async (): Promise<TOrder[]> => {
-  try {
-    const endpoint = "/fapi/v1/allOrders";
-    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
-    const params = {
-      ...paramsNow,
-      startTime: getTimestampOfToday1AM(),
-    };
-    const queryString = paramsToQueryWithSignature(secret, params);
-    const url = `${baseUrl}${endpoint}?${queryString}`;
-    const response = await axios.get(url, commonAxiosOpt);
-
-    const orders = response.data;
-
-    return orders;
-  } catch (err) {
-    throwError(err);
-  }
-};
-
 const createMarketOrder = async (
   symbol: string,
   side: "BUY" | "SELL",
@@ -211,11 +182,7 @@ const createMarketOrder = async (
       };
     }
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message, {
-        cause: "binanceService createMarketOrder",
-      });
-    } else throw err;
+    throwError(err);
   }
 };
 
@@ -228,6 +195,5 @@ export default {
   getPositions,
   getExchangeInfo,
   getAccountInfo,
-  getOrdersFromToday1Am,
   getAccountFetch,
 };

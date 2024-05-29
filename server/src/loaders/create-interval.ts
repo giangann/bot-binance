@@ -9,7 +9,14 @@ import logService from "../services/log.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import marketOrderPieceService from "../services/market-order-piece.service";
 import { TExchangeInfoSymbol } from "../types/exchange-info";
-import { TNewOrder, TResponseFailure } from "../types/order";
+import {
+  TNewOrder,
+  TOrderInfo,
+  TOrderMoreInfo,
+  TOrderParam,
+  TOrderReason,
+  TResponseFailure,
+} from "../types/order";
 import { TPosition } from "../types/position";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
 import {
@@ -22,6 +29,7 @@ import {
   validateAmount,
 } from "../ultils/helper.ultil";
 import { logger } from "./logger.config";
+import { throwError } from "../ultils/error-handler.ultil";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
@@ -51,7 +59,7 @@ const createInterval = () => {
         const orderPiecesMap = orderPiecesToMap(openChain.order_pieces);
 
         // gen order params
-        const genOrderParamsArgs: Parameters<typeof genMarketOrderParams> = [
+        const genOrderParamsArgs: Parameters<typeof genOrderInfoArray> = [
           symbolPriceTickersMap,
           symbolPriceTickers1AmMap,
           positionsMap,
@@ -59,10 +67,10 @@ const createInterval = () => {
           openChain,
           exchangeInfoSymbolsMap,
         ];
-        const orderParams = genMarketOrderParams(...genOrderParamsArgs);
+        const orderInfos = genOrderInfoArray(...genOrderParamsArgs);
 
         // make order and handle response
-        const createdOrders = await makeOrders(orderParams);
+        const createdOrders = await makeOrders(orderInfos);
         const successOrders = filterSuccessOrder(createdOrders);
         const failureOrders = filterFailOrder(createdOrders);
         const successOrdersData = successOrders.map((order) => order.data);
@@ -74,7 +82,7 @@ const createInterval = () => {
         // gen order pieces params and save to database
         const orderPiecesInfo: Parameters<typeof genOrderPieceParams> = [
           successOrdersData,
-          orderParams,
+          orderInfos,
           openChain.id,
         ];
         const orderPieceParams = genOrderPieceParams(...orderPiecesInfo);
@@ -85,7 +93,7 @@ const createInterval = () => {
 
         global.wsServerGlob.emit(
           "bot-tick",
-          orderParams.length,
+          orderInfos.length,
           successOrders.length,
           failureOrders.length
         );
@@ -96,33 +104,21 @@ const createInterval = () => {
         global.wsServerGlob.emit("app-err", JSON.stringify(err));
         logger.error(`name: ${name}; message: ${message}; cause: ${cause}`);
       } else {
-        
       }
     }
 
     console.log("emit and end tick");
   }, 10000);
-
-  global.tickInterval = interval;
 };
 
-type TOrderParams = {
-  symbol: string;
-  direction: "BUY" | "SELL";
-  amount: number;
-  percent?: number;
-  order_size?: number;
-  price_ticker?: number;
-  positionAmt?: number;
-};
-function genMarketOrderParams(
+function genOrderInfoArray(
   symbolPriceTickersMap: Record<string, TSymbolPriceTicker>,
   symbolPriceTickers1AmMap: Record<string, Omit<TSymbolPriceTicker, "time">>,
   positionsMap: Record<string, TPosition>,
   orderPiecesMap: Record<string, IMarketOrderPieceRecord>,
   openChain: IMarketOrderChainEntity,
   exchangeInfoSymbolsMap: Record<string, TExchangeInfoSymbol>
-) {
+): TOrderInfo[] {
   try {
     const {
       percent_to_first_buy,
@@ -130,7 +126,7 @@ function genMarketOrderParams(
       percent_to_sell,
       transaction_size_start,
     } = openChain;
-    let orderParams: TOrderParams[] = [];
+    let orderInfoArray: TOrderInfo[] = [];
 
     // loop through symbolPriceTickers
     const symbols = Object.keys(symbolPriceTickersMap);
@@ -150,7 +146,7 @@ function genMarketOrderParams(
       }
 
       // calculate percentChange
-      const percent_change = (currPrice / prevPrice - 1) * 100;
+      const percentChange = (currPrice / prevPrice - 1) * 100;
 
       // get position
       let position = positionsMap[symbol]; // positions just have symbol that positionAmt > 0
@@ -158,77 +154,90 @@ function genMarketOrderParams(
 
       // direction and order_size intitial
       let direction: "BUY" | "SELL" | "" = "";
-      let amount = transaction_size_start / currPrice;
+      let quantity = transaction_size_start / currPrice;
 
       // direction calculate
       const isFirstBuy =
-        percent_change >= parseFloat(percent_to_first_buy) &&
+        percentChange >= parseFloat(percent_to_first_buy) &&
         hasOrderToday === false;
-      if (percent_change <= parseFloat(percent_to_sell)) direction = "SELL";
-      if (percent_change >= parseFloat(percent_to_buy) || isFirstBuy)
+      if (percentChange <= parseFloat(percent_to_sell)) direction = "SELL";
+      if (percentChange >= parseFloat(percent_to_buy) || isFirstBuy)
         direction = "BUY";
       if (direction === "") continue;
 
       // order_size calculate
       if (direction === "SELL") {
         if (!position || !positionAmt) continue;
-        amount = positionAmt / 2;
+        quantity = positionAmt / 2;
       }
       if (direction === "BUY") {
         if (!position || !positionAmt) {
-          if (isFirstBuy) amount = transaction_size_start / currPrice;
+          if (isFirstBuy) quantity = transaction_size_start / currPrice;
           else continue;
         }
-        if (position && positionAmt) amount = positionAmt;
+        if (position && positionAmt) quantity = positionAmt;
       }
 
-      // amount precision
+      // order params:
       const quantityPrecision =
         exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
-      orderParams.push({
-        amount: validateAmount(amount, quantityPrecision),
-        direction,
+      quantity = validateAmount(quantity, quantityPrecision);
+      const orderParam: TOrderParam = {
         symbol,
-        percent: percent_change,
-        order_size: Math.round(amount * currPrice),
-        price_ticker: currPrice,
+        direction,
+        quantity,
+      };
+
+      // order reason:
+      const orderReason: TOrderReason = {
+        isFirstOrder: !hasOrderToday,
+        currPrice,
+        prevPrice,
+        percentChange,
         positionAmt,
-      });
+      };
+
+      // more info:
+      const orderMoreInfo: TOrderMoreInfo = {
+        amount: quantity * currPrice,
+      };
+
+      // add to array
+      orderInfoArray.push({ ...orderParam, ...orderReason, ...orderMoreInfo });
     }
-    console.log("total generated params: ", orderParams.length, " orders");
-    return orderParams;
+    return orderInfoArray;
   } catch (err) {
-    console.log(err);
+    throwError(err);
   }
 }
-async function makeOrders(orderParams: TOrderParams[]) {
+async function makeOrders(orderParams: TOrderParam[]) {
   const promises = orderParams.map((param) => {
-    const { symbol, amount, direction } = param;
-    return binanceService.createMarketOrder(symbol, direction, amount);
+    const { symbol, quantity, direction } = param;
+    return binanceService.createMarketOrder(symbol, direction, quantity);
   });
   return Promise.all(promises);
 }
 
 function genOrderPieceParams(
   newOrders: TNewOrder[],
-  orderParams: TOrderParams[],
+  orderInfos: TOrderInfo[],
   chainId: number
 ): IMarketOrderPieceCreate[] {
   let orderPieceParams: IMarketOrderPieceCreate[] = [];
 
   for (let newOrder of newOrders) {
-    for (let orderParam of orderParams) {
-      if (newOrder?.symbol === orderParam.symbol) {
+    for (let orderInfo of orderInfos) {
+      if (newOrder?.symbol === orderInfo.symbol) {
         let orderPiceParam: IMarketOrderPieceCreate = {
           id: newOrder.orderId.toString(),
           market_order_chains_id: chainId,
-          amount: orderParam.amount.toString(),
-          direction: orderParam.direction,
-          percent_change: orderParam.percent.toFixed(5),
-          symbol: orderParam.symbol,
-          price: orderParam.price_ticker.toString(),
+          quantity: orderInfo.quantity.toString(),
+          direction: orderInfo.direction,
+          percent_change: orderInfo.percentChange.toFixed(5),
+          symbol: orderInfo.symbol,
+          price: orderInfo.currPrice.toString(),
           total_balance: "0.00", // can't defined
-          transaction_size: orderParam.order_size.toString(),
+          transaction_size: orderInfo.amount.toString(),
         };
         orderPieceParams.push(orderPiceParam);
       }
