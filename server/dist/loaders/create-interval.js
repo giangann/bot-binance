@@ -13,7 +13,6 @@ const error_handler_ultil_1 = require("../ultils/error-handler.ultil");
 const helper_ultil_1 = require("../ultils/helper.ultil");
 const createInterval = () => {
     const interval = setInterval(async () => {
-    const interval = setInterval(async () => {
         console.log("start tick");
         try {
             // fetch statistic
@@ -25,7 +24,6 @@ const createInterval = () => {
             global.wsServerGlob.emit("ws-position", positions);
             global.wsServerGlob.emit("symbols-price", tickers);
             // fetch chain open
-            const openChain = await getChainOpen();
             const openChain = await getChainOpen();
             if (openChain) {
                 // fetch symbolPriceTickers 1AM from DB
@@ -85,13 +83,11 @@ function genOrderInfoArray(symbolPriceTickersMap, symbolPriceTickers1AmMap, posi
         for (let symbol of symbols) {
             // get prev price and current price
             let prevPrice = parseFloat(symbolPriceTickers1AmMap[symbol]?.price);
-            let prevPrice = parseFloat(symbolPriceTickers1AmMap[symbol]?.price);
             let todayLatestOrder = orderPiecesMap[symbol];
             const hasOrderToday = Boolean(todayLatestOrder);
             if (todayLatestOrder) {
                 prevPrice = parseFloat(todayLatestOrder.price);
             }
-            let currPrice = parseFloat(symbolPriceTickersMap[symbol]?.price);
             let currPrice = parseFloat(symbolPriceTickersMap[symbol]?.price);
             // check if need to skip, continue to next symbol
             if (!prevPrice || !currPrice) {
@@ -101,7 +97,6 @@ function genOrderInfoArray(symbolPriceTickersMap, symbolPriceTickers1AmMap, posi
             const percentChange = (currPrice / prevPrice - 1) * 100;
             // get position
             let position = positionsMap[symbol]; // positions just have symbol that positionAmt > 0
-            let positionAmt = parseFloat(position?.positionAmt);
             let positionAmt = parseFloat(position?.positionAmt);
             // direction and order_size intitial
             let direction = "";
@@ -170,7 +165,6 @@ async function makeOrders(orderInfos) {
         return binance_service_1.default.createMarketOrder(symbol, direction, quantity);
     });
     return Promise.all(promises);
-    return Promise.all(promises);
 }
 function genOrderPieceParams(mergedOrders, chainId) {
     return mergedOrders.map((mergedOrder) => {
@@ -197,7 +191,6 @@ function genLogParams(failedOrders, chainId) {
     let params = [];
     for (let failedOrder of failedOrders) {
         let { error: { code, msg }, } = failedOrder;
-        let orderInfo = failedOrder?.payload;
         let orderInfo = failedOrder?.payload;
         params.push({
             message: `code: ${code}, message: ${msg}, ${JSON.stringify(orderInfo)}`,
