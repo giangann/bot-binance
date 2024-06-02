@@ -1,4 +1,4 @@
-import { TNewOrder } from "../types/order";
+import { TNewOrder, TOrderInfo } from "../types/order";
 import { logger } from "../loaders/logger.config";
 import { errorToString } from "../ultils/error-handler.ultil";
 
@@ -16,26 +16,40 @@ function saveTickLog(
   logger.debug(content);
 }
 
-function saveOrderLog(
-  orderInfo: Pick<TNewOrder, "orderId" | "symbol" | "origQty" | "side">,
-  positionAmt: number | string,
-  percentChange: number | string,
-  prevPrice: number | string,
-  currPrice: number | string,
-  isFirstOrder: boolean,
-  size: number | string
-) {
-  const { orderId, symbol, origQty, side } = orderInfo;
-  const info = `OrderId: ${orderId}; Symbol: ${symbol}; Side:${side}; Qty: ${origQty}`;
-  const reason = `isFirstOrder: ${isFirstOrder}, prevPrice: ${prevPrice}, currPrice: ${currPrice}, percentChange: ${percentChange}, positionAmt: ${positionAmt}, size:${size}`;
+// orderInfo: TOrderInfo = TOrderParams & TOrderReason & TOrderMoreInfo
+// newOrder: response.data: TNewOrder when make new order
+function saveOrderLog(mergedOrder: TOrderInfo & TNewOrder, chainId: number) {
+  const {
+    orderId,
+    symbol,
+    side,
+    origQty,
+    currPrice,
+    prevPrice,
+    percentChange,
+    amount,
+    positionAmt,
+    isFirstOrder,
+  } = mergedOrder;
+
+  // example: CHAIN_ID: 137 ORDER_ID: 123456 || BUY 0.05 BTCUSDT
+  const info = `CHAIN_ID: ${chainId} ORDER_ID: ${orderId} || ${side} ${origQty} ${symbol}`;
+  const reason = `IS_FIRST_ORDER: ${isFirstOrder}, PREV_PRICE: ${prevPrice}, CURR_PRICE: ${currPrice}, PERCENT_CHANGE: ${percentChange}, POSITION_AMT: ${positionAmt}, AMOUNT: ${amount}`;
 
   logger.debug(`${info} ${reason}`);
 }
 
 // get string content from Error object and save to error.log file
-function saveErrorLog(err: Error) {
-  const content = errorToString(err);
-  logger.error(content);
+function saveErrorLog(err: any) {
+  if (err instanceof Error) {
+    const content = errorToString(err);
+    logger.error(content);
+  } else {
+    const errorKeys = Object.keys(err);
+    const errorProperties = Object.getOwnPropertyNames(err);
+    const content = `Uncommon Error Exception with Keys: ${errorKeys} --and-- Properties: ${errorProperties}`;
+    logger.error(content);
+  }
 }
 
 export default { saveOrderLog, saveTickLog, saveErrorLog };

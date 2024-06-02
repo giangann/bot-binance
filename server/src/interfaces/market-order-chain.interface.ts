@@ -29,7 +29,7 @@ export interface IMarketOrderChainCreate {
   percent_to_first_buy: string;
   percent_to_buy: string;
   percent_to_sell: string;
-  price_start: string;
+  price_start?: string;
 
   createdAt?: string;
   updatedAt?: string;

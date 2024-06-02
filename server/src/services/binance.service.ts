@@ -58,7 +58,7 @@ const getPositions = async (): Promise<TPosition[]> => {
 
 const getAccountInfo = async (): Promise<TAccount> => {
   try {
-    const endpoint = "/fapi/v2/accoun";
+    const endpoint = "/fapi/v2/account";
     const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
     const queryString = paramsToQueryWithSignature(secret, paramsNow);
     const url = `${baseUrl}${endpoint}?${queryString}`;

@@ -19,8 +19,8 @@ const create = async (params: ILogCreate) => {
   try {
     const paramsWithDateTime: ILogCreate = {
       ...params,
-      createdAt: moment().format("YYYY-MM-DD hh:mm:ss"),
-      updatedAt: moment().format("YYYY-MM-DD hh:mm:ss"),
+      createdAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+      updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
     };
     const createdRecord = await getRepository(Log).save(paramsWithDateTime);
     return createdRecord;

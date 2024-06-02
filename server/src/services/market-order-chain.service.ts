@@ -33,8 +33,8 @@ const detail = async (id: number) => {
 const create = async (params: IMarketOrderChainCreate) => {
   const paramsWithDateTime: IMarketOrderChainCreate = {
     ...params,
-    createdAt: moment().format("YYYY-MM-DD hh:mm:ss"),
-    updatedAt: moment().format("YYYY-MM-DD hh:mm:ss"),
+    createdAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+    updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
   };
   const createdRecord = await getRepository(MarketOrderChain).save(
     paramsWithDateTime
@@ -45,7 +45,7 @@ const create = async (params: IMarketOrderChainCreate) => {
 const update = async (params: IMarketOrderChainUpdate) => {
   const filtered = { id: params.id };
   delete params.id;
-  params.updatedAt = moment().format("YYYY-MM-DD hh:mm:ss");
+  params.updatedAt = moment().format("YYYY-MM-DD HH:mm:ss");
   const repo = getRepository(MarketOrderChain);
   const updateRes = await repo.update(filtered, params);
   return updateRes;

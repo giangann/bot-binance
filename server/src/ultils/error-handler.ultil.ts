@@ -1,6 +1,7 @@
+// @ts-nocheck
 import { AxiosError } from "axios";
 import { stackTraceShorter } from "./helper.ultil";
-import { resolveModuleName } from "typescript";
+import loggerService from "../services/logger.service";
 
 // convert Node Error object to string
 export function errorToString(err: Error) {
@@ -36,4 +37,19 @@ export function throwError(err: any, causeCustom?: string) {
     if (!cause) err.cause = causeCustom;
     throw err;
   }
+}
+
+// 1. emit Error information to client
+// 2. save Error information to error.log file
+export function handleTickError(err: any) {
+  if (err instanceof Error) {
+    global.wsServerGlob.emit("app-err", JSON.stringify(err.message));
+  } else {
+    // exception
+    global.wsServerGlob.emit(
+      "app-err",
+      "Uncommon Error Exception, view detail in error.log file"
+    );
+  }
+  loggerService.saveErrorLog(err);
 }

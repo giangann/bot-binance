@@ -33,8 +33,8 @@ const list = async (params?: IMarketOrderPieceList) => {
 const create = async (params: IMarketOrderPieceCreate) => {
   const paramsWithDateTime: IMarketOrderPieceCreate = {
     ...params,
-    createdAt: moment().format("YYYY-MM-DD hh:mm:ss"),
-    updatedAt: moment().format("YYYY-MM-DD hh:mm:ss"),
+    createdAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+    updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
   };
   const createdRecord = await getRepository(MarketOrderPiece).save(
     paramsWithDateTime

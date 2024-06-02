@@ -6,6 +6,7 @@ import {
 } from "market-order-piece.interface";
 import binanceService from "../services/binance.service";
 import logService from "../services/log.service";
+import loggerService from "../services/logger.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import marketOrderPieceService from "../services/market-order-piece.service";
 import { TExchangeInfoSymbol } from "../types/exchange-info";
@@ -19,6 +20,7 @@ import {
 } from "../types/order";
 import { TPosition } from "../types/position";
 import { TSymbolPriceTicker } from "../types/symbol-price-ticker";
+import { handleTickError, throwError } from "../ultils/error-handler.ultil";
 import {
   exchangeInfoSymbolsToMap,
   filterFailOrder,
@@ -28,8 +30,6 @@ import {
   symbolPriceTickersToMap,
   validateAmount,
 } from "../ultils/helper.ultil";
-import { logger } from "./logger.config";
-import { throwError } from "../ultils/error-handler.ultil";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
@@ -75,22 +75,25 @@ const createInterval = () => {
         const failureOrders = filterFailOrder(createdOrders);
         const successOrdersData = successOrders.map((order) => order.data);
 
-        // save log database
+        // save failure orders to bot_binance.logs database table
         const logParmas = genLogParams(failureOrders, openChain.id);
         await saveLogs(logParmas);
 
-        // gen order pieces params and save to database
+        // merge successOrders to bot_binance.market_order_pieces database table
+        const mergedOrders = mergeOrders(orderInfos, successOrdersData);
+
+        // save success orders to
         const orderPiecesInfo: Parameters<typeof genOrderPieceParams> = [
-          successOrdersData,
-          orderInfos,
+          mergedOrders,
           openChain.id,
         ];
         const orderPieceParams = genOrderPieceParams(...orderPiecesInfo);
         await saveOrderPieces(orderPieceParams);
 
-        // save success order to debug log
-        // saveOrderDebugLog(successOrdersData, orderParams, openChain.id);
+        // Side Effect: save success order to debug log
+        saveOrderDebugLog(mergedOrders, openChain.id);
 
+        // ws emit result of tick
         global.wsServerGlob.emit(
           "bot-tick",
           orderInfos.length,
@@ -99,12 +102,7 @@ const createInterval = () => {
         );
       }
     } catch (err) {
-      if (err instanceof Error) {
-        const { name, message, cause } = err;
-        global.wsServerGlob.emit("app-err", JSON.stringify(err));
-        logger.error(`name: ${name}; message: ${message}; cause: ${cause}`);
-      } else {
-      }
+      handleTickError(err);
     }
 
     console.log("emit and end tick");
@@ -210,42 +208,42 @@ function genOrderInfoArray(
     throwError(err);
   }
 }
-async function makeOrders(orderParams: TOrderParam[]) {
-  const promises = orderParams.map((param) => {
-    const { symbol, quantity, direction } = param;
+async function makeOrders(orderInfos: TOrderInfo[]) {
+  const promises = orderInfos.map((info) => {
+    const { symbol, quantity, direction } = info;
     return binanceService.createMarketOrder(symbol, direction, quantity);
   });
   return Promise.all(promises);
 }
 
 function genOrderPieceParams(
-  newOrders: TNewOrder[],
-  orderInfos: TOrderInfo[],
+  mergedOrders: (TOrderInfo & TNewOrder)[],
   chainId: number
 ): IMarketOrderPieceCreate[] {
-  let orderPieceParams: IMarketOrderPieceCreate[] = [];
-
-  for (let newOrder of newOrders) {
-    for (let orderInfo of orderInfos) {
-      if (newOrder?.symbol === orderInfo.symbol) {
-        let orderPiceParam: IMarketOrderPieceCreate = {
-          id: newOrder.orderId.toString(),
-          market_order_chains_id: chainId,
-          quantity: orderInfo.quantity.toString(),
-          direction: orderInfo.direction,
-          percent_change: orderInfo.percentChange.toFixed(5),
-          symbol: orderInfo.symbol,
-          price: orderInfo.currPrice.toString(),
-          total_balance: "0.00", // can't defined
-          transaction_size: orderInfo.amount.toString(),
-        };
-        orderPieceParams.push(orderPiceParam);
-      }
-    }
-  }
-
-  return orderPieceParams;
+  return mergedOrders.map((mergedOrder) => {
+    const {
+      orderId,
+      quantity,
+      direction,
+      percentChange,
+      symbol,
+      currPrice,
+      amount,
+    } = mergedOrder;
+    return {
+      id: orderId.toString(),
+      market_order_chains_id: chainId,
+      quantity: quantity.toString(),
+      direction: direction,
+      percent_change: percentChange.toFixed(5),
+      symbol: symbol,
+      price: currPrice.toString(),
+      total_balance: "0.00", // can't defined
+      transaction_size: amount.toString(),
+    };
+  });
 }
+
 async function saveOrderPieces(orderPieceParams: IMarketOrderPieceCreate[]) {
   return Promise.all(
     orderPieceParams.map(async (param) => {
@@ -272,6 +270,7 @@ function genLogParams(
   }
   return params;
 }
+
 async function saveLogs(logParams: ILogCreate[]) {
   return Promise.all(
     logParams.map(async (param) => {
@@ -280,11 +279,39 @@ async function saveLogs(logParams: ILogCreate[]) {
   );
 }
 
+function saveOrderDebugLog(
+  mergedOrders: (TNewOrder & TOrderInfo)[],
+  chainId: number
+) {
+  mergedOrders.forEach((mergedOrder) => {
+    loggerService.saveOrderLog(mergedOrder, chainId);
+  });
+}
 // if order with same symbol, get only 1 latest order
 async function getChainOpen(): Promise<IMarketOrderChainEntity | null> {
   const openChain = await marketOrderChainService.list({ status: "open" });
   if (openChain.length) return openChain[0];
   else return null;
+}
+
+// merge each order in success orders with information of this correspond order
+function mergeOrders(
+  orderInfos: TOrderInfo[],
+  newOrders: TNewOrder[]
+): (TOrderInfo & TNewOrder)[] {
+  let mergedOrders = [];
+  for (let newOrder of newOrders) {
+    for (let orderInfo of orderInfos) {
+      if (newOrder.symbol === orderInfo.symbol) {
+        const mergedOrder: TOrderInfo & TNewOrder = {
+          ...newOrder,
+          ...orderInfo,
+        };
+        mergedOrders.push(mergedOrder);
+      }
+    }
+  }
+  return mergedOrders;
 }
 
 export { createInterval };
