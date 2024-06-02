@@ -116,3 +116,52 @@
 {"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 29295, side: SELL"}
 {"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MOVRUSDT, quantity: 6, side: SELL"}
 {"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PEOPLEUSDT, quantity: 1052, side: SELL"}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 19102838     || BUY  12    AXSUSDT              IS_FIRST_ORDER: true , PREV_PRICE: 7.934000  , CURR_PRICE: 8.660000  , PERCENT_CHANGE: 9.15%  , POSITION_AMT: NaN    , AMOUNT: 103.920"}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 22110773     || BUY  29    MASKUSDT             IS_FIRST_ORDER: true , PREV_PRICE: 2.901000  , CURR_PRICE: 3.505000  , PERCENT_CHANGE: 20.82% , POSITION_AMT: NaN    , AMOUNT: 101.645"}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 11872765     || BUY  60.6  ALICEUSDT            IS_FIRST_ORDER: true , PREV_PRICE: 1.506000  , CURR_PRICE: 1.650000  , PERCENT_CHANGE: 9.56%  , POSITION_AMT: NaN    , AMOUNT: 99.990 "}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 1384658385   || BUY  0.026 ETHUSDT              IS_FIRST_ORDER: true , PREV_PRICE: 3725.000000, CURR_PRICE: 3784.000000, PERCENT_CHANGE: 1.58%  , POSITION_AMT: NaN    , AMOUNT: 98.384 "}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 174493       || BUY  31.1  WIFUSDT              IS_FIRST_ORDER: true , PREV_PRICE: 3.038500  , CURR_PRICE: 3.210500  , PERCENT_CHANGE: 5.66%  , POSITION_AMT: NaN    , AMOUNT: 99.847 "}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 7635387      || BUY  11.8  HIGHUSDT             IS_FIRST_ORDER: true , PREV_PRICE: 6.800000  , CURR_PRICE: 8.500000  , PERCENT_CHANGE: 25.00% , POSITION_AMT: 56     , AMOUNT: 100.300"}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 17935744     || BUY  45    IMXUSDT              IS_FIRST_ORDER: true , PREV_PRICE: 1.432200  , CURR_PRICE: 2.214700  , PERCENT_CHANGE: 54.64% , POSITION_AMT: NaN    , AMOUNT: 99.662 "}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 22110774     || BUY  25    MASKUSDT             IS_FIRST_ORDER: false, PREV_PRICE: 3.505000  , CURR_PRICE: 4.000000  , PERCENT_CHANGE: 14.12% , POSITION_AMT: 29     , AMOUNT: 100.000"}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 18238367     || BUY  10121 LINAUSDT             IS_FIRST_ORDER: true , PREV_PRICE: 0.008000  , CURR_PRICE: 0.009880  , PERCENT_CHANGE: 23.50% , POSITION_AMT: NaN    , AMOUNT: 99.995 "}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 669691536    || BUY  1.220 LTCUSDT              IS_FIRST_ORDER: true , PREV_PRICE: 77.310000 , CURR_PRICE: 81.990000 , PERCENT_CHANGE: 6.05%  , POSITION_AMT: NaN    , AMOUNT: 100.028"}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 669691538    || SELL 0.610 LTCUSDT              IS_FIRST_ORDER: false, PREV_PRICE: 81.990000 , CURR_PRICE: 77.380000 , PERCENT_CHANGE: -5.62% , POSITION_AMT: 1.22   , AMOUNT: 47.202 "}
+{"level":"debug","message":"CHAIN_ID: 152 ORDER_ID: 139859       || BUY  926   TOKENUSDT            IS_FIRST_ORDER: true , PREV_PRICE: 0.106500  , CURR_PRICE: 0.108000  , PERCENT_CHANGE: 1.41%  , POSITION_AMT: 29295  , AMOUNT: 100.008"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: HIGHUSDT, quantity: 67.8, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 31.6, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ALICEUSDT, quantity: 60.6, side: SELL"}
+{"level":"info","message":"orderId: 669691549, symbol: LTCUSDT, quantity: 0.610, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 5879, side: SELL"}
+{"level":"info","message":"orderId: 18238439, symbol: LINAUSDT, quantity: 10121, side: SELL"}
+{"level":"info","message":"-4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL"}
+{"level":"info","message":"orderId: 1384687533, symbol: ETHUSDT, quantity: 0.026, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 552, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: IMXUSDT, quantity: 45, side: SELL"}
+{"level":"info","message":"orderId: 22110866, symbol: MASKUSDT, quantity: 54, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 1.48, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 30221, side: SELL"}
+{"level":"info","message":"orderId: 174524, symbol: WIFUSDT, quantity: 31.1, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MOVRUSDT, quantity: 6, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: AXSUSDT, quantity: 12, side: SELL"}
+{"level":"debug","message":"CHAIN_ID: 153 ORDER_ID: 19102867     || BUY  12    AXSUSDT              IS_FIRST_ORDER: true , PREV_PRICE: 7.93400     , CURR_PRICE: 8.66000     , PERCENT_CHANGE: 9.15%  , POSITION_AMT: 12     , AMOUNT: 103.920, QUANTITY_PRECISION: 0 , TIMESTAMP: 2024-06-02 21:13:15"}
+{"level":"debug","message":"CHAIN_ID: 153 ORDER_ID: 139872       || BUY  926   TOKENUSDT            IS_FIRST_ORDER: true , PREV_PRICE: 0.10650     , CURR_PRICE: 0.10800     , PERCENT_CHANGE: 1.41%  , POSITION_AMT: 30221  , AMOUNT: 100.008, QUANTITY_PRECISION: 0 , TIMESTAMP: 2024-06-02 21:13:15"}
+{"level":"debug","message":"CHAIN_ID: 153 ORDER_ID: 11872804     || BUY  60.6  ALICEUSDT            IS_FIRST_ORDER: true , PREV_PRICE: 1.50600     , CURR_PRICE: 1.65000     , PERCENT_CHANGE: 9.56%  , POSITION_AMT: 60.6   , AMOUNT: 99.990 , QUANTITY_PRECISION: 1 , TIMESTAMP: 2024-06-02 21:13:15"}
+{"level":"debug","message":"CHAIN_ID: 153 ORDER_ID: 7635414      || BUY  11.8  HIGHUSDT             IS_FIRST_ORDER: true , PREV_PRICE: 6.80000     , CURR_PRICE: 8.50000     , PERCENT_CHANGE: 25.00% , POSITION_AMT: 67.8   , AMOUNT: 100.300, QUANTITY_PRECISION: 1 , TIMESTAMP: 2024-06-02 21:13:15"}
+{"level":"debug","message":"CHAIN_ID: 153 ORDER_ID: 17935747     || BUY  45    IMXUSDT              IS_FIRST_ORDER: true , PREV_PRICE: 1.43220     , CURR_PRICE: 2.21460     , PERCENT_CHANGE: 54.63% , POSITION_AMT: 45     , AMOUNT: 99.657 , QUANTITY_PRECISION: 0 , TIMESTAMP: 2024-06-02 21:13:15"}
+{"level":"debug","message":"CHAIN_ID: 153 ORDER_ID: 669691572    || BUY  1.220 LTCUSDT              IS_FIRST_ORDER: true , PREV_PRICE: 77.31000    , CURR_PRICE: 81.99000    , PERCENT_CHANGE: 6.05%  , POSITION_AMT: 0      , AMOUNT: 100.028, QUANTITY_PRECISION: 3 , TIMESTAMP: 2024-06-02 21:13:16"}
+{"level":"debug","message":"CHAIN_ID: 153 ORDER_ID: 1384706151   || BUY  0.026 ETHUSDT              IS_FIRST_ORDER: true , PREV_PRICE: 3725.00000  , CURR_PRICE: 3783.99000  , PERCENT_CHANGE: 1.58%  , POSITION_AMT: 0      , AMOUNT: 98.384 , QUANTITY_PRECISION: 3 , TIMESTAMP: 2024-06-02 21:13:24"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: HIGHUSDT, quantity: 79.6, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 31.6, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ALICEUSDT, quantity: 121.2, side: SELL"}
+{"level":"info","message":"orderId: 669691577, symbol: LTCUSDT, quantity: 1.220, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 5879, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: LINAUSDT, quantity: 10120, side: SELL"}
+{"level":"info","message":"-4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL"}
+{"level":"info","message":"orderId: 1384709825, symbol: ETHUSDT, quantity: 0.026, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 552, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: IMXUSDT, quantity: 90, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 1.48, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 31147, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MOVRUSDT, quantity: 6, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: AXSUSDT, quantity: 24, side: SELL"}

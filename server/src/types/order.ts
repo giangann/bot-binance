@@ -43,6 +43,7 @@ export type TOrderReason = {
 
 export type TOrderMoreInfo = {
   amount: number; // size calculated by base asset (USD)
+  quantityPrecision: number;
 };
 
 export type TOrderInfo = TOrderParam & TOrderReason & TOrderMoreInfo;

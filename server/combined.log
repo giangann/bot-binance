@@ -54,3 +54,33 @@
 {"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 29295, side: SELL"}
 {"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MOVRUSDT, quantity: 6, side: SELL"}
 {"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PEOPLEUSDT, quantity: 1052, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: HIGHUSDT, quantity: 67.8, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 31.6, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ALICEUSDT, quantity: 60.6, side: SELL"}
+{"level":"info","message":"orderId: 669691549, symbol: LTCUSDT, quantity: 0.610, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 5879, side: SELL"}
+{"level":"info","message":"orderId: 18238439, symbol: LINAUSDT, quantity: 10121, side: SELL"}
+{"level":"info","message":"-4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL"}
+{"level":"info","message":"orderId: 1384687533, symbol: ETHUSDT, quantity: 0.026, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 552, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: IMXUSDT, quantity: 45, side: SELL"}
+{"level":"info","message":"orderId: 22110866, symbol: MASKUSDT, quantity: 54, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 1.48, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 30221, side: SELL"}
+{"level":"info","message":"orderId: 174524, symbol: WIFUSDT, quantity: 31.1, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MOVRUSDT, quantity: 6, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: AXSUSDT, quantity: 12, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: HIGHUSDT, quantity: 79.6, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 31.6, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ALICEUSDT, quantity: 121.2, side: SELL"}
+{"level":"info","message":"orderId: 669691577, symbol: LTCUSDT, quantity: 1.220, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 5879, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: LINAUSDT, quantity: 10120, side: SELL"}
+{"level":"info","message":"-4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL"}
+{"level":"info","message":"orderId: 1384709825, symbol: ETHUSDT, quantity: 0.026, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 552, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: IMXUSDT, quantity: 90, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 1.48, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 31147, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MOVRUSDT, quantity: 6, side: SELL"}
+{"level":"info","message":"-4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: AXSUSDT, quantity: 24, side: SELL"}

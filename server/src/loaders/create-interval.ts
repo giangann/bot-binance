@@ -169,11 +169,14 @@ function genOrderInfoArray(
         quantity = positionAmt / 2;
       }
       if (direction === "BUY") {
-        if (!position || !positionAmt) {
-          if (isFirstBuy) quantity = transaction_size_start / currPrice;
-          else continue;
+        // if percent change is able to BUY:
+        // 1. check if is first buy, if first buy so alway buy with amount = transaction_size_start
+        // 2. if not first buy, check the current positionAmt of symbol, quantity = positionAmt
+        if (isFirstBuy) quantity = transaction_size_start / currPrice;
+        if (!isFirstBuy) {
+          if (!position || !positionAmt) quantity = positionAmt;
+          else quantity = transaction_size_start / currPrice;
         }
-        if (position && positionAmt) quantity = positionAmt;
       }
 
       // order params:
@@ -198,6 +201,7 @@ function genOrderInfoArray(
       // more info:
       const orderMoreInfo: TOrderMoreInfo = {
         amount: quantity * currPrice,
+        quantityPrecision
       };
 
       // add to array

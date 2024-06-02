@@ -9,14 +9,6 @@ export const Test = () => {
   return <>Test</>;
 };
 
-const getPromise = async (promise: Promise<string>) => {
-  try {
-    const response = await promise;
-    console.log(response);
-  } catch (err: any) {
-    console.log("promise err", err);
-  }
-};
 
 const getPromises = async (promises: Promise<string>[]) => {
   const start = Date.now();

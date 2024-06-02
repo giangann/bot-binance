@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.ordersToMap = exports.positionsToMap = exports.symbolPriceTickersToMap = exports.exchangeInfoSymbolsToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
+exports.stackTraceShorter = exports.filterFailOrder = exports.filterSuccessOrder = exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.positionsToMap = exports.symbolPriceTickersToMap = exports.exchangeInfoSymbolsToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
 const crypto_1 = require("crypto");
 function priceToPercent(p1, p2) {
     return (p2 / p1 - 1) * 100;
@@ -122,19 +122,6 @@ function positionsToMap(positions) {
     return res;
 }
 exports.positionsToMap = positionsToMap;
-function ordersToMap(orders) {
-    let res = {};
-    // lastest order first
-    const sortOrders = orders.sort((a, b) => b.time - a.time);
-    for (let order of sortOrders) {
-        let key = order.symbol;
-        if (!(key in res)) {
-            res[key] = order;
-        }
-    }
-    return res;
-}
-exports.ordersToMap = ordersToMap;
 function orderPiecesToMap(orderPieces) {
     let res = {};
     // lastest order first
@@ -179,3 +166,20 @@ function filterAblePosition(positions) {
     return positions.filter((pos) => parseFloat(pos.positionAmt) > 0);
 }
 exports.filterAblePosition = filterAblePosition;
+function filterSuccessOrder(newOrders) {
+    return newOrders.filter((newOrder) => newOrder.success === true);
+}
+exports.filterSuccessOrder = filterSuccessOrder;
+function filterFailOrder(newOrders) {
+    return newOrders.filter((newOrder) => newOrder.success === false);
+}
+exports.filterFailOrder = filterFailOrder;
+// make stackTrace of error shorter
+function stackTraceShorter(trace) {
+    const traceArr = trace.split("\n    ");
+    const firstTrace = traceArr[traceArr.length - 1];
+    const secondTrace = traceArr[traceArr.length - 2];
+    const thirdTrace = traceArr[traceArr.length - 3];
+    return `${firstTrace}  -  ${secondTrace}  -  ${thirdTrace}`;
+}
+exports.stackTraceShorter = stackTraceShorter;

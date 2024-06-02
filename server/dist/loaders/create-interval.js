@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -15,98 +6,107 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createInterval = void 0;
 const binance_service_1 = __importDefault(require("../services/binance.service"));
 const log_service_1 = __importDefault(require("../services/log.service"));
+const logger_service_1 = __importDefault(require("../services/logger.service"));
 const market_order_chain_service_1 = __importDefault(require("../services/market-order-chain.service"));
 const market_order_piece_service_1 = __importDefault(require("../services/market-order-piece.service"));
+const error_handler_ultil_1 = require("../ultils/error-handler.ultil");
 const helper_ultil_1 = require("../ultils/helper.ultil");
-const logger_config_1 = require("./logger.config");
 const createInterval = () => {
-    const interval = setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
+    const interval = setInterval(async () => {
         console.log("start tick");
         try {
-            // fetch binance account info and emit to client
-            const accInfo = yield binance_service_1.default.getAccountInfo();
+            // fetch statistic
+            const accInfo = await binance_service_1.default.getAccountInfo();
+            const positions = await binance_service_1.default.getPositions();
+            const tickers = await binance_service_1.default.getSymbolPriceTickers();
+            const { symbols } = await binance_service_1.default.getExchangeInfo();
             global.wsServerGlob.emit("ws-account-info", accInfo);
-            // fetch position info and emit to client
-            const positions = yield binance_service_1.default.getPositions();
             global.wsServerGlob.emit("ws-position", positions);
-            // fetch symbolPriceTickers now
-            const symbolPriceTickers = yield binance_service_1.default.getSymbolPriceTickers();
-            const symbolPriceTickersMap = (0, helper_ultil_1.symbolPriceTickersToMap)(symbolPriceTickers);
-            global.wsServerGlob.emit("symbols-price", symbolPriceTickers);
-            // fetch exchange info
-            const exchangeInfo = yield binance_service_1.default.getExchangeInfo();
-            const exchangeInfoSymbolsMap = (0, helper_ultil_1.exchangeInfoSymbolsToMap)(exchangeInfo.symbols);
+            global.wsServerGlob.emit("symbols-price", tickers);
             // fetch chain open
-            const openChain = yield getChainOpen();
+            const openChain = await getChainOpen();
             if (openChain) {
                 // fetch symbolPriceTickers 1AM from DB
-                const symbolPriceTickers1Am = yield binance_service_1.default.getSymbolPriceTickers1Am();
-                const symbolPriceTickers1AmMap = (0, helper_ultil_1.symbolPriceTickersToMap)(symbolPriceTickers1Am);
-                // // fetch list position
+                const tickers1AM = await binance_service_1.default.getSymbolPriceTickers1Am();
+                // storage statistic in Object
+                const symbolPriceTickersMap = (0, helper_ultil_1.symbolPriceTickersToMap)(tickers);
+                const exchangeInfoSymbolsMap = (0, helper_ultil_1.exchangeInfoSymbolsToMap)(symbols);
+                const symbolPriceTickers1AmMap = (0, helper_ultil_1.symbolPriceTickersToMap)(tickers1AM);
                 const positionsMap = (0, helper_ultil_1.positionsToMap)(positions);
-                // orderPieces of current order chain
                 const orderPiecesMap = (0, helper_ultil_1.orderPiecesToMap)(openChain.order_pieces);
                 // gen order params
-                const orderParams = genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, orderPiecesMap, openChain, exchangeInfoSymbolsMap);
-                const createdOrders = yield makeOrders(orderParams);
-                const successOrders = filterOrder(createdOrders, true);
-                const failureOrders = filterOrder(createdOrders, false);
-                const successOrdersData = successOrders.map((order) => {
-                    return order.data;
-                });
+                const genOrderParamsArgs = [
+                    symbolPriceTickersMap,
+                    symbolPriceTickers1AmMap,
+                    positionsMap,
+                    orderPiecesMap,
+                    openChain,
+                    exchangeInfoSymbolsMap,
+                ];
+                const orderInfos = genOrderInfoArray(...genOrderParamsArgs);
+                // make order and handle response
+                const createdOrders = await makeOrders(orderInfos);
+                const successOrders = (0, helper_ultil_1.filterSuccessOrder)(createdOrders);
+                const failureOrders = (0, helper_ultil_1.filterFailOrder)(createdOrders);
+                const successOrdersData = successOrders.map((order) => order.data);
+                // save failure orders to bot_binance.logs database table
                 const logParmas = genLogParams(failureOrders, openChain.id);
-                yield saveLogs(logParmas);
-                const orderPieceParams = genOrderPieceParams(successOrdersData, orderParams, openChain.id);
-                yield saveOrderPieces(orderPieceParams);
-                // save success order to debug log
-                saveOrderDebugLog(successOrdersData, orderParams, openChain.id);
-                global.wsServerGlob.emit("bot-tick", orderParams.length, successOrders.length, failureOrders.length);
+                await saveLogs(logParmas);
+                // merge successOrders to bot_binance.market_order_pieces database table
+                const mergedOrders = mergeOrders(orderInfos, successOrdersData);
+                // save success orders to
+                const orderPiecesInfo = [
+                    mergedOrders,
+                    openChain.id,
+                ];
+                const orderPieceParams = genOrderPieceParams(...orderPiecesInfo);
+                await saveOrderPieces(orderPieceParams);
+                // Side Effect: save success order to debug log
+                saveOrderDebugLog(mergedOrders, openChain.id);
+                // ws emit result of tick
+                global.wsServerGlob.emit("bot-tick", orderInfos.length, successOrders.length, failureOrders.length);
             }
         }
         catch (err) {
-            const appErr = { name: err.name, message: err.message };
-            global.wsServerGlob.emit("app-err", JSON.stringify(appErr));
-            logger_config_1.logger.error(err.message);
+            (0, error_handler_ultil_1.handleTickError)(err);
         }
         console.log("emit and end tick");
-    }), 10000);
-    global.tickInterval = interval;
+    }, 10000);
 };
 exports.createInterval = createInterval;
-function genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, orderPiecesMap, openChain, exchangeInfoSymbolsMap) {
-    var _a, _b, _c;
+function genOrderInfoArray(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, orderPiecesMap, openChain, exchangeInfoSymbolsMap) {
     try {
         const { percent_to_first_buy, percent_to_buy, percent_to_sell, transaction_size_start, } = openChain;
-        let orderParams = [];
+        let orderInfoArray = [];
         // loop through symbolPriceTickers
         const symbols = Object.keys(symbolPriceTickersMap);
         for (let symbol of symbols) {
             // get prev price and current price
-            let prevPrice = parseFloat((_a = symbolPriceTickers1AmMap[symbol]) === null || _a === void 0 ? void 0 : _a.price);
+            let prevPrice = parseFloat(symbolPriceTickers1AmMap[symbol]?.price);
             let todayLatestOrder = orderPiecesMap[symbol];
             const hasOrderToday = Boolean(todayLatestOrder);
             if (todayLatestOrder) {
                 prevPrice = parseFloat(todayLatestOrder.price);
             }
-            let currPrice = parseFloat((_b = symbolPriceTickersMap[symbol]) === null || _b === void 0 ? void 0 : _b.price);
+            let currPrice = parseFloat(symbolPriceTickersMap[symbol]?.price);
             // check if need to skip, continue to next symbol
             if (!prevPrice || !currPrice) {
                 continue;
             }
             // calculate percentChange
-            const percent_change = (currPrice / prevPrice - 1) * 100;
+            const percentChange = (currPrice / prevPrice - 1) * 100;
             // get position
             let position = positionsMap[symbol]; // positions just have symbol that positionAmt > 0
-            let positionAmt = parseFloat(position === null || position === void 0 ? void 0 : position.positionAmt);
+            let positionAmt = parseFloat(position?.positionAmt);
             // direction and order_size intitial
             let direction = "";
-            let amount = transaction_size_start / currPrice;
+            let quantity = transaction_size_start / currPrice;
             // direction calculate
-            const isFirstBuy = percent_change >= parseFloat(percent_to_first_buy) &&
+            const isFirstBuy = percentChange >= parseFloat(percent_to_first_buy) &&
                 hasOrderToday === false;
-            if (percent_change <= parseFloat(percent_to_sell))
+            if (percentChange <= parseFloat(percent_to_sell))
                 direction = "SELL";
-            if (percent_change >= parseFloat(percent_to_buy) || isFirstBuy)
+            if (percentChange >= parseFloat(percent_to_buy) || isFirstBuy)
                 direction = "BUY";
             if (direction === "")
                 continue;
@@ -114,85 +114,84 @@ function genMarketOrderParams(symbolPriceTickersMap, symbolPriceTickers1AmMap, p
             if (direction === "SELL") {
                 if (!position || !positionAmt)
                     continue;
-                amount = positionAmt / 2;
+                quantity = positionAmt / 2;
             }
             if (direction === "BUY") {
-                if (!position || !positionAmt) {
-                    if (isFirstBuy)
-                        amount = transaction_size_start / currPrice;
+                // if percent change is able to BUY:
+                // 1. check if is first buy, if first buy so alway buy with amount = transaction_size_start
+                // 2. if not first buy, check the current positionAmt of symbol, quantity = positionAmt
+                if (isFirstBuy)
+                    quantity = transaction_size_start / currPrice;
+                if (!isFirstBuy) {
+                    if (!position || !positionAmt)
+                        quantity = positionAmt;
                     else
-                        continue;
+                        quantity = transaction_size_start / currPrice;
                 }
-                if (position && positionAmt)
-                    amount = positionAmt;
             }
-            // amount precision
-            const quantityPrecision = (_c = exchangeInfoSymbolsMap[symbol]) === null || _c === void 0 ? void 0 : _c.quantityPrecision;
-            orderParams.push({
-                amount: (0, helper_ultil_1.validateAmount)(amount, quantityPrecision),
-                direction,
+            // order params:
+            const quantityPrecision = exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
+            quantity = (0, helper_ultil_1.validateAmount)(quantity, quantityPrecision);
+            const orderParam = {
                 symbol,
-                percent: percent_change,
-                order_size: Math.round(amount * currPrice),
-                price_ticker: currPrice,
+                direction,
+                quantity,
+            };
+            // order reason:
+            const orderReason = {
+                isFirstOrder: !hasOrderToday,
+                currPrice,
+                prevPrice,
+                percentChange,
                 positionAmt,
-            });
+            };
+            // more info:
+            const orderMoreInfo = {
+                amount: quantity * currPrice,
+                quantityPrecision
+            };
+            // add to array
+            orderInfoArray.push({ ...orderParam, ...orderReason, ...orderMoreInfo });
         }
-        console.log("total generated params: ", orderParams.length, " orders");
-        return orderParams;
+        return orderInfoArray;
     }
     catch (err) {
-        console.log(err);
+        (0, error_handler_ultil_1.throwError)(err);
     }
 }
-function makeOrders(orderParams) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const promises = orderParams.map((param) => __awaiter(this, void 0, void 0, function* () {
-            const { symbol, amount, direction } = param;
-            try {
-                return yield binance_service_1.default.createMarketOrder(symbol, direction, amount);
-            }
-            catch (error) {
-                console.log("error", error);
-            }
-        }));
-        return Promise.all(promises);
+async function makeOrders(orderInfos) {
+    const promises = orderInfos.map((info) => {
+        const { symbol, quantity, direction } = info;
+        return binance_service_1.default.createMarketOrder(symbol, direction, quantity);
+    });
+    return Promise.all(promises);
+}
+function genOrderPieceParams(mergedOrders, chainId) {
+    return mergedOrders.map((mergedOrder) => {
+        const { orderId, quantity, direction, percentChange, symbol, currPrice, amount, } = mergedOrder;
+        return {
+            id: orderId.toString(),
+            market_order_chains_id: chainId,
+            quantity: quantity.toString(),
+            direction: direction,
+            percent_change: percentChange.toFixed(5),
+            symbol: symbol,
+            price: currPrice.toString(),
+            total_balance: "0.00", // can't defined
+            transaction_size: amount.toString(),
+        };
     });
 }
-function genOrderPieceParams(newOrders, orderParams, chainId) {
-    let orderPieceParams = [];
-    for (let newOrder of newOrders) {
-        for (let orderParam of orderParams) {
-            if ((newOrder === null || newOrder === void 0 ? void 0 : newOrder.symbol) === orderParam.symbol) {
-                let orderPiceParam = {
-                    id: newOrder.orderId.toString(),
-                    market_order_chains_id: chainId,
-                    amount: orderParam.amount.toString(),
-                    direction: orderParam.direction,
-                    percent_change: orderParam.percent.toFixed(5),
-                    symbol: orderParam.symbol,
-                    price: orderParam.price_ticker.toString(),
-                    total_balance: "0.00", // can't defined
-                    transaction_size: orderParam.order_size.toString(),
-                };
-                orderPieceParams.push(orderPiceParam);
-            }
-        }
-    }
-    return orderPieceParams;
-}
-function saveOrderPieces(orderPieceParams) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return Promise.all(orderPieceParams.map((param) => __awaiter(this, void 0, void 0, function* () {
-            return yield market_order_piece_service_1.default.create(param);
-        })));
-    });
+async function saveOrderPieces(orderPieceParams) {
+    return Promise.all(orderPieceParams.map(async (param) => {
+        return await market_order_piece_service_1.default.create(param);
+    }));
 }
 function genLogParams(failedOrders, chainId) {
     let params = [];
     for (let failedOrder of failedOrders) {
         let { error: { code, msg }, } = failedOrder;
-        let orderInfo = failedOrder === null || failedOrder === void 0 ? void 0 : failedOrder.payload;
+        let orderInfo = failedOrder?.payload;
         params.push({
             message: `code: ${code}, message: ${msg}, ${JSON.stringify(orderInfo)}`,
             market_order_chains_id: chainId,
@@ -201,40 +200,37 @@ function genLogParams(failedOrders, chainId) {
     }
     return params;
 }
-function saveLogs(logParams) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return Promise.all(logParams.map((param) => __awaiter(this, void 0, void 0, function* () {
-            return yield log_service_1.default.create(param);
-        })));
+async function saveLogs(logParams) {
+    return Promise.all(logParams.map(async (param) => {
+        return await log_service_1.default.create(param);
+    }));
+}
+function saveOrderDebugLog(mergedOrders, chainId) {
+    mergedOrders.forEach((mergedOrder) => {
+        logger_service_1.default.saveOrderLog(mergedOrder, chainId);
     });
 }
-// log success order
-function saveOrderDebugLog(...args) {
-    const [newOrders, orderParams, chainId] = args;
+// if order with same symbol, get only 1 latest order
+async function getChainOpen() {
+    const openChain = await market_order_chain_service_1.default.list({ status: "open" });
+    if (openChain.length)
+        return openChain[0];
+    else
+        return null;
+}
+// merge each order in success orders with information of this correspond order
+function mergeOrders(orderInfos, newOrders) {
+    let mergedOrders = [];
     for (let newOrder of newOrders) {
-        for (let orderParam of orderParams) {
-            if ((newOrder === null || newOrder === void 0 ? void 0 : newOrder.symbol) === orderParam.symbol) {
-                const { orderId, side, origQty, symbol } = newOrder;
-                const { positionAmt } = orderParam;
-                let newDebugLog = `chainId: ${chainId}; `;
-                newDebugLog = `create new order: ${orderId} ${side} ${origQty} ${symbol}`;
-                if (side === "SELL")
-                    newDebugLog += ` before order has ${positionAmt} ${symbol}`;
-                logger_config_1.logger.debug(newDebugLog);
+        for (let orderInfo of orderInfos) {
+            if (newOrder.symbol === orderInfo.symbol) {
+                const mergedOrder = {
+                    ...newOrder,
+                    ...orderInfo,
+                };
+                mergedOrders.push(mergedOrder);
             }
         }
     }
-}
-function filterOrder(newOrders, success) {
-    return newOrders.filter((newOrder) => newOrder.success === success);
-}
-// if order with same symbol, get only 1 latest order
-function getChainOpen() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const openChain = yield market_order_chain_service_1.default.list({ status: "open" });
-        if (openChain.length)
-            return openChain[0];
-        else
-            return null;
-    });
+    return mergedOrders;
 }

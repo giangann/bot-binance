@@ -12,8 +12,9 @@ const list = async (params?: { status: TOrderChainStatus }) => {
 
   const repo = getRepository(MarketOrderChain)
     .createQueryBuilder("market_order_chains")
-    .leftJoinAndSelect("market_order_chains.order_pieces", "pieces");
-
+    .leftJoinAndSelect("market_order_chains.order_pieces", "pieces")
+    .orderBy("market_order_chains.createdAt", "DESC")
+    .addOrderBy("pieces.createdAt", "ASC");
   if (status) {
     repo.andWhere("market_order_chains.status = :status", { status });
   }

@@ -1,6 +1,6 @@
 import ArticleIcon from "@mui/icons-material/Article";
 import { Box, Grid, Stack, Typography, styled } from "@mui/material";
-import { blue, grey } from "@mui/material/colors";
+import { blue, green, grey, red } from "@mui/material/colors";
 import dayjs from "dayjs";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -172,7 +172,7 @@ const OrderChain = (props: IMarketOrderChainRecord) => {
             <PieceHeader>transaction_size</PieceHeader>
             <PieceHeader>price</PieceHeader>
             <PieceHeader>percent_change</PieceHeader>
-            <PieceHeader>amount</PieceHeader>
+            <PieceHeader>quantity</PieceHeader>
             <PieceHeader>createdAt</PieceHeader>
           </Stack>
           {order_pieces.map((piece) => (
@@ -189,22 +189,22 @@ const OrderPiece = (props: IMarketOrderPieceRecord) => {
     id,
     symbol,
     transaction_size,
-    amount,
+    quantity,
     direction,
     price,
     percent_change,
     createdAt,
   } = props;
   return (
-    <PieceBox>
+    <PieceBox direction={direction as "BUY"|"SELL"}>
       <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
         <PieceCell>{id}</PieceCell>
         <PieceCell>{symbol}</PieceCell>
         <PieceCell>{direction}</PieceCell>
-        <PieceCell>{transaction_size}</PieceCell>
+        <PieceCell>{parseFloat(transaction_size).toFixed(3)}</PieceCell>
         <PieceCell>{price}</PieceCell>
         <PieceCell>{parseFloat(percent_change).toFixed(2)}%</PieceCell>
-        <PieceCell>{parseFloat(amount).toFixed(5)}</PieceCell>
+        <PieceCell>{parseFloat(quantity)}</PieceCell>
 
         <PieceCell>{dayjs(createdAt).format("DD/MM/YYYY HH:mm:ss")}</PieceCell>
       </Stack>
@@ -220,14 +220,26 @@ const ChainBox = styled(Box, {
   backgroundColor: open ? blue["200"] : grey["400"],
   [theme.breakpoints.down("sm")]: {},
 }));
-const PieceBox = styled(Box)(({ theme }) => ({
-  padding: 8,
-  paddingLeft: 16,
-  marginLeft: 8,
-  borderRadius: 8,
-  backgroundColor: grey["50"],
-  [theme.breakpoints.down("sm")]: {},
-}));
+// const PieceBox = styled(Box)(({ theme }) => ({
+//   padding: 8,
+//   paddingLeft: 16,
+//   marginLeft: 8,
+//   borderRadius: 8,
+//   backgroundColor: grey["50"],
+//   [theme.breakpoints.down("sm")]: {},
+// }));
+
+const PieceBox =
+  styled(Box, {
+    shouldForwardProp: (prop) => prop !== "direction",
+  }) <
+  { direction: "BUY" | "SELL" } >
+  (({ direction, theme }) => ({
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: direction === "BUY" ? green["50"] : red["50"],
+    [theme.breakpoints.down("sm")]: {},
+  }));
 const PieceCell = styled(Typography)({
   flexBasis: `${100 / 8}%`,
 });

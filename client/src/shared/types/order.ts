@@ -17,13 +17,13 @@ export interface IMarketOrderChainRecord {
 
 export interface IMarketOrderPieceRecord {
   id: string;
+  market_order_chains_id: number;
   symbol: string;
   direction: string;
-  market_order_chains_id: number;
   total_balance: string;
   price: string;
   percent_change: string;
-  amount: string;
+  quantity: string;
   transaction_size: string;
   order_chain: IMarketOrderChainRecord;
   timestamp: string;
