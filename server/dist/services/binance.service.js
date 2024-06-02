@@ -19,13 +19,16 @@ const commonHeader = {
 };
 const commonAxiosOpt = {
     headers: { ...commonHeader },
+    headers: { ...commonHeader },
     validateStatus: (_status) => (0, helper_ultil_1.isSuccess)(_status),
 };
 const coinService = new coin_service_1.default(baseUrl.includes("testnet") ? true : false);
 const getExchangeInfo = async () => {
+const getExchangeInfo = async () => {
     try {
         const endpoint = "/fapi/v1/exchangeInfo";
         const url = `${baseUrl}${endpoint}`;
+        const response = await axios_1.default.get(url, commonAxiosOpt);
         const response = await axios_1.default.get(url, commonAxiosOpt);
         const exchangeInfo = response.data;
         return exchangeInfo;
@@ -35,11 +38,14 @@ const getExchangeInfo = async () => {
     }
 };
 const getPositions = async () => {
+};
+const getPositions = async () => {
     try {
         const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
         const endpoint = "/fapi/v2/positionRisk";
         const url = `${baseUrl}${endpoint}?${queryString}`;
+        const response = await axios_1.default.get(url, commonAxiosOpt);
         const response = await axios_1.default.get(url, commonAxiosOpt);
         const positions = response.data;
         return (0, helper_ultil_1.filterAblePosition)(positions);
@@ -49,11 +55,14 @@ const getPositions = async () => {
     }
 };
 const getAccountInfo = async () => {
+};
+const getAccountInfo = async () => {
     try {
         const endpoint = "/fapi/v2/account";
         const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
         const url = `${baseUrl}${endpoint}?${queryString}`;
+        const response = await axios_1.default.get(url, commonAxiosOpt);
         const response = await axios_1.default.get(url, commonAxiosOpt);
         const accInfo = response.data;
         return accInfo;
@@ -63,11 +72,14 @@ const getAccountInfo = async () => {
     }
 };
 const getAccountFetch = async () => {
+};
+const getAccountFetch = async () => {
     try {
         const endpoint = "/fapi/v2/account";
         const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
         const url = `${baseUrl}${endpoint}?${queryString}`;
+        const response = await fetch(url, {
         const response = await fetch(url, {
             method: "GET",
             headers: {
@@ -76,6 +88,7 @@ const getAccountFetch = async () => {
             },
         });
         const accInfo = await response.json();
+        const accInfo = await response.json();
         return accInfo;
     }
     catch (err) {
@@ -83,7 +96,10 @@ const getAccountFetch = async () => {
     }
 };
 const getSymbolPriceTickers1Am = async () => {
+};
+const getSymbolPriceTickers1Am = async () => {
     try {
+        const price1Am = await coinService.list();
         const price1Am = await coinService.list();
         return price1Am;
     }
@@ -135,12 +151,18 @@ const createMarketOrder = async (symbol, side, quantity, type = "market", _price
         const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
         let orderParams = {
             symbol,
+        let orderParams = {
+            symbol,
             type,
             quantity,
             side,
             ...paramsNow,
         };
+            side,
+            ...paramsNow,
+        };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, orderParams);
+        const response = await fetch(`${baseUrl}${endpoint}?${queryString}`, {
         const response = await fetch(`${baseUrl}${endpoint}?${queryString}`, {
             method: "POST",
             headers: {
@@ -150,12 +172,14 @@ const createMarketOrder = async (symbol, side, quantity, type = "market", _price
         });
         if (response.status === 200 || response.status === 201) {
             const data = await response.json();
+            const data = await response.json();
             return {
                 success: true,
                 data: data,
             };
         }
         else {
+            const err = await response.json();
             const err = await response.json();
             return {
                 success: false,
@@ -167,6 +191,7 @@ const createMarketOrder = async (symbol, side, quantity, type = "market", _price
     catch (err) {
         (0, error_handler_ultil_1.throwError)(err);
     }
+};
 };
 exports.default = {
     getSymbolPriceTicker,

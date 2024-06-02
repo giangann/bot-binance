@@ -25,12 +25,29 @@ async function updateOrderChain() {
     catch (err) {
         console.log("err updateOrderChain", err);
     }
+async function updateOrderChain() {
+    try {
+        const chainIsOpen = await getChainOpen();
+        const updatedRes = await market_order_chain_service_1.default.update({
+            id: chainIsOpen.id,
+            total_balance_end: "0.000",
+            percent_change: "0.000", // can't defined
+            price_end: "0.000",
+            status: "closed",
+            updatedAt: (0, moment_1.default)().format("YYYY-MM-DD HH:mm:ss"),
+        });
+        return updatedRes;
+    }
+    catch (err) {
+        console.log("err updateOrderChain", err);
+    }
 }
 // return a promise {symbol, id, }
 const quit = async () => {
     await updateOrderChain();
     //   ws emit quit bot
     global.wsServerGlob.emit("bot-quit", "bot was quited");
+};
 };
 exports.default = {
     quit,
