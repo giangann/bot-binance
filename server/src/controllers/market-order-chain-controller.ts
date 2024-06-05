@@ -1,10 +1,7 @@
 import IController from "IController";
+import logService from "../services/log.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import { ServerResponse } from "../ultils/server-response.ultil";
-import logService from "../services/log.service";
-import { IMarketOrderPieceCreate } from "market-order-piece.interface";
-import marketOrderPieceService from "../services/market-order-piece.service";
-import { logger } from "../loaders/logger.config";
 
 const list: IController = async (req, res) => {
   try {

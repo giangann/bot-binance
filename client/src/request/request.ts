@@ -1,12 +1,17 @@
 export const baseURL = import.meta.env.VITE_BASE_URL;
 
-export type TMeta = {
-  total: number;
+export type TPagination = {
+  currPage: number;
+  prevPage: number | null;
+  nextPage: number | null;
+  perPage: number;
+  totalPage: number;
+  totalItems: number;
 };
 export type TResponseSuccess<T> = {
   success: true;
   data: T;
-  meta: TMeta;
+  pagi: TPagination;
 };
 export type TResponseFailure = {
   success: false;
