@@ -14,14 +14,14 @@ export class ServerResponse {
     data: any,
     status: number = 200,
     cookie?: { key: string; value: any },
-    total?: number
+    totalItems?: number
   ) {
-    let meta = { total };
+    const pagi = { totalItems };
     res.status(status);
     if (cookie) {
       const { key, value } = cookie;
       res.cookie(key, value);
     }
-    res.json({ data, meta, success: true });
+    res.json({ data, pagi, success: true });
   }
 }
