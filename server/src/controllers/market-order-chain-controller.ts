@@ -1,12 +1,9 @@
 import IController from "IController";
+import { IMarketOrderChainEntity } from "market-order-chain.interface";
+import { IMarketOrderPieceRecord } from "market-order-piece.interface";
 import logService from "../services/log.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import { ServerResponse } from "../ultils/server-response.ultil";
-import { IMarketOrderPieceRecord } from "market-order-piece.interface";
-import {
-  IMarketOrderChainEntity,
-  IMarketOrderChainRecord,
-} from "market-order-chain.interface";
 
 const list: IController = async (req, res) => {
   try {
@@ -20,7 +17,7 @@ const list: IController = async (req, res) => {
     const totalItems = listChain.length;
 
     const listChainWithPaginatedPieces = listChain.map((chain) =>
-      slicePiecesOfChain(chain, piecesPagiInitial)
+      slicePiecesOfChainWithPagi(chain, piecesPagiInitial)
     );
 
     ServerResponse.response(
@@ -30,6 +27,32 @@ const list: IController = async (req, res) => {
       null,
       totalItems
     );
+  } catch (err) {
+    ServerResponse.error(res, err.message);
+  }
+};
+
+const getPiecesById: IController = async (req, res) => {
+  try {
+    const chainId = req.query?.chain_id;
+    const page = req.query?.page;
+    const perpage = req.query?.perpage;
+
+    if (!chainId) throw new Error("Bad Request");
+
+    const chainIdInt = parseInt(chainId as string);
+    const pageInt = parseInt((page ?? "1") as string);
+    const perpageInt = parseInt((perpage ?? "5") as string);
+
+    const pagi = {
+      page: pageInt,
+      perpage: perpageInt,
+    };
+
+    const chain = await marketOrderChainService.detail(chainIdInt);
+    const chainWithPaginatedPieces = slicePiecesOfChainWithPagi(chain, pagi);
+
+    ServerResponse.response(res, chainWithPaginatedPieces, 200, null);
   } catch (err) {
     ServerResponse.error(res, err.message);
   }
@@ -72,11 +95,16 @@ function pagiPiecesOfChain(
   return paginatedPieces;
 }
 
-const slicePiecesOfChain = (
+const slicePiecesOfChainWithPagi = (
   chain: IMarketOrderChainEntity,
   pagi: { page: number; perpage: number }
-) => ({
-  ...chain,
-  order_pieces: pagiPiecesOfChain(chain.order_pieces, pagi),
-});
-export default { list, getLogs, isBotActive };
+) => {
+  return {
+    ...chain,
+    order_pieces: {
+      data: pagiPiecesOfChain(chain.order_pieces, pagi),
+      pagi: { totalItems: chain.order_pieces.length },
+    },
+  };
+};
+export default { list, getPiecesById, getLogs, isBotActive };

@@ -1,3 +1,5 @@
+import { Modify, TResponseWithPagiSimple } from "./base";
+
 export type TOrderChainStatus = "open" | "closed";
 
 export interface IMarketOrderChainRecord {
@@ -30,3 +32,14 @@ export interface IMarketOrderPieceRecord {
   createdAt: string;
   updatedAt: string;
 }
+
+export type TMarketOrderPiecesWithPagi = TResponseWithPagiSimple<
+  IMarketOrderPieceRecord[]
+>;
+
+export type TMarketOrderChainWithPiecesPagi = Modify<
+  IMarketOrderChainRecord,
+  {
+    order_pieces: TMarketOrderPiecesWithPagi;
+  }
+>;

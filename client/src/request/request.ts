@@ -8,6 +8,11 @@ export type TPagination = {
   totalPage: number;
   totalItems: number;
 };
+
+export type TPagiApiShort = {
+  totalItems: number;
+};
+
 export type TResponseSuccess<T> = {
   success: true;
   data: T;

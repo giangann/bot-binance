@@ -1,27 +1,27 @@
-import ArticleIcon from "@mui/icons-material/Article";
-import { Box, Grid, Stack, Typography, styled } from "@mui/material";
-import { blue, green, grey, red } from "@mui/material/colors";
-import dayjs from "dayjs";
+import { Box, Grid, Stack, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { BotContext } from "../../context/BotContext";
 import { SocketContext } from "../../context/SocketContext";
 import { getApi } from "../../request/request";
 import {
-  IMarketOrderChainRecord,
-  IMarketOrderPieceRecord,
+  TMarketOrderChainWithPiecesPagi
 } from "../../shared/types/order";
-import { CenterBox } from "../../styled/styled";
 import { Balance } from "./Balance";
 import { NewOrderChain } from "./NewOrderChain";
+import { OrderChains } from "./OrderChains";
 import { Position } from "./Position";
 
 export const ListOrderChain = () => {
-  const [orderChains, setOrderChains] = useState<IMarketOrderChainRecord[]>([]);
+  const [orderChains, setOrderChains] = useState<
+    TMarketOrderChainWithPiecesPagi[]
+  >([]);
   const socket = useContext(SocketContext);
   const bot = useContext(BotContext);
   const fetchOrderChains = useCallback(async () => {
-    const response = await getApi<IMarketOrderChainRecord[]>("order-chain");
+    const response = await getApi<TMarketOrderChainWithPiecesPagi[]>(
+      "order-chain"
+    );
     if (response.success) setOrderChains(response.data);
   }, []);
 
@@ -73,184 +73,32 @@ export const ListOrderChain = () => {
   }, []);
   return (
     <Box>
-      <Grid container columnSpacing={2}>
-        <Grid xs={12} sm={4}>
-          <Balance />
-        </Grid>
-        <Grid xs={12} sm={8}>
-          <Position />
-        </Grid>
+      <BalanceAndPosition />
+      <TitleAndNewChainBtn />
+      <OrderChains orderChains={orderChains} />
+    </Box>
+  );
+};
+
+const BalanceAndPosition = () => {
+  return (
+    <Grid container columnSpacing={2}>
+      <Grid xs={12} sm={4}>
+        <Balance />
       </Grid>
-      <Stack direction={"row"} spacing={2} my={2}>
-        <Typography variant="h5">BOT - danh sách hoạt động</Typography>
-        <NewOrderChain />
-      </Stack>
-      {!orderChains.length ? (
-        <Typography my={4} textAlign={"center"} fontSize={28}>
-          Chưa có chuỗi lệnh được đặt
-        </Typography>
-      ) : (
-        <Stack spacing={2}>
-          {orderChains.map((chain) => (
-            <OrderChain {...chain} />
-          ))}
-        </Stack>
-      )}
-    </Box>
+      <Grid xs={12} sm={8}>
+        <Position />
+      </Grid>
+    </Grid>
   );
 };
 
-const OrderChain = (props: IMarketOrderChainRecord) => {
-  const {
-    order_pieces,
-    id,
-    status,
-    transaction_size_start,
-    percent_to_first_buy,
-    percent_to_buy,
-    percent_to_sell,
-  } = props;
-
+const TitleAndNewChainBtn = () => {
   return (
-    <Box>
-      <CenterBox mb={0.5}>
-        <a href={`/log/${id}`} target="_blank">
-          <ViewLogButton>
-            <Typography display={"inline"} mr={1}>
-              View log
-            </Typography>
-            <ArticleIcon />
-          </ViewLogButton>
-        </a>
-      </CenterBox>
-      <ChainBox open={status === "open"}>
-        <Stack
-          direction={"row"}
-          spacing={2}
-          sx={{ borderBottom: `1px solid ${grey["50"]}`, pb: 0.5, mb: 1 }}
-        >
-          <Typography>{id}</Typography>
-          <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
-            <Typography>
-              status:{" "}
-              <Typography sx={{ fontWeight: 600 }} component={"span"}>
-                {status}
-              </Typography>
-            </Typography>
-            {/*  */}
-            <Typography>
-              transaction_size_start:{" "}
-              <Typography sx={{ fontWeight: 600 }} component={"span"}>
-                {transaction_size_start} USD
-              </Typography>
-            </Typography>
-            <Typography>
-              percent_to_first_buy:{" "}
-              <Typography sx={{ fontWeight: 600 }} component={"span"}>
-                {percent_to_first_buy}%
-              </Typography>
-            </Typography>
-            <Typography>
-              percent_to_buy:{" "}
-              <Typography sx={{ fontWeight: 600 }} component={"span"}>
-                {percent_to_buy}%
-              </Typography>
-            </Typography>
-            <Typography>
-              percent_to_sell:{" "}
-              <Typography sx={{ fontWeight: 600 }} component={"span"}>
-                {percent_to_sell}%
-              </Typography>
-            </Typography>
-          </Stack>
-        </Stack>
-        <Stack spacing={1}>
-          <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
-            <PieceHeader>id</PieceHeader>
-            <PieceHeader>symbol</PieceHeader>
-            <PieceHeader>direction</PieceHeader>
-            <PieceHeader>transaction_size</PieceHeader>
-            <PieceHeader>price</PieceHeader>
-            <PieceHeader>percent_change</PieceHeader>
-            <PieceHeader>quantity</PieceHeader>
-            <PieceHeader>createdAt</PieceHeader>
-          </Stack>
-          {order_pieces.map((piece) => (
-            <OrderPiece {...piece} />
-          ))}
-        </Stack>
-      </ChainBox>
-    </Box>
+    <Stack direction={"row"} spacing={2} my={2}>
+      <Typography variant="h5">BOT - danh sách hoạt động</Typography>
+      <NewOrderChain />
+    </Stack>
   );
 };
 
-const OrderPiece = (props: IMarketOrderPieceRecord) => {
-  const {
-    id,
-    symbol,
-    transaction_size,
-    quantity,
-    direction,
-    price,
-    percent_change,
-    createdAt,
-  } = props;
-  return (
-    <PieceBox direction={direction as "BUY"|"SELL"}>
-      <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
-        <PieceCell>{id}</PieceCell>
-        <PieceCell>{symbol}</PieceCell>
-        <PieceCell>{direction}</PieceCell>
-        <PieceCell>{parseFloat(transaction_size).toFixed(3)}</PieceCell>
-        <PieceCell>{price}</PieceCell>
-        <PieceCell>{parseFloat(percent_change).toFixed(2)}%</PieceCell>
-        <PieceCell>{parseFloat(quantity)}</PieceCell>
-
-        <PieceCell>{dayjs(createdAt).format("DD/MM/YYYY HH:mm:ss")}</PieceCell>
-      </Stack>
-    </PieceBox>
-  );
-};
-
-const ChainBox = styled(Box, {
-  shouldForwardProp: (prop) => prop !== "open",
-})<{ open: boolean }>(({ open, theme }) => ({
-  padding: 16,
-  borderRadius: 16,
-  backgroundColor: open ? blue["200"] : grey["400"],
-  [theme.breakpoints.down("sm")]: {},
-}));
-// const PieceBox = styled(Box)(({ theme }) => ({
-//   padding: 8,
-//   paddingLeft: 16,
-//   marginLeft: 8,
-//   borderRadius: 8,
-//   backgroundColor: grey["50"],
-//   [theme.breakpoints.down("sm")]: {},
-// }));
-
-const PieceBox =
-  styled(Box, {
-    shouldForwardProp: (prop) => prop !== "direction",
-  }) <
-  { direction: "BUY" | "SELL" } >
-  (({ direction, theme }) => ({
-    padding: 16,
-    borderRadius: 16,
-    backgroundColor: direction === "BUY" ? green["50"] : red["50"],
-    [theme.breakpoints.down("sm")]: {},
-  }));
-const PieceCell = styled(Typography)({
-  flexBasis: `${100 / 8}%`,
-});
-
-const PieceHeader = styled(PieceCell)({
-  textAlign: "left",
-});
-
-const ViewLogButton = styled(Box)({
-  margin: "auto",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-});

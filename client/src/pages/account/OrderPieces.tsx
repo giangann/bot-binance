@@ -2,9 +2,7 @@ import { Box, Stack, Typography, styled } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 import dayjs from "dayjs";
 import React from "react";
-import {
-    IMarketOrderPieceRecord
-} from "../../shared/types/order";
+import { IMarketOrderPieceRecord } from "../../shared/types/order";
 
 type Props = {
   orderPieces: IMarketOrderPieceRecord[];
@@ -12,16 +10,6 @@ type Props = {
 export const OrderPieces: React.FC<Props> = ({ orderPieces }) => {
   return (
     <Stack spacing={1}>
-      <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
-        <PieceHeader>id</PieceHeader>
-        <PieceHeader>symbol</PieceHeader>
-        <PieceHeader>direction</PieceHeader>
-        <PieceHeader>transaction_size</PieceHeader>
-        <PieceHeader>price</PieceHeader>
-        <PieceHeader>percent_change</PieceHeader>
-        <PieceHeader>quantity</PieceHeader>
-        <PieceHeader>createdAt</PieceHeader>
-      </Stack>
       {orderPieces.map((piece) => (
         <OrderPiece {...piece} />
       ))}
@@ -69,6 +57,3 @@ const PieceCell = styled(Typography)({
   flexBasis: `${100 / 8}%`,
 });
 
-const PieceHeader = styled(PieceCell)({
-  textAlign: "left",
-});

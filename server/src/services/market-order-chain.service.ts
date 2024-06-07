@@ -14,7 +14,7 @@ const list = async (params?: { status: TOrderChainStatus }) => {
     .createQueryBuilder("market_order_chains")
     .leftJoinAndSelect("market_order_chains.order_pieces", "pieces")
     .orderBy("market_order_chains.createdAt", "DESC")
-    .addOrderBy("pieces.createdAt", "ASC");
+    .addOrderBy("pieces.createdAt", "DESC");
   if (status) {
     repo.andWhere("market_order_chains.status = :status", { status });
   }
@@ -26,7 +26,8 @@ const detail = async (id: number) => {
   const repo = getRepository(MarketOrderChain)
     .createQueryBuilder("market_order_chains")
     .leftJoinAndSelect("market_order_chains.order_pieces", "order_pieces")
-    .where("market_order_chains.id = :id", { id });
+    .where("market_order_chains.id = :id", { id })
+    .orderBy("order_pieces.createdAt", "DESC");
   const orderChain = await repo.getOne();
   return orderChain;
 };
