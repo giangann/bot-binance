@@ -4,7 +4,7 @@ import {
 } from "market-order-chain.interface";
 
 export interface ILogRecord {
-  id: string;
+  id: number;
   message: string;
   type: string;
   market_order_chains_id: number;

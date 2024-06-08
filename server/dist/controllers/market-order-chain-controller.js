@@ -54,9 +54,20 @@ const isBotActive = async (req, res) => {
 };
 const getLogs = async (req, res) => {
     try {
+        const page = req.query?.page;
+        const perpage = req.query?.perpage;
+        const pageInt = parseInt((page ?? "1"));
+        const perpageInt = parseInt((perpage ?? "5"));
+        const pagi = {
+            page: pageInt,
+            perpage: perpageInt,
+        };
         const chainId = parseInt(req.params?.chainId);
-        const logs = await log_service_1.default.list({ market_order_chains_id: chainId });
-        server_response_ultil_1.ServerResponse.response(res, logs);
+        const logs = await log_service_1.default.list({
+            market_order_chains_id: chainId,
+        });
+        const paginatedLogs = logsWithPagi(logs, pagi);
+        server_response_ultil_1.ServerResponse.response(res, paginatedLogs);
     }
     catch (err) {
         server_response_ultil_1.ServerResponse.error(res, err.message);
@@ -82,4 +93,15 @@ const slicePiecesOfChainWithPagi = (chain, pagi) => {
         },
     };
 };
+function pagiLogs(logs, pagi) {
+    const { page, perpage } = pagi;
+    const startIndex = page * perpage - perpage;
+    const endIndex = page * perpage;
+    const paginatedLogs = logs.slice(startIndex, endIndex);
+    return paginatedLogs;
+}
+const logsWithPagi = (logs, pagi) => ({
+    data: pagiLogs(logs, pagi),
+    pagi: { totalItems: logs.length },
+});
 exports.default = { list, getPiecesById, getLogs, isBotActive };

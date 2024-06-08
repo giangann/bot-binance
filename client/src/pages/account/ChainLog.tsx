@@ -6,6 +6,9 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { SocketContext } from "../../context/SocketContext";
 import { getApi } from "../../request/request";
+import { usePagination } from "../../hooks/usePagination";
+import { CustomPagi } from "../../components/Table/CustomPagi";
+import { TResponseWithPagiSimple } from "../../shared/types/base";
 
 type TLog = {
   id: number;
@@ -17,31 +20,46 @@ type TLog = {
 };
 export const ChainLog = () => {
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
   const socket = useContext(SocketContext);
   const params = useParams();
   const chainId = params?.chainId;
 
-  const fetchLogs = useCallback(async () => {
-    const response = await getApi<TLog[]>(`order-chain/log/${chainId}`);
-    if (response.success) setLogs(response.data);
-    else toast.error(response.error.message);
+  const pagiData = usePagination({ rows: totalItems });
+  const { currPage, perpage } = pagiData;
+
+  const fetchLogs = useCallback(async (currPage: number, perpage: number) => {
+    const params = {
+      page: `${currPage}`,
+      perpage: `${perpage}`,
+    };
+    const response = await getApi<TResponseWithPagiSimple<TLog[]>>(
+      `order-chain/log/${chainId}`,
+      params
+    );
+    if (response.success) {
+      setLogs(response.data.data);
+      setTotalItems(response.data.pagi.totalItems);
+    } else {
+      toast.error(response.error.message);
+    }
   }, []);
 
   useEffect(() => {
-    fetchLogs();
-  }, [params]);
+    fetchLogs(currPage, perpage);
+  }, [params, currPage, perpage]);
 
   //   use for socket fetch realtime
   useEffect(() => {
     socket?.on("err-orders", (nums_of_err_orders: number) => {
-      fetchLogs();
+      fetchLogs(currPage, perpage);
       toast.warning(`Có ${nums_of_err_orders} lệnh bị lỗi khi thực hiện`);
     });
 
     return () => {
       socket?.off("err-orders");
     };
-  }, []);
+  }, [currPage, perpage]);
 
   return (
     <BlockBox open={false}>
@@ -50,29 +68,38 @@ export const ChainLog = () => {
           No logs
         </Typography>
       ) : (
-        <Stack spacing={1}>
-          {logs.map((log) => {
-            const { market_order_chains_id, type, message, createdAt } = log;
-            return (
-              <LineBox>
-                <Stack
-                  direction={"row"}
-                  spacing={2}
-                  justifyContent={"space-between"}
-                >
-                  <Typography>{market_order_chains_id}</Typography>
-                  <Typography>{type}</Typography>
-                  <Typography>{message}</Typography>
-                  <Typography>
-                    {dayjs(createdAt).format("DD/MM/YYYY HH:mm:ss")}
-                  </Typography>
-                </Stack>
-              </LineBox>
-            );
-          })}
-        </Stack>
+        <>
+          <Logs logs={logs} />
+          <CustomPagi totalItems={totalItems} {...pagiData} />
+        </>
       )}
     </BlockBox>
+  );
+};
+
+const Logs = ({ logs }: { logs: TLog[] }) => {
+  return (
+    <Stack spacing={1}>
+      {logs.map((log) => {
+        const { market_order_chains_id, type, message, createdAt } = log;
+        return (
+          <LineBox>
+            <Stack
+              direction={"row"}
+              spacing={2}
+              justifyContent={"space-between"}
+            >
+              <Typography>{market_order_chains_id}</Typography>
+              <Typography>{type}</Typography>
+              <Typography>{message}</Typography>
+              <Typography>
+                {dayjs(createdAt).format("DD/MM/YYYY HH:mm:ss")}
+              </Typography>
+            </Stack>
+          </LineBox>
+        );
+      })}
+    </Stack>
   );
 };
 

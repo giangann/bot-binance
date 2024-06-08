@@ -4,6 +4,8 @@ import { IMarketOrderPieceRecord } from "market-order-piece.interface";
 import logService from "../services/log.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import { ServerResponse } from "../ultils/server-response.ultil";
+import { Log } from "../entities/log.entity";
+import { ILogEntity } from "log.interface";
 
 const list: IController = async (req, res) => {
   try {
@@ -70,9 +72,24 @@ const isBotActive: IController = async (req, res) => {
 
 const getLogs: IController = async (req, res) => {
   try {
+    const page = req.query?.page;
+    const perpage = req.query?.perpage;
+
+    const pageInt = parseInt((page ?? "1") as string);
+    const perpageInt = parseInt((perpage ?? "5") as string);
+
+    const pagi = {
+      page: pageInt,
+      perpage: perpageInt,
+    };
+
     const chainId = parseInt(req.params?.chainId);
-    const logs = await logService.list({ market_order_chains_id: chainId });
-    ServerResponse.response(res, logs);
+    const logs = await logService.list({
+      market_order_chains_id: chainId,
+    });
+
+    const paginatedLogs = logsWithPagi(logs, pagi);
+    ServerResponse.response(res, paginatedLogs);
   } catch (err) {
     ServerResponse.error(res, err.message);
   }
@@ -107,4 +124,22 @@ const slicePiecesOfChainWithPagi = (
     },
   };
 };
+
+function pagiLogs(logs: ILogEntity[], pagi: { page: number; perpage: number }) {
+  const { page, perpage } = pagi;
+  const startIndex = page * perpage - perpage;
+  const endIndex = page * perpage;
+
+  const paginatedLogs = logs.slice(startIndex, endIndex);
+  return paginatedLogs;
+}
+
+const logsWithPagi = (
+  logs: ILogEntity[],
+  pagi: { page: number; perpage: number }
+) => ({
+  data: pagiLogs(logs, pagi),
+  pagi: { totalItems: logs.length },
+});
+
 export default { list, getPiecesById, getLogs, isBotActive };
