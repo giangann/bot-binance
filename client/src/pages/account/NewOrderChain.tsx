@@ -13,6 +13,7 @@ import { BaseInput } from "../../components/Input";
 import { BotContext } from "../../context/BotContext";
 import { SocketContext } from "../../context/SocketContext";
 import { getApi, postApi } from "../../request/request";
+import { OrderChainContext } from "../../context/OrderChainContext";
 
 type TNewOrderChain = {
   transaction_size: string;
@@ -32,6 +33,7 @@ export const NewOrderChain = () => {
   const [open, setOpen] = useState(false);
   const socket = useContext(SocketContext);
   const bot = useContext(BotContext);
+  const { fetchOrderChains } = useContext(OrderChainContext);
   const {
     register,
     handleSubmit,
@@ -46,6 +48,7 @@ export const NewOrderChain = () => {
       if (response.success) {
         toast.success("Bot kích hoạt thành công, check point mỗi 10s");
         bot.onToggle(true);
+        fetchOrderChains();
       } else toast.error(response.error.message);
     } catch (err) {
       console.log(err);
@@ -58,10 +61,11 @@ export const NewOrderChain = () => {
     const response = await getApi("bot/quit");
     if (response.success) {
       // @ts-ignore
-      const {numOfSuccess, numOfFailure} = response.data
-      const msg = `close: ${numOfSuccess} and failure: ${numOfFailure}`
-      toast.success(msg)
+      const { numOfSuccess, numOfFailure } = response.data;
+      const msg = `close: ${numOfSuccess} and failure: ${numOfFailure}`;
+      toast.success(msg);
       bot.onToggle(false);
+      fetchOrderChains();
     } else toast.error(response.error.message);
   };
 

@@ -1,33 +1,60 @@
+import { useEffect, useState } from "react";
+
 export const Test = () => {
-  const promise1 = genPromise(1, 2);
-  const promise2 = genPromise(2, 2.9);
-  const promise3 = genPromise(3, 1);
-
-  const promises = [promise1, promise2, promise3];
-
-  getPromises(promises);
-  return <>Test</>;
+  return (
+    <>
+      Test
+      <Parent />
+    </>
+  );
 };
 
+const Parent = () => {
+  const [array, setArray] = useState([1, 2, 3]);
+  const [childs, setChilds] = useState(["a", "b"]);
 
-const getPromises = async (promises: Promise<string>[]) => {
-  const start = Date.now();
-  try {
-    const response = await Promise.all(promises);
-
-    console.log(response);
-  } catch (err) {
-    console.log("err", err);
-  } finally {
-    console.log("time: ", Date.now() - start,'ms');
-  }
-};
-
-const genPromise = async (id: number, seconds: number) => {
-  return new Promise<string>((resolve, reject) => {
+  useEffect(() => {
     setTimeout(() => {
-      if (id ===1 || id ===2) reject(`promise ${id} failure`)
-      resolve(`promise ${id} success`);
-    }, seconds * 1000);
-  });
+      console.log("Add 4 to Array and SetState call");
+      console.log("Add c child to childs");
+
+      setArray([...array, 4]);
+      setChilds([...childs, "c"]);
+    }, 3000);
+  }, []);
+
+  return (
+    <>
+      {childs.map((_child) => (
+        <Child array={array} />
+      ))}
+    </>
+  );
+};
+
+// const Parent = () => {
+//   const [array, setArray] = useState([1, 2, 3]);
+
+//   useEffect(() => {
+//     setTimeout(() => {
+//       console.log("Add 4 to Array and SetState call");
+//       setArray([...array, 4]);
+//     }, 3000);
+//   }, []);
+
+//   return <Child array={array} />;
+// };
+
+const Child = ({ array }: any) => {
+  const [childArray, setChildArray] = useState(array);
+
+  if (array !== childArray) {
+    setChildArray(array);
+  }
+  return (
+    <>
+      <p>Child</p>
+      <p>{JSON.stringify(childArray)}</p>
+    </>
+  );
 };

@@ -9,14 +9,14 @@ class ServerResponse {
             error: { name: "Backend Error", message: errorMessage },
         });
     }
-    static response(res, data, status = 200, cookie, total) {
-        let meta = { total };
+    static response(res, data, status = 200, cookie, totalItems) {
+        const pagi = { totalItems };
         res.status(status);
         if (cookie) {
             const { key, value } = cookie;
             res.cookie(key, value);
         }
-        res.json({ data, meta, success: true });
+        res.json({ data, pagi, success: true });
     }
 }
 exports.ServerResponse = ServerResponse;

@@ -55,3 +55,10 @@ Opt1: Promise.all
   percentChange: 7 (toFixed 2)
   positionAmt: 7 
   amount: 8 (toFixed 3)
+
+
+--------------------------07/06/2024 12:20------------------------
+1. fetch lại OrderPieces và pagi khi bot-tick (chỉ fetch ở chain đang active) (done)
+2. active bot / quit bot => immediatly refetch list chain (because chain change status) (done)
+
+3. Khi props thay đổi thì component có re-render hay không ?

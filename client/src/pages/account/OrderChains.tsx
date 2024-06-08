@@ -38,8 +38,12 @@ const OrderChain = (props: TMarketOrderChainWithPiecesPagi) => {
       <ViewChainLog id={id} />
       <ChainBox open={status === "open"}>
         <ChainInfo chainInfo={props} />
-
-        <ListOrderPiece chainId={id} orderPieces={data} pagi={pagi} />
+        <ListOrderPiece
+          status={status}
+          chainId={id}
+          orderPieces={data}
+          pagi={pagi}
+        />
       </ChainBox>
     </Box>
   );

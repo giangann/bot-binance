@@ -5,6 +5,9 @@ export const usePagination = ({ rows }: { rows: number }) => {
   const [perpage, setPerpage] = useState(5);
   const [currPage, setCurrPage] = useState(1);
 
+  console.log("component re-render");
+  console.log("currPage: ", currPage, "rows: ", rows);
+
   const totalPage = useMemo(() => Math.ceil(rows / perpage), [rows, perpage]);
   const onNextPage = () => {
     setCurrPage(currPage + 1);
