@@ -174,8 +174,19 @@ function genOrderInfoArray(
         // 2. if not first buy, check the current positionAmt of symbol, quantity = positionAmt
         if (isFirstBuy) quantity = transaction_size_start / currPrice;
         if (!isFirstBuy) {
-          if (!position || !positionAmt) quantity = positionAmt;
-          else quantity = transaction_size_start / currPrice;
+          if (!position || !positionAmt) {
+            // log the strange behavior (if not firstBuy but still empty position)
+            const errCause = `SYMBOL: ${symbol} IS_FIRST_BUY: ${isFirstBuy} but POSITION: <${position} - ${JSON.stringify(
+              position
+            )}> POSITION_AMT: ${positionAmt} `;
+            loggerService.saveErrorLog(
+              new Error("Strange behavior", { cause: errCause })
+            );
+            // next loop
+            continue;
+          } else {
+            quantity = positionAmt;
+          }
         }
       }
 
@@ -201,7 +212,7 @@ function genOrderInfoArray(
       // more info:
       const orderMoreInfo: TOrderMoreInfo = {
         amount: quantity * currPrice,
-        quantityPrecision
+        quantityPrecision,
       };
 
       // add to array

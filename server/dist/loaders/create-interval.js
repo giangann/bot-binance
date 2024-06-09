@@ -123,10 +123,16 @@ function genOrderInfoArray(symbolPriceTickersMap, symbolPriceTickers1AmMap, posi
                 if (isFirstBuy)
                     quantity = transaction_size_start / currPrice;
                 if (!isFirstBuy) {
-                    if (!position || !positionAmt)
+                    if (!position || !positionAmt) {
+                        // log the strange behavior (if not firstBuy but still empty position)
+                        const errCause = `SYMBOL: ${symbol} IS_FIRST_BUY: ${isFirstBuy} but POSITION: <${position} - ${JSON.stringify(position)}> POSITION_AMT: ${positionAmt} `;
+                        logger_service_1.default.saveErrorLog(new Error("Strange behavior", { cause: errCause }));
+                        // next loop
+                        continue;
+                    }
+                    else {
                         quantity = positionAmt;
-                    else
-                        quantity = transaction_size_start / currPrice;
+                    }
                 }
             }
             // order params:
@@ -148,7 +154,7 @@ function genOrderInfoArray(symbolPriceTickersMap, symbolPriceTickers1AmMap, posi
             // more info:
             const orderMoreInfo = {
                 amount: quantity * currPrice,
-                quantityPrecision
+                quantityPrecision,
             };
             // add to array
             orderInfoArray.push({ ...orderParam, ...orderReason, ...orderMoreInfo });
