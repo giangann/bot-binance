@@ -6,10 +6,13 @@ import {
   TNewOrder,
   TResponSuccess,
   TResponse,
-  TResponseFailure
+  TResponseFailure,
 } from "../types/order";
 import { TPosition } from "../types/position";
-import { TSymbolMarkPriceWs } from "../types/symbol-mark-price";
+import {
+  TSymbolMarkPrice,
+  TSymbolMarkPriceWs,
+} from "../types/symbol-mark-price";
 import {
   TSymbolPriceTicker,
   TSymbolPriceTickerWs,
@@ -159,6 +162,18 @@ export function symbolPriceTickersToMap<
   return res;
 }
 
+export function symbolPriceMarketsToMap(symbolPriceMarket: TSymbolMarkPrice[]) {
+  let res: Record<string, TSymbolMarkPrice> = {};
+
+  for (let symbolPrice of symbolPriceMarket) {
+    let key = symbolPrice.symbol;
+    if (!(key in res)) {
+      res[key] = symbolPrice;
+    }
+  }
+  return res;
+}
+
 export function positionsToMap(positions: TPosition[]) {
   let res: Record<string, TPosition> = {};
   for (let position of positions) {
@@ -237,4 +252,63 @@ export function stackTraceShorter(trace: string): string {
   const thirdTrace = traceArr[traceArr.length - 3];
 
   return `${firstTrace}  -  ${secondTrace}  -  ${thirdTrace}`;
+}
+
+type TTickerAndMarkPrice = TSymbolMarkPrice & TSymbolPriceTicker;
+export function mergeTicerPriceAndMarketPriceBySymbol(
+  tickerPrices: TSymbolPriceTicker[],
+  marketPrices: TSymbolMarkPrice[]
+): TTickerAndMarkPrice[] {
+  // Change array to map
+  const tickerPricesMap = symbolPriceTickersToMap(tickerPrices);
+  const marketPricesMap = symbolPriceMarketsToMap(marketPrices);
+
+  const result: TTickerAndMarkPrice[] = [];
+
+  // merge handle here
+
+  // 1.
+  // Loop through tickerPrices
+  // Find the correspond marketPrice
+  // Push to result the value of tickerPrice and marketPrice, remove that marketPrice from the marketPricesMap object
+
+  // Loop through remain value of marketPricesMap object
+  // Push to result the value of marketPrice and tickerPrice (null)
+
+  // Loop through tickerPrices
+  for (const tickerPrice of tickerPrices) {
+    const key = tickerPrice.symbol;
+    const marketPrice = marketPricesMap[key];
+    if (marketPrice) {
+      result.push({
+        ...marketPrice,
+        price: tickerPrice.price,
+      });
+      delete marketPricesMap[key]; // Remove matched marketPrice
+    } else {
+      result.push({
+        symbol: tickerPrice.symbol,
+        markPrice: null,
+        indexPrice: "",
+        estimatedSettlePrice: "",
+        lastFundingRate: "",
+        interestRate: "",
+        nextFundingTime: 0,
+        time: tickerPrice.time,
+        price: tickerPrice.price,
+      });
+    }
+  }
+
+  // Loop through remaining values of marketPricesMap
+  for (const key in marketPricesMap) {
+    const marketPrice = marketPricesMap[key];
+    result.push({
+      ...marketPrice,
+      price: null,
+      time: marketPrice.time,
+    });
+  }
+
+  return result;
 }

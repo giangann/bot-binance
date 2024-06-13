@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadApp = void 0;
 const create_interval_1 = require("./create-interval");
-const cron_job_1 = require("./cron-job");
 const db_connect_1 = require("./db-connect");
 const http_server_1 = require("./http-server");
 const logger_config_1 = require("./logger.config");
@@ -14,7 +13,7 @@ const loadApp = async () => {
         const wsServer = (0, ws_server_1.createWebSocket)(httpServer);
         global.wsServerGlob = wsServer;
         (0, subcribe_binance_stream_1.subcribeAndForwardBinanceStream)();
-        (0, cron_job_1.cronJobSchedule)();
+        // cronJobSchedule();
         await (0, db_connect_1.connectDatabase)();
         (0, create_interval_1.createInterval)();
         return {

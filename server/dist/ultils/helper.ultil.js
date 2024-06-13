@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stackTraceShorter = exports.filterFailOrder = exports.filterSuccessOrder = exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.positionsToMap = exports.symbolPriceTickersToMap = exports.exchangeInfoSymbolsToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
+exports.mergeTicerPriceAndMarketPriceBySymbol = exports.stackTraceShorter = exports.filterFailOrder = exports.filterSuccessOrder = exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.positionsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.exchangeInfoSymbolsToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
 const crypto_1 = require("crypto");
 function priceToPercent(p1, p2) {
     return (p2 / p1 - 1) * 100;
@@ -111,6 +111,17 @@ function symbolPriceTickersToMap(symbolPriceTickers) {
     return res;
 }
 exports.symbolPriceTickersToMap = symbolPriceTickersToMap;
+function symbolPriceMarketsToMap(symbolPriceMarket) {
+    let res = {};
+    for (let symbolPrice of symbolPriceMarket) {
+        let key = symbolPrice.symbol;
+        if (!(key in res)) {
+            res[key] = symbolPrice;
+        }
+    }
+    return res;
+}
+exports.symbolPriceMarketsToMap = symbolPriceMarketsToMap;
 function positionsToMap(positions) {
     let res = {};
     for (let position of positions) {
@@ -183,3 +194,52 @@ function stackTraceShorter(trace) {
     return `${firstTrace}  -  ${secondTrace}  -  ${thirdTrace}`;
 }
 exports.stackTraceShorter = stackTraceShorter;
+function mergeTicerPriceAndMarketPriceBySymbol(tickerPrices, marketPrices) {
+    // Change array to map
+    const tickerPricesMap = symbolPriceTickersToMap(tickerPrices);
+    const marketPricesMap = symbolPriceMarketsToMap(marketPrices);
+    const result = [];
+    // merge handle here
+    // 1.
+    // Loop through tickerPrices
+    // Find the correspond marketPrice
+    // Push to result the value of tickerPrice and marketPrice, remove that marketPrice from the marketPricesMap object
+    // Loop through remain value of marketPricesMap object
+    // Push to result the value of marketPrice and tickerPrice (null)
+    // Loop through tickerPrices
+    for (const tickerPrice of tickerPrices) {
+        const key = tickerPrice.symbol;
+        const marketPrice = marketPricesMap[key];
+        if (marketPrice) {
+            result.push({
+                ...marketPrice,
+                price: tickerPrice.price,
+            });
+            delete marketPricesMap[key]; // Remove matched marketPrice
+        }
+        else {
+            result.push({
+                symbol: tickerPrice.symbol,
+                markPrice: null,
+                indexPrice: "",
+                estimatedSettlePrice: "",
+                lastFundingRate: "",
+                interestRate: "",
+                nextFundingTime: 0,
+                time: tickerPrice.time,
+                price: tickerPrice.price,
+            });
+        }
+    }
+    // Loop through remaining values of marketPricesMap
+    for (const key in marketPricesMap) {
+        const marketPrice = marketPricesMap[key];
+        result.push({
+            ...marketPrice,
+            price: null,
+            time: marketPrice.time,
+        });
+    }
+    return result;
+}
+exports.mergeTicerPriceAndMarketPriceBySymbol = mergeTicerPriceAndMarketPriceBySymbol;

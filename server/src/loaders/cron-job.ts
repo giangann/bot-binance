@@ -120,14 +120,3 @@ const getSymbolMarketPrices = async (
   const markPrices: TSymbolMarkPrice[] = response.data;
   return markPrices;
 };
-
-const test = async () => {
-  await connectDatabase();
-  // testnet
-  await updateCoinTestnetTableMarkPriceCol();
-  await updateCoinTestnetTableTickerPriceCol();
-  // future
-  await updateCoinFutureTableTickerPriceCol();
-  await updateCoinFutureTableMarkPriceCol();
-};
-// test();

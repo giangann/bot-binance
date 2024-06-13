@@ -5,7 +5,7 @@ export type TSymbolPriceTicker = {
 };
 
 export type TSymbolPriceTickerWs = {
-  e: '24hrTicker'; // Event type
+  e: "24hrTicker"; // Event type
   E: number; // Event time
   s: string; // Symbol
   p: string; // Price change

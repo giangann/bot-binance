@@ -41,5 +41,9 @@ class CoinService {
         const createdCoin = await (0, typeorm_1.getRepository)(this.entity).save(params);
         return createdCoin;
     }
+    async truncate() {
+        const result = await (0, typeorm_1.getRepository)(this.entity).clear();
+        return result;
+    }
 }
 exports.default = CoinService;

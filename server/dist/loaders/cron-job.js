@@ -7,7 +7,6 @@ exports.cronJobSchedule = void 0;
 const axios_1 = __importDefault(require("axios"));
 const node_cron_1 = __importDefault(require("node-cron"));
 const coin_service_1 = __importDefault(require("../services/coin.service"));
-const db_connect_1 = require("./db-connect");
 const futureTestnetUrl = "https://testnet.binancefuture.com";
 const futureUrl = "https://fapi.binance.com";
 const coinTestnetService = new coin_service_1.default(true);
@@ -103,13 +102,3 @@ const getSymbolMarketPrices = async (baseUrl) => {
     const markPrices = response.data;
     return markPrices;
 };
-const test = async () => {
-    await (0, db_connect_1.connectDatabase)();
-    // testnet
-    await updateCoinTestnetTableMarkPriceCol();
-    await updateCoinTestnetTableTickerPriceCol();
-    // future
-    await updateCoinFutureTableTickerPriceCol();
-    await updateCoinFutureTableMarkPriceCol();
-};
-// test();

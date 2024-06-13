@@ -4,6 +4,7 @@ import { Balance } from "./pages/account/Balance";
 // import { TradeHistory } from "./pages/account/TradeHistory";
 import { OrderCreate } from "./pages/account/OrderCreate";
 import { Coin } from "./pages/coin/Coin";
+import { UpdateCoinPrice } from "./pages/coin/UpdateCoinPrice";
 export const Home = () => {
   return (
     <Box>
@@ -11,6 +12,8 @@ export const Home = () => {
       <Balance />
 
       <OrderCreate/>
+
+      <UpdateCoinPrice/>
       {/* <OrderHistory /> */}
       {/* <TradeHistory />  */}
     </Box>

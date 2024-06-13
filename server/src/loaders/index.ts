@@ -12,7 +12,7 @@ export const loadApp = async () => {
     const wsServer = createWebSocket(httpServer);
     global.wsServerGlob = wsServer;
     subcribeAndForwardBinanceStream();
-    cronJobSchedule();
+    // cronJobSchedule();
     await connectDatabase();
     createInterval();
     return {
