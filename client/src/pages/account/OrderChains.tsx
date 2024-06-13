@@ -19,11 +19,11 @@ export const OrderChains: React.FC<Props> = ({ orderChains }) => {
           Chưa có chuỗi lệnh được đặt
         </Typography>
       ) : (
-        <Stack spacing={2}>
+        <>
           {orderChains.map((chain) => (
             <OrderChain {...chain} />
           ))}
-        </Stack>
+        </>
       )}
     </>
   );
@@ -34,16 +34,18 @@ const OrderChain = (props: TMarketOrderChainWithPiecesPagi) => {
   const { data, pagi } = order_pieces;
 
   return (
-    <Box>
+    <Box mb={4}>
       <ViewChainLog id={id} />
       <ChainBox open={status === "open"}>
-        <ChainInfo chainInfo={props} />
-        <ListOrderPiece
-          status={status}
-          chainId={id}
-          orderPieces={data}
-          pagi={pagi}
-        />
+        <Box>
+          <ChainInfo chainInfo={props} />
+          <ListOrderPiece
+            status={status}
+            chainId={id}
+            orderPieces={data}
+            pagi={pagi}
+          />
+        </Box>
       </ChainBox>
     </Box>
   );
@@ -126,7 +128,11 @@ const ChainBox = styled(Box, {
   padding: 16,
   borderRadius: 16,
   backgroundColor: open ? blue["200"] : grey["400"],
-  [theme.breakpoints.down("sm")]: {},
+  [theme.breakpoints.down("sm")]: {
+    overflowX: "auto",
+    boxSizing: "border-box",
+    // width: "300px",
+  },
 }));
 
 const ViewLogButton = styled(Box)({

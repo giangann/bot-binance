@@ -1,9 +1,17 @@
 // take first time render pieces from parent
 // define method when pagination currentPage change
 
-import { Stack, Typography, styled } from "@mui/material";
+import { Typography, styled } from "@mui/material";
+import { green, red } from "@mui/material/colors";
+import dayjs from "dayjs";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
+import { BasicTable } from "../../components/Table/BasicTable";
 import { CustomPagi } from "../../components/Table/CustomPagi";
+import { StrictField } from "../../components/Table/Customtable";
+import { BotContext } from "../../context/BotContext";
+import { OrderChainContext } from "../../context/OrderChainContext";
+import { SocketContext } from "../../context/SocketContext";
 import { usePagination } from "../../hooks/usePagination";
 import { TPagiApiShort, getApi } from "../../request/request";
 import {
@@ -11,11 +19,6 @@ import {
   TMarketOrderChainWithPiecesPagi,
   TOrderChainStatus,
 } from "../../shared/types/order";
-import { OrderPieces } from "./OrderPieces";
-import { SocketContext } from "../../context/SocketContext";
-import { toast } from "react-toastify";
-import { BotContext } from "../../context/BotContext";
-import { OrderChainContext } from "../../context/OrderChainContext";
 
 type Props = {
   status: TOrderChainStatus;
@@ -88,6 +91,60 @@ export const ListOrderPiece: React.FC<Props> = ({
     [currPage, perpage, chainId]
   );
 
+  const orderPieceFields: StrictField<IMarketOrderPieceRecord>[] = [
+    {
+      header: "ID",
+      fieldKey: "id",
+      width: 200,
+    },
+    {
+      header: "Symbol",
+      fieldKey: "symbol",
+      width: 200,
+    },
+    {
+      header: "Direction",
+      fieldKey: "direction",
+      width: 200,
+    },
+    {
+      header: "Transaction Size",
+      fieldKey: "transaction_size",
+      render: ({ transaction_size }) => (
+        <StyledText>{parseFloat(transaction_size).toFixed(3)}</StyledText>
+      ),
+      width: 300,
+    },
+    {
+      header: "Price",
+      fieldKey: "price",
+      width: 200,
+    },
+    {
+      header: "Percent Change",
+      fieldKey: "percent_change",
+      render: ({ percent_change }) => (
+        <StyledText>{parseFloat(percent_change).toFixed(2)}%,</StyledText>
+      ),
+      width: 350,
+    },
+    {
+      header: "Quantity",
+      fieldKey: "quantity",
+      width: 200,
+    },
+    {
+      header: "Created At",
+      fieldKey: "createdAt",
+      render: ({ createdAt }) => (
+        <StyledText>
+          {dayjs(createdAt).format("DD/MM/YYYY HH:mm:ss")}
+        </StyledText>
+      ),
+      width: 400,
+    },
+  ];
+
   useEffect(() => {
     // Skip the API call on initial render as we already have the data from props
     if (isInitialRender.current) {
@@ -139,8 +196,16 @@ export const ListOrderPiece: React.FC<Props> = ({
 
   return (
     <>
-      <OrderPiecesHeader />
-      <OrderPieces orderPieces={pieces} />
+      <BasicTable
+        fields={orderPieceFields}
+        data={pieces}
+        rowProps={({ direction }) => ({
+          sx: {
+            backgroundColor: direction === "BUY" ? green["50"] : red["50"],
+          },
+        })}
+      />
+
       <CustomPagi
         currPage={currPage}
         perpage={perpage}
@@ -156,23 +221,12 @@ export const ListOrderPiece: React.FC<Props> = ({
   );
 };
 
-const OrderPiecesHeader = () => {
-  return (
-    <Stack mb={1} direction={"row"} spacing={2} justifyContent={"space-around"}>
-      <PieceHeader>id</PieceHeader>
-      <PieceHeader>symbol</PieceHeader>
-      <PieceHeader>direction</PieceHeader>
-      <PieceHeader>transaction_size</PieceHeader>
-      <PieceHeader>price</PieceHeader>
-      <PieceHeader>percent_change</PieceHeader>
-      <PieceHeader>quantity</PieceHeader>
-      <PieceHeader>createdAt</PieceHeader>
-    </Stack>
-  );
-};
-const PieceCell = styled(Typography)({
-  flexBasis: `${100 / 8}%`,
-});
-const PieceHeader = styled(PieceCell)({
+const StyledText = styled(Typography)(({ theme }) => ({
   textAlign: "left",
-});
+  color: "black",
+  fontWeight: 500,
+  fontSize: 15,
+  [theme.breakpoints.up("sm")]: {
+    fontSize: 17,
+  },
+}));
