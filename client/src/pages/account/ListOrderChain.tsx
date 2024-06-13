@@ -1,6 +1,7 @@
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { OrderChainContext } from "../../context/OrderChainContext";
 import { SocketContext } from "../../context/SocketContext";
 import { getApi } from "../../request/request";
 import { TMarketOrderChainWithPiecesPagi } from "../../shared/types/order";
@@ -8,7 +9,6 @@ import { Balance } from "./Balance";
 import { NewOrderChain } from "./NewOrderChain";
 import { OrderChains } from "./OrderChains";
 import { Position } from "./Position";
-import { OrderChainContext } from "../../context/OrderChainContext";
 
 export const ListOrderChain = () => {
   const [orderChains, setOrderChains] = useState<
@@ -48,8 +48,8 @@ export const ListOrderChain = () => {
 
 const BalanceAndPosition = () => {
   return (
-    <Grid container columnSpacing={2}>
-      <Grid xs={12} sm={4}>
+    <Grid container columnGap={2}>
+      <Grid xs={12} sm={3.5}>
         <Balance />
       </Grid>
       <Grid xs={12} sm={8}>
@@ -61,9 +61,11 @@ const BalanceAndPosition = () => {
 
 const TitleAndNewChainBtn = () => {
   return (
-    <Stack direction={"row"} spacing={2} my={2}>
-      <Typography variant="h5">BOT - danh sách hoạt động</Typography>
+    <Box my={4}>
+      <Typography mb={2} variant="h5">
+        BOT - danh sách hoạt động
+      </Typography>
       <NewOrderChain />
-    </Stack>
+    </Box>
   );
 };

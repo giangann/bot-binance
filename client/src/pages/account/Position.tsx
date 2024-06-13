@@ -4,7 +4,14 @@ import { getApi } from "../../request/request";
 import { TPosition } from "../../shared/types/position";
 import { toast } from "react-toastify";
 import { SocketContext } from "../../context/SocketContext";
-import { Box, IconButton, Skeleton, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Skeleton,
+  Stack,
+  Typography,
+  styled,
+} from "@mui/material";
 import { StrictField } from "../../components/Table/Customtable";
 import { CustomTable } from "../../components/Table/Customtable";
 import { sortPositionByPnl } from "../../ultils/helper";
@@ -42,17 +49,23 @@ export const Position = () => {
     {
       header: "Size",
       fieldKey: "positionAmt",
-      width: 300,
+      width: 200,
     },
     {
       header: "Entry Price",
       fieldKey: "entryPrice",
       width: 300,
+      render: ({ entryPrice }) => (
+        <StyledText>{parseFloat(entryPrice).toFixed(5)}</StyledText>
+      ),
     },
     {
       header: "Mark Price",
       fieldKey: "markPrice",
       width: 300,
+      render: ({ markPrice }) => (
+        <StyledText>{parseFloat(markPrice).toFixed(5)}</StyledText>
+      ),
     },
     {
       header: "Unrealized PNL",
@@ -63,7 +76,12 @@ export const Position = () => {
         let color = "";
         if (pnl > 0) color = "green";
         if (pnl < 0) color = "red";
-        return <Typography color={color}>{pnl.toFixed(2)}{' usdt'}</Typography>;
+        return (
+          <Typography display={'inline'} color={color}>
+            {pnl.toFixed(2)}
+            {" usdt"}
+          </Typography>
+        );
       },
     },
   ];
@@ -82,3 +100,13 @@ export const Position = () => {
     </Box>
   );
 };
+
+const StyledText = styled(Typography)(({ theme }) => ({
+  textAlign: "left",
+  color: "black",
+  fontWeight: 500,
+  fontSize: 15,
+  [theme.breakpoints.up("sm")]: {
+    fontSize: 17,
+  },
+}));

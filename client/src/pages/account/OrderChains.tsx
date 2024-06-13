@@ -79,46 +79,51 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
     percent_to_sell,
   } = chainInfo;
   return (
-    <Stack
-      direction={"row"}
-      spacing={2}
-      sx={{ borderBottom: `1px solid ${grey["50"]}`, pb: 0.5, mb: 1 }}
+    <Box
+      sx={{
+        overflowX: "auto",
+        padding: 1,
+        mb:1,
+        borderBottom: `1px solid ${grey["50"]}`,
+      }}
     >
-      <Typography>{id}</Typography>
-      <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
-        <Typography>
-          status:{" "}
-          <Typography sx={{ fontWeight: 600 }} component={"span"}>
-            {status}
+      <Stack direction={"row"} spacing={2}>
+        <Typography>{id}</Typography>
+        <Stack direction={"row"} spacing={2} justifyContent={"space-around"}>
+          <Typography>
+            status:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {status}
+            </Typography>
           </Typography>
-        </Typography>
-        {/*  */}
-        <Typography>
-          transaction_size_start:{" "}
-          <Typography sx={{ fontWeight: 600 }} component={"span"}>
-            {transaction_size_start} USD
+          {/*  */}
+          <Typography>
+            transaction_size_start:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {transaction_size_start} USD
+            </Typography>
           </Typography>
-        </Typography>
-        <Typography>
-          percent_to_first_buy:{" "}
-          <Typography sx={{ fontWeight: 600 }} component={"span"}>
-            {percent_to_first_buy}%
+          <Typography>
+            percent_to_first_buy:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {percent_to_first_buy}%
+            </Typography>
           </Typography>
-        </Typography>
-        <Typography>
-          percent_to_buy:{" "}
-          <Typography sx={{ fontWeight: 600 }} component={"span"}>
-            {percent_to_buy}%
+          <Typography>
+            percent_to_buy:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {percent_to_buy}%
+            </Typography>
           </Typography>
-        </Typography>
-        <Typography>
-          percent_to_sell:{" "}
-          <Typography sx={{ fontWeight: 600 }} component={"span"}>
-            {percent_to_sell}%
+          <Typography>
+            percent_to_sell:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {percent_to_sell}%
+            </Typography>
           </Typography>
-        </Typography>
+        </Stack>
       </Stack>
-    </Stack>
+    </Box>
   );
 };
 
@@ -126,12 +131,9 @@ const ChainBox = styled(Box, {
   shouldForwardProp: (prop) => prop !== "open",
 })<{ open: boolean }>(({ open, theme }) => ({
   padding: 16,
-  borderRadius: 16,
   backgroundColor: open ? blue["200"] : grey["400"],
   [theme.breakpoints.down("sm")]: {
-    overflowX: "auto",
-    boxSizing: "border-box",
-    // width: "300px",
+    padding: 0,
   },
 }));
 

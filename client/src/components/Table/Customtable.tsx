@@ -61,7 +61,10 @@ export function CustomTable<TData extends UnknownObj>({
           <TableRow>
             {fields.map((field) => (
               <TableCell
-                sx={{ padding: { xs: "8px", sm: "16px" } }}
+                sx={{
+                  padding: { xs: "8px", sm: "16px" },
+                  whiteSpace: "nowrap",
+                }}
                 width={field.width || DEFAULT_CELL_WIDTH}
               >
                 <StyledText>{field.header}</StyledText>
@@ -85,7 +88,12 @@ export function CustomTable<TData extends UnknownObj>({
                 <TableRow>
                   {fields.map(({ fieldKey, render }: StrictField<TData>) => {
                     return (
-                      <TableCell sx={{ padding: { xs: "12px", sm: "16px" } }}>
+                      <TableCell
+                        sx={{
+                          padding: { xs: "12px", sm: "16px" },
+                          whiteSpace: "nowrap",
+                        }}
+                      >
                         {render ? (
                           render(row)
                         ) : (
@@ -134,7 +142,7 @@ export function CustomTable<TData extends UnknownObj>({
 }
 
 const StyledText = styled(Typography)(({ theme }) => ({
-  textAlign: "center",
+  textAlign: "left",
   color: "white",
   fontWeight: 500,
   fontSize: 15,
@@ -144,7 +152,7 @@ const StyledText = styled(Typography)(({ theme }) => ({
 }));
 
 export const DefaultBodyText = styled(Typography)(({ theme }) => ({
-  textAlign: "center",
+  textAlign: "left",
   fontSize: 15,
   [theme.breakpoints.up("sm")]: {
     fontSize: 17,

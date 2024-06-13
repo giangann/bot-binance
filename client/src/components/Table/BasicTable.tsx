@@ -10,7 +10,6 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import { green } from "@mui/material/colors";
 import React from "react";
 import { UnknownObj } from "../../shared/types/base";
 
@@ -44,10 +43,19 @@ export function BasicTable<TData extends UnknownObj>({
           <TableRow>
             {fields.map((field) => (
               <TableCell
-                sx={{ padding: { xs: "8px", sm: "16px" } }}
+                sx={{
+                  padding: {
+                    xs: "8px 8px 8px 12px",
+                    sm: "16px",
+                    verticalAlign: "top",
+                    whiteSpace: "nowrap",
+                  },
+                }}
                 width={field.width || DEFAULT_CELL_WIDTH}
               >
-                <StyledText sx={{ fontWeight: 700 , color:'black'}}>{field.header}</StyledText>
+                <StyledText sx={{ fontWeight: 700, color: "black" }}>
+                  {field.header}
+                </StyledText>
               </TableCell>
             ))}
           </TableRow>
@@ -61,7 +69,7 @@ export function BasicTable<TData extends UnknownObj>({
               <TableRow {...rowProps?.(row)}>
                 {fields.map(({ fieldKey, render }: StrictField<TData>) => {
                   return (
-                    <TableCell sx={{ padding: { xs: "12px", sm: "16px" } }}>
+                    <TableCell sx={{ padding: { xs: "12px", sm: "16px" }, whiteSpace:'nowrap' }}>
                       {render ? (
                         render(row)
                       ) : (
