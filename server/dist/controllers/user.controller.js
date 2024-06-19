@@ -33,15 +33,6 @@ const getAccInfo = async (req, res) => {
         server_response_ultil_1.ServerResponse.error(res, err.message);
     }
 };
-const getAccInfoFetch = async (req, res) => {
-    try {
-        const accInfoFetch = await binance_service_1.default.getAccountFetch();
-        server_response_ultil_1.ServerResponse.response(res, accInfoFetch);
-    }
-    catch (err) {
-        server_response_ultil_1.ServerResponse.error(res, err.message);
-    }
-};
 const getPosition = async (req, res) => {
     // get position from binance service
     const positions = await binance_service_1.default.getPositions();
@@ -56,6 +47,5 @@ exports.default = {
     getOrderHistory,
     getTradeHistory,
     getAccInfo,
-    getAccInfoFetch,
     getPosition,
 };

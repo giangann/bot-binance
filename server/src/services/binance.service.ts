@@ -10,7 +10,7 @@ import { throwError } from "../ultils/error-handler.ultil";
 import {
   filterAblePosition,
   isSuccess,
-  paramsToQueryWithSignature
+  paramsToQueryWithSignature,
 } from "../ultils/helper.ultil";
 import CoinService from "./coin.service";
 dotenv.config();
@@ -65,25 +65,6 @@ const getAccountInfo = async (): Promise<TAccount> => {
     const response = await axios.get(url, commonAxiosOpt);
 
     const accInfo = response.data;
-    return accInfo;
-  } catch (err) {
-    throwError(err);
-  }
-};
-const getAccountFetch = async (): Promise<TAccount> => {
-  try {
-    const endpoint = "/fapi/v2/account";
-    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
-    const queryString = paramsToQueryWithSignature(secret, paramsNow);
-    const url = `${baseUrl}${endpoint}?${queryString}`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "X-MBX-APIKEY": apiKey,
-        "Content-Type": "application/json",
-      },
-    });
-    const accInfo = await response.json();
     return accInfo;
   } catch (err) {
     throwError(err);
@@ -195,5 +176,4 @@ export default {
   getPositions,
   getExchangeInfo,
   getAccountInfo,
-  getAccountFetch,
 };

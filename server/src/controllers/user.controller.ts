@@ -30,15 +30,6 @@ const getAccInfo: IController = async (req, res) => {
   }
 };
 
-const getAccInfoFetch: IController = async (req, res) => {
-  try {
-    const accInfoFetch = await binanceService.getAccountFetch();
-    ServerResponse.response(res, accInfoFetch);
-  } catch (err) {
-    ServerResponse.error(res, err.message);
-  }
-};
-
 const getPosition: IController = async (req, res) => {
   // get position from binance service
   const positions = await binanceService.getPositions();
@@ -53,6 +44,5 @@ export default {
   getOrderHistory,
   getTradeHistory,
   getAccInfo,
-  getAccInfoFetch,
   getPosition,
 };

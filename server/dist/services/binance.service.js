@@ -62,26 +62,6 @@ const getAccountInfo = async () => {
         (0, error_handler_ultil_1.throwError)(err);
     }
 };
-const getAccountFetch = async () => {
-    try {
-        const endpoint = "/fapi/v2/account";
-        const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
-        const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
-        const url = `${baseUrl}${endpoint}?${queryString}`;
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "X-MBX-APIKEY": apiKey,
-                "Content-Type": "application/json",
-            },
-        });
-        const accInfo = await response.json();
-        return accInfo;
-    }
-    catch (err) {
-        (0, error_handler_ultil_1.throwError)(err);
-    }
-};
 const getSymbolPriceTickers1Am = async () => {
     try {
         const price1Am = await coinService.list();
@@ -177,5 +157,4 @@ exports.default = {
     getPositions,
     getExchangeInfo,
     getAccountInfo,
-    getAccountFetch,
 };
