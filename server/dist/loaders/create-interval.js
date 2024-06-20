@@ -71,7 +71,7 @@ const createInterval = () => {
             (0, error_handler_ultil_1.handleTickError)(err);
         }
         console.log("emit and end tick");
-    }, 10000);
+    }, 20000);
 };
 exports.createInterval = createInterval;
 function genOrderInfoArray(symbolPriceTickersMap, symbolPriceTickers1AmMap, positionsMap, orderPiecesMap, openChain, exchangeInfoSymbolsMap) {

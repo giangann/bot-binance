@@ -106,7 +106,7 @@ const createInterval = () => {
     }
 
     console.log("emit and end tick");
-  }, 10000);
+  }, 20000);
 };
 
 function genOrderInfoArray(
