@@ -44,7 +44,7 @@ const getExchangeInfo = async (): Promise<TExchangeInfo> => {
 
 const getPositions = async (): Promise<TPosition[]> => {
   try {
-    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
+    const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
     const queryString = paramsToQueryWithSignature(secret, paramsNow);
     const endpoint = "/fapi/v2/positionRisk";
     const url = `${baseUrl}${endpoint}?${queryString}`;
@@ -59,7 +59,7 @@ const getPositions = async (): Promise<TPosition[]> => {
 const getAccountInfo = async (): Promise<TAccount> => {
   try {
     const endpoint = "/fapi/v2/account";
-    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
+    const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
     const queryString = paramsToQueryWithSignature(secret, paramsNow);
     const url = `${baseUrl}${endpoint}?${queryString}`;
     const response = await axios.get(url, commonAxiosOpt);
@@ -131,7 +131,7 @@ const createMarketOrder = async (
 ): Promise<TResponse<TNewOrder>> => {
   try {
     const endpoint = "/fapi/v1/order";
-    const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
+    const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
     let orderParams = {
       symbol,
       type,

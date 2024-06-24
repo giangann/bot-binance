@@ -36,7 +36,7 @@ const getExchangeInfo = async () => {
 };
 const getPositions = async () => {
     try {
-        const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
+        const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
         const endpoint = "/fapi/v2/positionRisk";
         const url = `${baseUrl}${endpoint}?${queryString}`;
@@ -51,7 +51,7 @@ const getPositions = async () => {
 const getAccountInfo = async () => {
     try {
         const endpoint = "/fapi/v2/account";
-        const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
+        const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
         const queryString = (0, helper_ultil_1.paramsToQueryWithSignature)(secret, paramsNow);
         const url = `${baseUrl}${endpoint}?${queryString}`;
         const response = await axios_1.default.get(url, commonAxiosOpt);
@@ -112,7 +112,7 @@ const getSymbolMarketPrices = async () => {
 const createMarketOrder = async (symbol, side, quantity, type = "market", _price) => {
     try {
         const endpoint = "/fapi/v1/order";
-        const paramsNow = { recvWindow: 10000, timestamp: Date.now() };
+        const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
         let orderParams = {
             symbol,
             type,

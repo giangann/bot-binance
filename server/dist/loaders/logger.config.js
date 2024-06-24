@@ -5,23 +5,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logger = void 0;
 const winston_1 = __importDefault(require("winston"));
-exports.logger = winston_1.default.createLogger({
-    format: winston_1.default.format.json(),
-    // defaultMeta:{timestamp: new Date()},
+const moment_1 = __importDefault(require("moment"));
+const { combine, printf, timestamp } = winston_1.default.format;
+const customFormat = printf(({ level, message, timestamp }) => {
+    return `${timestamp} ${level}: ${message}`;
+});
+const errorLogger = winston_1.default.createLogger({
+    format: combine(timestamp({ format: () => (0, moment_1.default)().format("YYYY-MM-DD HH:mm:ss") }), customFormat),
     transports: [
-        new winston_1.default.transports.File({ filename: "combined.log", level: "info" }),
-        new winston_1.default.transports.File({
-            filename: "error.log",
-            level: "error",
-        }),
-        new winston_1.default.transports.File({
-            filename: "order-debug.log",
-            level: "debug",
-        }),
+        new winston_1.default.transports.File({ filename: "logs/logger-error.log", level: "error" }),
     ],
 });
-if (process.env.NODE_ENV !== "production") {
-    exports.logger.add(new winston_1.default.transports.Console({
-        format: winston_1.default.format.json(),
-    }));
-}
+const transports = [
+    new winston_1.default.transports.File({ filename: "logs/combined.log", level: "info" }),
+    new winston_1.default.transports.File({
+        filename: "logs/error.log",
+        level: "error",
+    }),
+    new winston_1.default.transports.File({
+        filename: "logs/order-debug.log",
+        level: "debug",
+    }),
+];
+// Add error listeners to each transport
+transports.forEach((transport) => {
+    transport.on("error", (err) => {
+        // Handle the error, e.g., send an alert, write to another log, etc.
+        errorLogger.error(`Error writing to ${transport.name}: ${err.message}`, { error: err });
+    });
+});
+exports.logger = winston_1.default.createLogger({
+    format: combine(timestamp({ format: () => (0, moment_1.default)().format("YYYY-MM-DD HH:mm:ss") }), // Add timestamp
+    customFormat // Apply custom format
+    ),
+    transports: transports,
+});
