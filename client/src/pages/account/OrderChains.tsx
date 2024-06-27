@@ -4,6 +4,7 @@ import { blue, grey } from "@mui/material/colors";
 import { TMarketOrderChainWithPiecesPagi } from "../../shared/types/order";
 import { CenterBox } from "../../styled/styled";
 import { ListOrderPiece } from "./ListOrderPiece";
+import dayjs from "dayjs";
 
 // take orderChains array as props, render many OrderChain
 // OrderChain: take orderChain as props, render orderChain detail and ListOrderPiece
@@ -77,13 +78,15 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
     percent_to_first_buy,
     percent_to_buy,
     percent_to_sell,
+    stop_reason,
+    updatedAt,
   } = chainInfo;
   return (
     <Box
       sx={{
         overflowX: "auto",
         padding: 1,
-        mb:1,
+        mb: 1,
         borderBottom: `1px solid ${grey["50"]}`,
       }}
     >
@@ -121,6 +124,22 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
               {percent_to_sell}%
             </Typography>
           </Typography>
+          {status === "closed" && (
+            <>
+              <Typography>
+                closedAt:{" "}
+                <Typography sx={{ fontWeight: 600 }} component={"span"}>
+                  {dayjs(updatedAt).format("DD/MM/YYYY HH:mm:ss")}
+                </Typography>
+              </Typography>
+              <Typography>
+                reason:{" "}
+                <Typography sx={{ fontWeight: 600 }} component={"span"}>
+                  {stop_reason ?? 'null'}
+                </Typography>
+              </Typography>
+            </>
+          )}
         </Stack>
       </Stack>
     </Box>

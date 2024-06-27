@@ -28,8 +28,10 @@ import {
   orderPiecesToMap,
   positionsToMap,
   symbolPriceTickersToMap,
+  totalUnrealizedPnl,
   validateAmount,
 } from "../ultils/helper.ultil";
+import botService from "../services/bot.service";
 
 const createInterval = () => {
   const interval = setInterval(async () => {
@@ -57,6 +59,9 @@ const createInterval = () => {
         const symbolPriceTickers1AmMap = symbolPriceTickersToMap(tickers1AM);
         const positionsMap = positionsToMap(positions);
         const orderPiecesMap = orderPiecesToMap(openChain.order_pieces);
+
+        // check if over pnl to stop
+        await checkPnlToStop(openChain, positions);
 
         // gen order params
         const genOrderParamsArgs: Parameters<typeof genOrderInfoArray> = [
@@ -327,6 +332,36 @@ function mergeOrders(
     }
   }
   return mergedOrders;
+}
+
+async function checkPnlToStop(
+  chain: IMarketOrderChainEntity,
+  positions: TPosition[]
+) {
+  const isOverPnlToStop = chain.is_over_pnl_to_stop;
+  const pnlToStop = parseFloat(chain.pnl_to_stop);
+  const sumUnrealizedPnl = totalUnrealizedPnl(positions);
+
+  if (isOverPnlToStop) {
+    if (sumUnrealizedPnl < pnlToStop) {
+      const stopReason = `PNL: ${sumUnrealizedPnl}`;
+      await marketOrderChainService.update({
+        id: chain.id,
+        status: "closed",
+        stop_reason: stopReason,
+      });
+      await botService.closeAllPositions();
+
+      global.wsServerGlob.emit("bot-quit", "");
+    }
+  } else {
+    if (sumUnrealizedPnl > pnlToStop) {
+      await marketOrderChainService.update({
+        id: chain.id,
+        is_over_pnl_to_stop: true,
+      });
+    }
+  }
 }
 
 export { createInterval };

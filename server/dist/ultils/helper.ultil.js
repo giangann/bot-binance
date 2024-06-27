@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mergeTicerPriceAndMarketPriceBySymbol = exports.stackTraceShorter = exports.filterFailOrder = exports.filterSuccessOrder = exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.positionsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.exchangeInfoSymbolsToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
+exports.totalUnrealizedPnl = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.stackTraceShorter = exports.filterFailOrder = exports.filterSuccessOrder = exports.filterAblePosition = exports.isSuccess = exports.validateAmount = exports.orderPiecesToMap = exports.positionsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.exchangeInfoSymbolsToMap = exports.binanceStreamToSymbolPrice = exports.getTimestampOfYesterday1AM = exports.getTimestampOfToday1AM = exports.queryStringToSignature = exports.paramsToQueryWithSignature = exports.compareDate = exports.priceToPercent = void 0;
 const crypto_1 = require("crypto");
 function priceToPercent(p1, p2) {
     return (p2 / p1 - 1) * 100;
@@ -243,3 +243,11 @@ function mergeTicerPriceAndMarketPriceBySymbol(tickerPrices, marketPrices) {
     return result;
 }
 exports.mergeTicerPriceAndMarketPriceBySymbol = mergeTicerPriceAndMarketPriceBySymbol;
+function totalUnrealizedPnl(positions) {
+    let result = 0;
+    for (let position of positions) {
+        result += parseFloat(position.unRealizedProfit);
+    }
+    return result;
+}
+exports.totalUnrealizedPnl = totalUnrealizedPnl;

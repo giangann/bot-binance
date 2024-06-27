@@ -12,6 +12,7 @@ const active: IController = async (req, res) => {
       percent_to_first_buy: req.body.percent_to_first_buy,
       percent_to_buy: req.body.percent_to_buy,
       percent_to_sell: req.body.percent_to_sell,
+      pnl_to_stop: req.body.pnl_to_stop,
     };
 
     // create new chain

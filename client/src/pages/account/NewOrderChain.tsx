@@ -20,13 +20,15 @@ type TNewOrderChain = {
   percent_to_first_buy: string;
   percent_to_buy: string;
   percent_to_sell: string;
+  pnl_to_stop: string;
 };
 
 const defaultValue: TNewOrderChain = {
-  percent_to_first_buy: "1",
-  transaction_size: "100",
+  percent_to_first_buy: "0",
+  transaction_size: "20",
   percent_to_buy: "5",
-  percent_to_sell: "-2.5",
+  percent_to_sell: "-2",
+  pnl_to_stop: "10",
 };
 
 export const NewOrderChain = () => {
@@ -145,6 +147,13 @@ export const NewOrderChain = () => {
                 {...register("percent_to_sell")}
                 label="Bán khi lỗ thấp hơn: (%)"
                 placeholder="vd: -5 ... (nhỏ hơn 0)"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <BaseInput
+                {...register("pnl_to_stop")}
+                label="Đóng lệnh khi pnl nhỏ hơn: ($)"
+                placeholder="vd: 20, -10, ..."
               />
             </Grid>
           </Grid>

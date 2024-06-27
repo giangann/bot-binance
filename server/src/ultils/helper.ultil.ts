@@ -312,3 +312,11 @@ export function mergeTicerPriceAndMarketPriceBySymbol(
 
   return result;
 }
+
+export function totalUnrealizedPnl(positions: TPosition[]) {
+  let result = 0;
+  for (let position of positions) {
+    result += parseFloat(position.unRealizedProfit);
+  }
+  return result;
+}

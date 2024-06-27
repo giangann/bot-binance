@@ -12,6 +12,8 @@ export interface IMarketOrderChainRecord {
   percent_to_sell: string;
   total_balance_end?: string;
   percent_change?: string;
+  pnl_to_stop: string;
+  stop_reason?: string;
   order_pieces: IMarketOrderPieceRecord[];
   createdAt: string;
   updatedAt: string;

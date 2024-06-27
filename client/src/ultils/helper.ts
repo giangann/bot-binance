@@ -205,3 +205,11 @@ export function sortPositionByPnl(positions: TPosition[]) {
     sortValueInStringFormat(b.unRealizedProfit, a.unRealizedProfit)
   );
 }
+
+export function totalUnrealizedPnl(positions: TPosition[]) {
+  let result = 0;
+  for (let position of positions) {
+    result += parseFloat(position.unRealizedProfit);
+  }
+  return result;
+}

@@ -47,6 +47,15 @@ export class MarketOrderChain extends BaseEntity {
   @Column({ nullable: true })
   percent_change: string;
 
+  @Column({ nullable: false })
+  pnl_to_stop: string;
+
+  @Column({ nullable: true })
+  is_over_pnl_to_stop: boolean;
+
+  @Column({ nullable: true })
+  stop_reason: string;
+
   @OneToMany(() => MarketOrderPiece, (piece) => piece.order_chain)
   @JoinColumn({ name: "id", referencedColumnName: "market_order_chains_id" })
   order_pieces: MarketOrderPiece[];

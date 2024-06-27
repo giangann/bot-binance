@@ -1,0 +1,195 @@
+2024-06-27 19:00:52 info: orderId: 16164594, symbol: INJUSDT, quantity: 0.3, side: SELL
+2024-06-27 19:00:52 info: orderId: 479006419, symbol: BNBUSDT, quantity: 0.03, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 32.306, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: IOTXUSDT, quantity: 1901, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UMAUSDT, quantity: 7, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: BNXUSDT, quantity: 19.1, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MTLUSDT, quantity: 16, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: STMXUSDT, quantity: 3868, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KNCUSDT, quantity: 185, side: SELL
+2024-06-27 19:00:52 info: orderId: 6120271, symbol: ENSUSDT, quantity: 3.7, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ZECUSDT, quantity: 0.93, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 802, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DOTUSDT, quantity: 3.3, side: SELL
+2024-06-27 19:00:52 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: LITUSDT, quantity: 24.2, side: SELL
+2024-06-27 19:00:52 info: orderId: 262147, symbol: ORDIUSDT, quantity: 0.5, side: SELL
+2024-06-27 19:00:52 info: orderId: 17551648, symbol: SANDUSDT, quantity: 57, side: SELL
+2024-06-27 19:00:52 info: orderId: 6171855, symbol: JASMYUSDT, quantity: 1586, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 552, side: SELL
+2024-06-27 19:00:52 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: SUIUSDT, quantity: 0.7, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DENTUSDT, quantity: 91075, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: CKBUSDT, quantity: 9453, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 3.63, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 30534, side: SELL
+2024-06-27 19:00:52 info: orderId: 46001154, symbol: NEARUSDT, quantity: 42, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TURBOUSDT, quantity: 28241, side: SELL
+2024-06-27 19:00:52 info: orderId: 4761327, symbol: XVGUSDT, quantity: 10752, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MKRUSDT, quantity: 0.008, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UNIUSDT, quantity: 17, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: 1000PEPEUSDT, quantity: 1338, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: 1000RATSUSDT, quantity: 127, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: FETUSDT, quantity: 13, side: SELL
+2024-06-27 19:00:52 info: orderId: 62121, symbol: SUPERUSDT, quantity: 66, side: SELL
+2024-06-27 19:00:52 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KASUSDT, quantity: 132, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 32.306, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: IOTXUSDT, quantity: 1901, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UMAUSDT, quantity: 7, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: BNXUSDT, quantity: 19.1, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MTLUSDT, quantity: 16, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: STMXUSDT, quantity: 3868, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KNCUSDT, quantity: 185, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ZECUSDT, quantity: 0.93, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 802, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DOTUSDT, quantity: 3.3, side: SELL
+2024-06-27 19:00:58 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: LITUSDT, quantity: 24.2, side: SELL
+2024-06-27 19:00:58 info: orderId: 262149, symbol: ORDIUSDT, quantity: 0.5, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 552, side: SELL
+2024-06-27 19:00:58 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: SUIUSDT, quantity: 0.7, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DENTUSDT, quantity: 91075, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: CKBUSDT, quantity: 9453, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 3.63, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 30534, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TURBOUSDT, quantity: 28241, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MKRUSDT, quantity: 0.008, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UNIUSDT, quantity: 17, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: 1000PEPEUSDT, quantity: 1338, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: 1000RATSUSDT, quantity: 127, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: FETUSDT, quantity: 13, side: SELL
+2024-06-27 19:00:58 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KASUSDT, quantity: 132, side: SELL
+2024-06-27 19:04:42 error: NAME: TypeError | MESSAGE: Cannot read properties of undefined (reading 'data') | CAUSE: undefined | STACK: at async Timeout._onTimeout (/home/ann/Documents/freelancer/bot-binance/server/src/loaders/create-interval.ts:42:25)  -  at processTicksAndRejections (node:internal/process/task_queues:95:5)  -  at Object.getPositions (/home/ann/Documents/freelancer/bot-binance/server/src/services/binance.service.ts:55:15)
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 32.424, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: IOTXUSDT, quantity: 1901, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UMAUSDT, quantity: 14, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: BNXUSDT, quantity: 38.5, side: SELL
+2024-06-27 19:07:31 info: orderId: 16390150, symbol: MTLUSDT, quantity: 32, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: STMXUSDT, quantity: 7736, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KNCUSDT, quantity: 185, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ZECUSDT, quantity: 1.86, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 1604, side: SELL
+2024-06-27 19:07:31 info: orderId: 1517019, symbol: 1000SATSUSDT, quantity: 108696, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DOTUSDT, quantity: 6.6, side: SELL
+2024-06-27 19:07:31 info: orderId: 11232971, symbol: APTUSDT, quantity: 2.9, side: SELL
+2024-06-27 19:07:31 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: LITUSDT, quantity: 48.4, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ORDIUSDT, quantity: 0.5, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: NOTUSDT, quantity: 1213, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 552, side: SELL
+2024-06-27 19:07:31 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: SUIUSDT, quantity: 0.7, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DENTUSDT, quantity: 91075, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: CKBUSDT, quantity: 9453, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 3.63, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 30754, side: SELL
+2024-06-27 19:07:31 info: orderId: 1038683150, symbol: BCHUSDT, quantity: 0.049, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TURBOUSDT, quantity: 32609, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MKRUSDT, quantity: 0.016, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UNIUSDT, quantity: 19, side: SELL
+2024-06-27 19:07:31 info: orderId: 3399060, symbol: 1000PEPEUSDT, quantity: 1338, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: 1000RATSUSDT, quantity: 254, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: FETUSDT, quantity: 26, side: SELL
+2024-06-27 19:07:31 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KASUSDT, quantity: 132, side: SELL
+2024-06-27 19:29:02 info: orderId: 196520600, symbol: ETCUSDT, quantity: 0.77, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 32.542, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: IOTXUSDT, quantity: 1901, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UMAUSDT, quantity: 21, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: BNXUSDT, quantity: 57.9, side: SELL
+2024-06-27 19:29:02 info: orderId: 16390153, symbol: MTLUSDT, quantity: 15, side: SELL
+2024-06-27 19:29:02 info: orderId: 77310, symbol: ENAUSDT, quantity: 31, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: STMXUSDT, quantity: 11604, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KNCUSDT, quantity: 185, side: SELL
+2024-06-27 19:29:02 info: orderId: 42031366, symbol: ENJUSDT, quantity: 91, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ZECUSDT, quantity: 2.79, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 2406, side: SELL
+2024-06-27 19:29:02 info: orderId: 1517057, symbol: 1000SATSUSDT, quantity: 110497, side: SELL
+2024-06-27 19:29:02 info: orderId: 258316487, symbol: XRPUSDT, quantity: 27.0, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DOTUSDT, quantity: 10, side: SELL
+2024-06-27 19:29:02 info: orderId: 11233026, symbol: APTUSDT, quantity: 2.9, side: SELL
+2024-06-27 19:29:02 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: LITUSDT, quantity: 72.6, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ORDIUSDT, quantity: 1, side: SELL
+2024-06-27 19:29:02 info: orderId: 17551650, symbol: SANDUSDT, quantity: 57, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: NOTUSDT, quantity: 2426, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 552, side: SELL
+2024-06-27 19:29:02 info: orderId: 22130957, symbol: MASKUSDT, quantity: 6, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SUIUSDT, quantity: 24.3, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DENTUSDT, quantity: 91075, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: CKBUSDT, quantity: 9453, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 3.63, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 30974, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TURBOUSDT, quantity: 36977, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MKRUSDT, quantity: 0.024, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UNIUSDT, quantity: 21, side: SELL
+2024-06-27 19:29:02 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: 1000PEPEUSDT, quantity: 9, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: 1000RATSUSDT, quantity: 254, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: FETUSDT, quantity: 39, side: SELL
+2024-06-27 19:29:02 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KASUSDT, quantity: 132, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: INJUSDT, quantity: 0.8, side: SELL
+2024-06-27 19:32:43 info: orderId: 479006500, symbol: BNBUSDT, quantity: 0.03, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ETCUSDT, quantity: 0.37, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 32.66, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: IOTXUSDT, quantity: 1901, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UMAUSDT, quantity: 28, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: BNXUSDT, quantity: 77.3, side: SELL
+2024-06-27 19:32:43 info: orderId: 16390155, symbol: MTLUSDT, quantity: 15, side: SELL
+2024-06-27 19:32:43 info: orderId: 77312, symbol: ENAUSDT, quantity: 30, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: STMXUSDT, quantity: 15472, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KNCUSDT, quantity: 185, side: SELL
+2024-06-27 19:32:43 info: orderId: 42031368, symbol: ENJUSDT, quantity: 91, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ZECUSDT, quantity: 3.72, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 3208, side: SELL
+2024-06-27 19:32:43 info: orderId: 1517063, symbol: 1000SATSUSDT, quantity: 114286, side: SELL
+2024-06-27 19:32:43 info: orderId: 258316501, symbol: XRPUSDT, quantity: 38.5, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DOTUSDT, quantity: 13.4, side: SELL
+2024-06-27 19:32:43 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: LITUSDT, quantity: 96.8, side: SELL
+2024-06-27 19:32:43 info: orderId: 262214, symbol: ORDIUSDT, quantity: 0.7, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: NOTUSDT, quantity: 3639, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 552, side: SELL
+2024-06-27 19:32:43 info: orderId: 22130960, symbol: MASKUSDT, quantity: 6, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SUIUSDT, quantity: 47.9, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DENTUSDT, quantity: 91075, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: CKBUSDT, quantity: 9453, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 3.63, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 31194, side: SELL
+2024-06-27 19:32:43 info: orderId: 1038683204, symbol: BCHUSDT, quantity: 0.049, side: SELL
+2024-06-27 19:32:43 info: orderId: 19083106, symbol: 1000SHIBUSDT, quantity: 1053, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TURBOUSDT, quantity: 41345, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MKRUSDT, quantity: 0.032, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UNIUSDT, quantity: 23, side: SELL
+2024-06-27 19:32:43 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: 1000PEPEUSDT, quantity: 55, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: 1000RATSUSDT, quantity: 254, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: FETUSDT, quantity: 52, side: SELL
+2024-06-27 19:32:43 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KASUSDT, quantity: 132, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: INJUSDT, quantity: 0.8, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ETCUSDT, quantity: 0.37, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: XMRUSDT, quantity: 32.778, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: IOTXUSDT, quantity: 1901, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UMAUSDT, quantity: 35, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: BNXUSDT, quantity: 96.7, side: SELL
+2024-06-27 19:40:10 info: orderId: 16390157, symbol: MTLUSDT, quantity: 15, side: SELL
+2024-06-27 19:40:10 info: orderId: 77314, symbol: ENAUSDT, quantity: 31, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: STMXUSDT, quantity: 19340, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KNCUSDT, quantity: 185, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: ZECUSDT, quantity: 4.65, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TUSDT, quantity: 4010, side: SELL
+2024-06-27 19:40:10 info: orderId: 1517085, symbol: 1000SATSUSDT, quantity: 114286, side: SELL
+2024-06-27 19:40:10 info: orderId: 258316538, symbol: XRPUSDT, quantity: 38.5, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DOTUSDT, quantity: 16.8, side: SELL
+2024-06-27 19:40:10 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: LSKUSDT, quantity: 1, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: LITUSDT, quantity: 121, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: NOTUSDT, quantity: 4852, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: PHBUSDT, quantity: 552, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SUIUSDT, quantity: 47.9, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: DENTUSDT, quantity: 91075, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: CKBUSDT, quantity: 9453, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: SSVUSDT, quantity: 3.63, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TOKENUSDT, quantity: 31414, side: SELL
+2024-06-27 19:40:10 info: orderId: 1038683223, symbol: BCHUSDT, quantity: 0.049, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: TURBOUSDT, quantity: 45713, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: MKRUSDT, quantity: 0.04, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: UNIUSDT, quantity: 25, side: SELL
+2024-06-27 19:40:10 info: -4164 - Order's notional must be no smaller than 5 (unless you choose reduce only)., symbol: 1000PEPEUSDT, quantity: 104, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: 1000RATSUSDT, quantity: 254, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: FETUSDT, quantity: 65, side: SELL
+2024-06-27 19:40:10 info: -4131 - The counterparty's best price does not meet the PERCENT_PRICE filter limit., symbol: KASUSDT, quantity: 132, side: SELL

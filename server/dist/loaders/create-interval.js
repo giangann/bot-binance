@@ -11,6 +11,7 @@ const market_order_chain_service_1 = __importDefault(require("../services/market
 const market_order_piece_service_1 = __importDefault(require("../services/market-order-piece.service"));
 const error_handler_ultil_1 = require("../ultils/error-handler.ultil");
 const helper_ultil_1 = require("../ultils/helper.ultil");
+const bot_service_1 = __importDefault(require("../services/bot.service"));
 const createInterval = () => {
     const interval = setInterval(async () => {
         console.log("start tick");
@@ -34,6 +35,8 @@ const createInterval = () => {
                 const symbolPriceTickers1AmMap = (0, helper_ultil_1.symbolPriceTickersToMap)(tickers1AM);
                 const positionsMap = (0, helper_ultil_1.positionsToMap)(positions);
                 const orderPiecesMap = (0, helper_ultil_1.orderPiecesToMap)(openChain.order_pieces);
+                // check if over pnl to stop
+                await checkPnlToStop(openChain, positions);
                 // gen order params
                 const genOrderParamsArgs = [
                     symbolPriceTickersMap,
@@ -239,4 +242,29 @@ function mergeOrders(orderInfos, newOrders) {
         }
     }
     return mergedOrders;
+}
+async function checkPnlToStop(chain, positions) {
+    const isOverPnlToStop = chain.is_over_pnl_to_stop;
+    const pnlToStop = parseFloat(chain.pnl_to_stop);
+    const sumUnrealizedPnl = (0, helper_ultil_1.totalUnrealizedPnl)(positions);
+    if (isOverPnlToStop) {
+        if (sumUnrealizedPnl < pnlToStop) {
+            const stopReason = `PNL: ${sumUnrealizedPnl}`;
+            await market_order_chain_service_1.default.update({
+                id: chain.id,
+                status: "closed",
+                stop_reason: stopReason,
+            });
+            await bot_service_1.default.closeAllPositions();
+            global.wsServerGlob.emit("bot-quit", "");
+        }
+    }
+    else {
+        if (sumUnrealizedPnl > pnlToStop) {
+            await market_order_chain_service_1.default.update({
+                id: chain.id,
+                is_over_pnl_to_stop: true,
+            });
+        }
+    }
 }

@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { StrictField } from "../../components/Table/Customtable";
 import { CustomTable } from "../../components/Table/Customtable";
-import { sortPositionByPnl } from "../../ultils/helper";
+import { sortPositionByPnl, totalUnrealizedPnl } from "../../ultils/helper";
 
 export const Position = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -77,7 +77,7 @@ export const Position = () => {
         if (pnl > 0) color = "green";
         if (pnl < 0) color = "red";
         return (
-          <Typography display={'inline'} color={color}>
+          <Typography display={"inline"} color={color}>
             {pnl.toFixed(2)}
             {" usdt"}
           </Typography>
@@ -96,7 +96,14 @@ export const Position = () => {
       {isLoading && (
         <Skeleton variant="rectangular" width={"100%"} height={"200px"} />
       )}
-      {!isLoading && <CustomTable fields={fields} data={sortedPositions} />}
+      {!isLoading && (
+        <>
+          <Typography>
+            Total Unrealized PNL: {totalUnrealizedPnl(positions).toFixed(3)}
+          </Typography>
+          <CustomTable fields={fields} data={sortedPositions} />
+        </>
+      )}
     </Box>
   );
 };
