@@ -44,7 +44,8 @@ export interface IMarketOrderChainUpdate {
   total_balance_end?: string;
   price_end?: string;
   percent_change?: string;
-  updatedAt?: string;
+  pnl_to_stop?: string;
   is_over_pnl_to_stop?: boolean;
   stop_reason?: string;
+  updatedAt?: string;
 }

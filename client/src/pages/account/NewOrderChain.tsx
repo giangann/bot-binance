@@ -71,8 +71,6 @@ export const NewOrderChain = () => {
     } else toast.error(response.error.message);
   };
 
-  console.log("is active", bot.active);
-
   useEffect(() => {
     socket?.on("bot-running", (msg) => {
       toast.info(msg);

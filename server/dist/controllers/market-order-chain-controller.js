@@ -21,6 +21,20 @@ const list = async (req, res) => {
         server_response_ultil_1.ServerResponse.error(res, err.message);
     }
 };
+const update = async (req, res) => {
+    try {
+        const id = parseFloat(req.params?.id);
+        const pnl_to_stop = req.body.pnl_to_stop;
+        const updatedRecords = await market_order_chain_service_1.default.update({
+            id,
+            pnl_to_stop,
+        });
+        server_response_ultil_1.ServerResponse.response(res, updatedRecords);
+    }
+    catch (err) {
+        server_response_ultil_1.ServerResponse.error(res, err.message);
+    }
+};
 const getPiecesById = async (req, res) => {
     try {
         const chainId = req.query?.chain_id;
@@ -104,4 +118,4 @@ const logsWithPagi = (logs, pagi) => ({
     data: pagiLogs(logs, pagi),
     pagi: { totalItems: logs.length },
 });
-exports.default = { list, getPiecesById, getLogs, isBotActive };
+exports.default = { list, update, getPiecesById, getLogs, isBotActive };

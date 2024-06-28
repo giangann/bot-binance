@@ -34,6 +34,22 @@ const list: IController = async (req, res) => {
   }
 };
 
+const update: IController = async (req, res) => {
+  try {
+    const id = parseFloat(req.params?.id);
+    const pnl_to_stop = req.body.pnl_to_stop;
+
+    const updatedRecords = await marketOrderChainService.update({
+      id,
+      pnl_to_stop,
+    });
+
+    ServerResponse.response(res, updatedRecords);
+  } catch (err) {
+    ServerResponse.error(res, err.message);
+  }
+};
+
 const getPiecesById: IController = async (req, res) => {
   try {
     const chainId = req.query?.chain_id;
@@ -142,4 +158,4 @@ const logsWithPagi = (
   pagi: { totalItems: logs.length },
 });
 
-export default { list, getPiecesById, getLogs, isBotActive };
+export default { list, update, getPiecesById, getLogs, isBotActive };

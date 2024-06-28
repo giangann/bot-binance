@@ -1,10 +1,24 @@
 import ArticleIcon from "@mui/icons-material/Article";
-import { Box, Stack, Typography, styled } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Stack,
+  Typography,
+  styled
+} from "@mui/material";
 import { blue, grey } from "@mui/material/colors";
+import dayjs from "dayjs";
+import { useRef, useState } from "react";
+import { toast } from "react-toastify";
+import { BaseInput } from "../../components/Input";
+import {
+  IcOutlineKeyboardReturn,
+  IcSharpFileDownloadDone
+} from "../../icons/Icons";
+import { putApi } from "../../request/request";
 import { TMarketOrderChainWithPiecesPagi } from "../../shared/types/order";
 import { CenterBox } from "../../styled/styled";
 import { ListOrderPiece } from "./ListOrderPiece";
-import dayjs from "dayjs";
 
 // take orderChains array as props, render many OrderChain
 // OrderChain: take orderChain as props, render orderChain detail and ListOrderPiece
@@ -78,9 +92,26 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
     percent_to_first_buy,
     percent_to_buy,
     percent_to_sell,
+    pnl_to_stop,
     stop_reason,
     updatedAt,
   } = chainInfo;
+  const [isEdit, setIsEdit] = useState(false);
+  const inputRef = useRef(null);
+
+  const updatePnlToStop = async () => {
+    // @ts-ignore
+    const newValue = inputRef.current ? inputRef.current.value : pnl_to_stop;
+    const response = await putApi(`order-chain/${id}`, {
+      pnl_to_stop: newValue,
+    });
+
+    if (response.success) {
+      toast.success("Update success");
+    } else {
+      toast.error(response.error.message);
+    }
+  };
   return (
     <Box
       sx={{
@@ -124,6 +155,42 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
               {percent_to_sell}%
             </Typography>
           </Typography>
+
+          {!isEdit && (
+            <div
+              onClick={() => setIsEdit(true)}
+              onMouseOut={() => console.log("mouse out")}
+            >
+              <Typography>
+                pnl_to_stop:{" "}
+                <Typography sx={{ fontWeight: 600 }} component={"span"}>
+                  {pnl_to_stop}$
+                </Typography>
+              </Typography>
+            </div>
+          )}
+
+          {isEdit && (
+            <Stack direction={"row"} alignItems={"center"}>
+              <IconButton
+                sx={{ padding: "4px", height: "32px" }}
+                onClick={() => setIsEdit(false)}
+              >
+                <IcOutlineKeyboardReturn color={"blue"} fontSize={24} />
+              </IconButton>
+              <BaseInput
+                sx={{ minWidth: "unset", width: "70px" }}
+                ref={inputRef}
+                defaultValue={pnl_to_stop}
+              />
+              <IconButton
+                sx={{ padding: "4px", height: "32px" }}
+                onClick={updatePnlToStop}
+              >
+                <IcSharpFileDownloadDone color={"green"} fontSize={24} />
+              </IconButton>
+            </Stack>
+          )}
           {status === "closed" && (
             <>
               <Typography>
@@ -135,7 +202,7 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
               <Typography>
                 reason:{" "}
                 <Typography sx={{ fontWeight: 600 }} component={"span"}>
-                  {stop_reason ?? 'null'}
+                  {stop_reason ?? "null"}
                 </Typography>
               </Typography>
             </>

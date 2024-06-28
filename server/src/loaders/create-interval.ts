@@ -342,26 +342,40 @@ async function checkPnlToStop(
   const pnlToStop = parseFloat(chain.pnl_to_stop);
   const sumUnrealizedPnl = totalUnrealizedPnl(positions);
 
-  if (isOverPnlToStop) {
-    if (sumUnrealizedPnl < pnlToStop) {
-      const stopReason = `PNL: ${sumUnrealizedPnl}`;
-      await marketOrderChainService.update({
-        id: chain.id,
-        status: "closed",
-        stop_reason: stopReason,
-      });
-      await botService.closeAllPositions();
-
-      global.wsServerGlob.emit("bot-quit", "");
-    }
-  } else {
-    if (sumUnrealizedPnl > pnlToStop) {
-      await marketOrderChainService.update({
-        id: chain.id,
-        is_over_pnl_to_stop: true,
-      });
-    }
+  // CASE 1
+  if (sumUnrealizedPnl < pnlToStop) {
+    const stopReason = `PNL: ${sumUnrealizedPnl}`;
+    await marketOrderChainService.update({
+      id: chain.id,
+      status: "closed",
+      stop_reason: stopReason,
+    });
+    await botService.closeAllPositions();
+    
+    global.wsServerGlob.emit("bot-quit", "");
   }
+
+  // CASE 2
+  // if (isOverPnlToStop) {
+  //   if (sumUnrealizedPnl < pnlToStop) {
+  //     const stopReason = `PNL: ${sumUnrealizedPnl}`;
+  //     await marketOrderChainService.update({
+  //       id: chain.id,
+  //       status: "closed",
+  //       stop_reason: stopReason,
+  //     });
+  //     await botService.closeAllPositions();
+
+  //     global.wsServerGlob.emit("bot-quit", "");
+  //   }
+  // } else {
+  //   if (sumUnrealizedPnl > pnlToStop) {
+  //     await marketOrderChainService.update({
+  //       id: chain.id,
+  //       is_over_pnl_to_stop: true,
+  //     });
+  //   }
+  // }
 }
 
 export { createInterval };
