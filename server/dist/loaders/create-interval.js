@@ -113,6 +113,9 @@ function genOrderInfoArray(symbolPriceTickersMap, symbolPriceTickers1AmMap, posi
                 direction = "BUY";
             if (direction === "")
                 continue;
+            if (direction === "SELL" &&
+                parseFloat(todayLatestOrder.quantity) <= 1.5 * quantity)
+                continue;
             // order_size calculate
             if (direction === "SELL") {
                 if (!position || !positionAmt)

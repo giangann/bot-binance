@@ -167,6 +167,11 @@ function genOrderInfoArray(
       if (percentChange >= parseFloat(percent_to_buy) || isFirstBuy)
         direction = "BUY";
       if (direction === "") continue;
+      if (
+        direction === "SELL" &&
+        parseFloat(todayLatestOrder.quantity) <= 1.5 * quantity
+      )
+        continue;
 
       // order_size calculate
       if (direction === "SELL") {
@@ -351,7 +356,7 @@ async function checkPnlToStop(
       stop_reason: stopReason,
     });
     await botService.closeAllPositions();
-    
+
     global.wsServerGlob.emit("bot-quit", "");
   }
 
