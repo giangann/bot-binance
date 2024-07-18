@@ -1,0 +1,5 @@
+node_modules
+note.txt
+.env
+src/test
+dist/test
