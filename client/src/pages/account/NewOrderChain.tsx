@@ -24,7 +24,7 @@ type TNewOrderChain = {
 };
 
 const defaultValue: TNewOrderChain = {
-  percent_to_first_buy: "0",
+  percent_to_first_buy: "1",
   transaction_size: "20",
   percent_to_buy: "5",
   percent_to_sell: "-2",

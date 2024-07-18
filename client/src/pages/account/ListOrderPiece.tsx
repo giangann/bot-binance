@@ -155,31 +155,16 @@ export const ListOrderPiece: React.FC<Props> = ({
     fetchOrderPieces({ currPage, perpage, chainId });
   }, [currPage, perpage, chainId]);
 
-  // socket listen event
   useEffect(() => {
     if (status === "open") {
-      socket?.on(
-        "bot-tick",
-        (
-          nums_of_order: number,
-          num_of_success_order: number,
-          num_of_error_order: number
-        ) => {
-          const infoMsg = `Có ${nums_of_order} lệnh được đặt`;
-          const successMsg = `Có ${num_of_success_order} lệnh thành công`;
-          const errorMsg = `Có ${num_of_error_order} lệnh thất bại`;
-          toast.info(infoMsg);
-          toast.success(successMsg);
-          toast.error(errorMsg);
-
-          fetchOrderPieces({ currPage, perpage, chainId });
-        }
-      );
+      socket?.on("new-order-placed", (msg: IMarketOrderPieceRecord) => {
+        setPieces([msg, ...pieces]);
+      });
       return () => {
-        socket?.off("bot-tick");
+        socket?.off("new-order-placed");
       };
     }
-  }, [status, currPage, perpage, chainId]);
+  }, [status, pieces]);
 
   useEffect(() => {
     if (status === "open") {
