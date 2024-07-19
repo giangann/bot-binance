@@ -1,0 +1,37 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const data_prepare_1 = __importDefault(require("./loaders/data-prepare"));
+const db_connect_1 = require("./loaders/db-connect");
+const http_server_1 = __importDefault(require("./loaders/http-server"));
+const market_data_stream_1 = require("./loaders/market-data-stream");
+const ticker_prices_update_1 = require("./loaders/ticker-prices-update");
+const websocket_client_1 = require("./loaders/websocket-client");
+const websocket_server_1 = require("./loaders/websocket-server");
+const start = async () => {
+    try {
+        await (0, db_connect_1.connectDatabase)();
+        await (0, data_prepare_1.default)();
+        const httpServer = (0, http_server_1.default)();
+        const wsServer = (0, websocket_server_1.createWebSocketServerInstance)(httpServer);
+        global.isBotActive = false;
+        global.wsServerInstance = wsServer;
+        global.orderPlaceWsConnection = (0, websocket_client_1.createWebSocketConnectionPlaceOrder)();
+        global.updatePositionsWsConnection = (0, websocket_client_1.createWebSocketConnectionGetAndUpdatePositions)();
+        global.closePositionsWsConnection = (0, websocket_client_1.createWebSocketConnectionClosePositions)();
+        // initial other global variable
+        global.orderInfosMap = {};
+        global.orderPieces = [];
+        global.orderPiecesMap = {};
+        global.ableOrderSymbolsMap = {};
+        global.tickCount = 0;
+        (0, market_data_stream_1.subcribeAndForwardBinanceStream)();
+        (0, ticker_prices_update_1.listenSymbolTickerPricesStreamWs)();
+    }
+    catch (err) {
+        console.log(err);
+    }
+};
+start();

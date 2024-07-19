@@ -1,0 +1,131 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const helper_1 = require("../ultils/helper");
+const binance_service_1 = require("./binance.service");
+const coin_price_1am_service_1 = __importDefault(require("./coin-price-1am.service"));
+const market_order_chain_service_1 = __importDefault(require("./market-order-chain.service"));
+const market_order_piece_service_1 = __importDefault(require("./market-order-piece.service"));
+const active = async () => {
+    // Fetch data
+    // const promises = [getExchangeInfo(), getSymbolTickerPrices(), new CoinService().list(), getPositions()]
+    // const [exchangeInfo,symbolTickerPricesNow,symbolPricesStart,positions ] = await Promise.all(promises)
+    const exchangeInfo = await (0, binance_service_1.getExchangeInfo)();
+    const symbolTickerPricesNow = await (0, binance_service_1.getSymbolTickerPrices)();
+    const symbolPricesStart = await new coin_price_1am_service_1.default().list();
+    const positions = await (0, binance_service_1.getPositions)();
+    // Process data
+    const symbolPricesStartMap = (0, helper_1.symbolPricesToMap)(symbolPricesStart);
+    const { symbols } = exchangeInfo;
+    const exchangeInfoSymbolsMap = (0, helper_1.exchangeInfoSymbolsToMap)(symbols);
+    const positionsMap = (0, helper_1.positionsToMap)(positions);
+    const ableOrderSymbols = Object.keys(symbolPricesStartMap);
+    const ableOrderSymbolsMap = (0, helper_1.ableOrderSymbolsToMap)(ableOrderSymbols);
+    // Update data in memory
+    global.symbolTickerPricesNow = symbolTickerPricesNow;
+    global.symbolPricesStart = symbolPricesStart;
+    global.symbolPricesStartMap = symbolPricesStartMap;
+    global.exchangeInfoSymbolsMap = exchangeInfoSymbolsMap;
+    global.positionsMap = positionsMap;
+    global.ableOrderSymbolsMap = ableOrderSymbolsMap;
+    // get opening chain
+    const openingChain = global.openingChain;
+    // Make first tick or orders
+    for (let symbolTickerPrice of symbolTickerPricesNow) {
+        const symbol = symbolTickerPrice.symbol;
+        // get price start
+        const symbolPriceStart = global.symbolPricesStartMap[symbol];
+        const priceStart = symbolPriceStart?.price;
+        if (!priceStart)
+            continue;
+        // get price now
+        const priceNow = symbolTickerPrice.price;
+        if (!priceNow)
+            continue;
+        // percent change
+        const priceStartNumber = parseFloat(priceStart);
+        const priceNowNumber = parseFloat(priceNow);
+        const percentChange = (priceNowNumber / priceStartNumber - 1) * 100;
+        // decide to first buy or not
+        const percentToFirstBuy = openingChain.percent_to_first_buy;
+        const percentToFirstBuyNumber = parseFloat(percentToFirstBuy);
+        if (percentChange > percentToFirstBuyNumber) {
+            // calculate quantity
+            const transactionSizeNumber = openingChain.transaction_size_start;
+            const buyQty = transactionSizeNumber / priceNowNumber;
+            const precision = exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
+            const buyQtyValid = (0, helper_1.validateAmount)(buyQty, precision);
+            const direction = "BUY";
+            // prepare
+            const newOrderInfo = {
+                symbol: symbol,
+                amount: buyQtyValid * priceNowNumber, // is transaction size
+                currPrice: priceNowNumber,
+                prevPrice: priceStartNumber,
+                percentChange: percentChange,
+                direction: direction,
+                isFirstOrder: true,
+                positionAmt: 0,
+                quantity: buyQtyValid,
+                quantityPrecision: precision,
+            };
+            // -- Place order, get the id generated from uuidV4 for check order info purpose
+            const cb = (uuid) => {
+                // add new key-val
+                global.orderInfosMap[uuid] = newOrderInfo;
+            };
+            (0, binance_service_1.placeOrderWebsocket)(symbol, buyQtyValid, direction, cb);
+        }
+    }
+    // Update status of Bot as active after a timeout
+    setTimeout(() => {
+        global.isBotActive = true;
+    }, 3000);
+    // global.isBotActive = true;
+};
+const quit = async () => {
+    // update bot status
+    global.isBotActive = false;
+    // update chain information database
+    const openingChain = global.openingChain;
+    const { id } = openingChain;
+    await market_order_chain_service_1.default.update({ id, status: "closed" });
+    // store data from memory to database (order pieces)
+    const orderPieces = global.orderPieces;
+    const promiseArr = orderPieces.map((piece) => {
+        return market_order_piece_service_1.default.create(piece);
+    });
+    const orderPiecesCreatedResponse = await Promise.all(promiseArr);
+    // close positions
+    // get positions
+    const positionsMap = global.positionsMap;
+    const symbols = Object.keys(positionsMap);
+    for (let symbol of symbols) {
+        const position = positionsMap[symbol];
+        const positionAmt = position?.positionAmt;
+        const positionAmtNumber = parseFloat(positionAmt);
+        if (!positionAmtNumber || positionAmtNumber === 0)
+            continue;
+        const direction = "SELL";
+        // dont need to validate by precision because when place order its already valid
+        const qty = positionAmtNumber;
+        // place sell order
+        (0, binance_service_1.closePositionWebSocket)(symbol, qty, direction);
+    }
+    // clean up memory (remove uneccessary data)
+    global.orderPieces = [];
+    global.orderPiecesMap = {};
+    global.orderInfosMap = {};
+    global.ableOrderSymbolsMap = {};
+    global.tickCount = 0;
+    global.openingChain = null;
+    global.symbolPricesStart = null;
+    global.symbolPricesStartMap = null;
+    global.symbolTickerPricesNow = null;
+    global.exchangeInfoSymbolsMap = null;
+    global.positionsMap = null;
+    return orderPiecesCreatedResponse;
+};
+exports.default = { active, quit };

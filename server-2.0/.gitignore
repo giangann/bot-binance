@@ -3,3 +3,4 @@ note.txt
 .env
 src/test
 dist/test
+logs
