@@ -12,10 +12,12 @@ import { validateAmount } from "../helper";
 export const tickerPricesUpdateEvHandlerWs = (msg: any): void => {
   try {
     const isBotRunning = global.isBotActive;
-    if (isBotRunning === false) return;
+    console.log('isBotRunning',isBotRunning)
+    if (!isBotRunning) return;
 
     // update tick count
     global.tickCount += 1;
+    console.log('global.tickCount',global.tickCount)
     if (global.tickCount % BOT_RUN_INTERVAL !== 0) return;
 
     // evaluate and place order if bot is active
@@ -29,7 +31,7 @@ export const tickerPricesUpdateEvHandlerWs = (msg: any): void => {
     evaluateAndPlaceOrderWs(symbolTickerPrices);
 
     // update positions
-    updatePositionsWebsocket();
+    // updatePositionsWebsocket();
   } catch (err) {
     loggerService.saveError(err)
   }

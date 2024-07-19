@@ -1,15 +1,14 @@
 import WebSocket from "ws";
 import {
-  ICoinPrice1AM,
-  ICoinPrice1AMMap,
+  ICoinPrice1AMMap
 } from "../interfaces/coin-price-1am.interface";
 import { IMarketOrderChainEntity } from "../interfaces/market-order-chain.interface";
-import { TSymbolMarketPrice, TSymbolTickerPrice } from "./rest-api";
+import { IMarketOrderPieceEntity, TOrderPiecesMap } from "../interfaces/market-order-piece.interface";
+import { TSymbolTickerPrice } from "./rest-api";
 import { TExchangeInfoSymbolsMap } from "./rest-api/exchange-info.type";
 import { TPositionsMap } from "./rest-api/position.type";
 import { TOrderInfosMap } from "./websocket/order-info.type";
 import { TWsServer } from "./websocket/ws-server.type";
-import { IMarketOrderPieceEntity, TOrderPiecesMap } from "../interfaces/market-order-piece.interface";
 
 declare global {
   var wsServerInstance: TWsServer;
@@ -19,10 +18,8 @@ declare global {
 
   var ableOrderSymbolsMap: Record<string, boolean>;
 
-  var symbolPricesStart: ICoinPrice1AM[] | null;
   var symbolPricesStartMap: ICoinPrice1AMMap | null;
 
-  var symbolMarketPricesNow: TSymbolMarketPrice[];
   var symbolTickerPricesNow: TSymbolTickerPrice[];
 
   var exchangeInfoSymbolsMap: TExchangeInfoSymbolsMap;
@@ -36,4 +33,5 @@ declare global {
 
   var tickCount: number
 }
-export {};
+export { };
+

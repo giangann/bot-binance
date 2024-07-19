@@ -1,57 +1,27 @@
 // // @ts-nocheck
 import { TOrderInfo } from "../types/websocket/order-info.type";
 import {
-  ableOrderSymbolsToMap,
-  exchangeInfoSymbolsToMap,
-  positionsToMap,
-  symbolPricesToMap,
-  validateAmount,
+  validateAmount
 } from "../ultils/helper";
 import {
   closePositionWebSocket,
-  getExchangeInfo,
-  getPositions,
-  getSymbolTickerPrices,
-  placeOrderWebsocket,
+  placeOrderWebsocket
 } from "./binance.service";
-import CoinService from "./coin-price-1am.service";
 import loggerService from "./logger.service";
 import marketOrderChainService from "./market-order-chain.service";
 import marketOrderPieceService from "./market-order-piece.service";
 const active = async () => {
-  // Fetch data
-  // const promises = [getExchangeInfo(), getSymbolTickerPrices(), new CoinService().list(), getPositions()]
-  // const [exchangeInfo,symbolTickerPricesNow,symbolPricesStart,positions ] = await Promise.all(promises)
-  const exchangeInfo = await getExchangeInfo();
-  const symbolTickerPricesNow = await getSymbolTickerPrices();
-  const symbolPricesStart = await new CoinService().list();
-  const positions = await getPositions();
-
-  // Process data
-  const symbolPricesStartMap = symbolPricesToMap(symbolPricesStart);
-  const { symbols } = exchangeInfo;
-  const exchangeInfoSymbolsMap = exchangeInfoSymbolsToMap(symbols);
-  const positionsMap = positionsToMap(positions);
-  const ableOrderSymbols = Object.keys(symbolPricesStartMap);
-  const ableOrderSymbolsMap = ableOrderSymbolsToMap(ableOrderSymbols);
-
-  // Update data in memory
-  global.symbolTickerPricesNow = symbolTickerPricesNow;
-  global.symbolPricesStart = symbolPricesStart;
-  global.symbolPricesStartMap = symbolPricesStartMap;
-  global.exchangeInfoSymbolsMap = exchangeInfoSymbolsMap;
-  global.positionsMap = positionsMap;
-  global.ableOrderSymbolsMap = ableOrderSymbolsMap;
-
   // get opening chain
-  const openingChain = global.openingChain;
+  const openingChain = global.openingChain
+  const symbolPricesStartMap = global.symbolPricesStartMap;
+  const exchangeInfoSymbolsMap = global.exchangeInfoSymbolsMap
 
   // Make first tick or orders
-  for (let symbolTickerPrice of symbolTickerPricesNow) {
+  for (let symbolTickerPrice of global.symbolTickerPricesNow) {
     const symbol = symbolTickerPrice.symbol;
 
     // get price start
-    const symbolPriceStart = global.symbolPricesStartMap[symbol];
+    const symbolPriceStart = symbolPricesStartMap[symbol];
     const priceStart = symbolPriceStart?.price;
     if (!priceStart) continue;
 
@@ -148,9 +118,7 @@ const quit = async () => {
   global.tickCount = 0;
 
   global.openingChain = null;
-  global.symbolPricesStart = null;
   global.symbolPricesStartMap = null;
-  global.symbolTickerPricesNow = null;
   global.exchangeInfoSymbolsMap = null;
   global.positionsMap = null;
 

@@ -1,3 +1,4 @@
+import prepareDataBot from "../loaders/data-prepare-bot";
 import IController from "../interfaces/IController";
 import botService from "../services/bot.service";
 import marketOrderChainService from "../services/market-order-chain.service";
@@ -22,6 +23,8 @@ const active: IController = async (req, res) => {
     });
     // update global data
     global.openingChain = newOrderChain;
+
+    await prepareDataBot();
 
     // call to service
     await botService.active();

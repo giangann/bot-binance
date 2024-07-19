@@ -63,7 +63,9 @@ export function genMessageWs(
 
 export function randomNumber(start: number, end: number): number {
   if (start > end) {
-    throw new Error("The start number must be less than or equal to the end number.");
+    throw new Error(
+      "The start number must be less than or equal to the end number."
+    );
   }
 
   const range = end - start + 1; // Adjusted for inclusive range
@@ -80,13 +82,13 @@ export function priceByChoice(prevPrice: string, choiceNumber: number) {
       break;
     case 2:
       percentChangeByChoice = randomNumber(6, 10);
-      break
+      break;
     case 3:
       percentChangeByChoice = randomNumber(-10, -3);
-      break
+      break;
     case 4:
       percentChangeByChoice = randomNumber(-2, 0);
-      break
+      break;
     default:
       break;
   }
@@ -94,7 +96,5 @@ export function priceByChoice(prevPrice: string, choiceNumber: number) {
   const currPriceNumber = prevPriceNumber * (percentChangeByChoice / 100 + 1);
   const currPrice = currPriceNumber.toFixed(5);
 
-  return `${choiceNumber}:`+`${prevPriceNumber.toFixed(5)}:`+currPrice;
+  return `${choiceNumber}:` + `${prevPriceNumber.toFixed(5)}:` + currPrice;
 }
-
-console.log(genMessageWs(mockWebSocketMessage1))
