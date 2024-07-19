@@ -1,64 +1,47 @@
-1. sửa cronjob:
-  logic hiện tại: call api symbols price, loop từng symbol, nếu tìm thấy trong db thì chỉ update
-  mong muốn: nếu record không tìm thấy trong database thì tạo mới. Nếu tìm thấy thì chỉ update
+Logic
 
-2. Việc testnet và future có số lượng symbol không giống nhau
-  Do testnet trả về ít symbol hơn (ticker api và mark api)
+Lần 0
+Ngay từ đầu khi kích hoạt, phải duyệt qua tất cả symbol để tìm symbol có khả năng tạo buy order
+Vì nếu chỉ dựa vào sự kiện ticker price update sẽ bỏ sót các symbol không nằm trong message mà có percent change đủ khả năng tạo order
 
-// amount (gia tri lenh)
-// quantity = size (kich thuoc lenh)
+Chú ý:
+Lần 1,...lần n
+Với interval bằng 3, khi 1 symbol được cập nhật có nên lưu lại dữ liệu cập nhật của symbol đó
+chỉ cần lưu lại thôi, không cần tạo order cũng được
 
-// Binance Order Params
-//// 1.symbol  2.direction  3.quantity
+Cần làm hiện tại:
+  Kiểm tra cách làm việc của logic lần 1,...lần nhật
+  Bằng cách chạy genmessage, chạy interval, kết hợp việc load data từ đầu
+    Cần những data gì
+      orderPieces: Queue Lưu list order thành công theo thứ tự thời gian tạo
+      orderPiecesMap: Map lưu các orderPieces với:
+        key: phân theo từng symbol với mục đích tăng tốc độ truy vấn thông tin orders của symbol (order gần nhất, tổng số order)
+        value: Queue lưu list order thành công của symbol theo thứ tự thời gian tạo
+      orderInfosMap: Map lưu thông tin order của symbol có percent change đủ khả năng thực hiện order
+        key: orderId cho node server tự generate (uuidv4)
+        value: thông tin order (symbol, price, quantity, transaction size, ...)
+      positionsMap: Map lưu thông tin postions của symbol, mục đích truy vấn positionAmt của symbol
+        key: symbol
+        value: {positionAmt: '<number>'}
+      symbolPricesStartMap: Map lưu thông tin ticker_price, mark_price của symbol. Mục đích truy vấn các price của symbol
+        key: symbol
+        value: {price: '<number>', mark_price: '<number>'}
+      exchangeInfoMap: Map lưu thông tin về exchange của symbol. Mục đích truy vấn precision của symbol
+        key: symbol
+        value: {precision: number}
+      openingChain: Object lưu thông tin về chain đang được mở;
+        {percent_to_buy, to_sell, transaction_size_start....}
+      ableOrderSymbolsMap: Map lưu thông tin về trạng thái lỗi của symbol hay không. Mục đích kiểm tra symbol có bị lỗi hay không. 
+        key: symbol
+        value: true/false
 
-// what symbol? <currPrice, prevPrice, isFirstOrder>
-//// >percent to buy or <percent to sell
-//// >percent to first buy and isFirstOrder
+    Phase khai báo: Tất cả được khai báo trong global index.d.ts
 
-// what direction? <currPrice, prevPrice, isFirstOrder>
-//// >percent to buy => buy
-//// < percent to sell => sell
-//// > percent to first buy and isFirstOrder => buy
+    Phase start app: Khởi tạo giá trị cho những data nào?
+      Khởi tạo giá trị cho isBotActive -> false
 
-// quantity <currPrice, prevPrice, isFirstOrder, positionAmt>
-//// first order and > percent to first buy => transaction size
-//// not first order and > percent to buy => positionAmt
-
-
-3. Xử lý lưu order_pieces vào db
-Opt1: Promise.all
-  Nhược điểm: Nếu phát sinh lỗi thì ngay cả những order thành công cũng sẽ không được lưu vào db
-  Hậu quả: Nếu order thành công tức là position tương ứng sẽ xuất hiện
-          Ở tick tiếp theo nếu percent change phù hợp để sell thì khi kiểm tra position sẽ tạo lệnh bán ra 1/2 position amount hiện tại
-  Ảnh hưởng khác:
-          
---------------------------01/06/2024 14:36------------------------
-1. IS_FIRST_ORDER = true thì bắt buộc amount = transaction_size_start, không tính theo positionAmt. (done)
-2. Căn chỉnh thẳng các cột trong order debug .log file (done)
-3. Hàm compare_date không sai, đã sửa cách ghi time vào database khi config moment từ hh:mm:ss sang HH:mm:ss (done)
-4. Thêm vào OrderReason giá trị quantityPrecision để hiểu được quy tắc làm tròn của symbol đó, giải thích cho sự chênh lệch amount của order [ví dụ solusdt có quantityPrecision=0 cho nên khi ở mức giá 177$/1solusdt mà thực hiện giao dịch với khối lượng 100$ thì để tránh lỗi, code sẽ làm tròn 0 chữ số thập phân sau dấu phẩy 100/177 = 0,565 sẽ được làm tròn thành 1 => amoount = 1*177 = 177$ và vượt dự kiến là 100$ ] (done)
-5. Chỉnh log positionAmt đang bị NAN => chuyển về giá trị 0 (done)
-6. Phía bảng ở client cột amount đổi tên thành quantity, và chỉnh lại giá trị, hiện tại đang bị hiển thị NAN value 
-7. Thứ tự order piece phiá client trả về đang không theo createdAt, sửa lại thứ tự theo createdAt asc (done)
-8. Sửa orderdebug.log format của amount từ padEnd 7 sang padEnd 10 (done)
-
----------------------------resolve-----------------------
-2. use padStart and padEnd js string method.
-  chainId: 3
-  orderId: 12
-  Buy or Sell: 4
-  quantity: 5
-  symbol: 20
-  isFirstOrder: 5 (true:4, false:5)
-  prevPrice: 10 (to fixed 6)
-  currPrice: 10 (to fixed 6)
-  percentChange: 7 (toFixed 2)
-  positionAmt: 7 
-  amount: 8 (toFixed 3)
+    Phase kích hoạt bot:
 
 
---------------------------07/06/2024 12:20------------------------
-1. fetch lại OrderPieces và pagi khi bot-tick (chỉ fetch ở chain đang active) (done)
-2. active bot / quit bot => immediatly refetch list chain (because chain change status) (done)
-
-3. Khi props thay đổi thì component có re-render hay không ?
+    Những data đó được dùng với mục đích gì
+    
