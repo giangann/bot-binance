@@ -1,6 +1,7 @@
+import WebSocket from "ws";
+import loggerService from "../services/logger.service";
 import { getAndUpdatePositionsEventHandler } from "../ultils/event-handler/get-and-update-positions-handler";
 import { newOrderPlaceEvHandlerWs } from "../ultils/event-handler/new-order-placed.handler";
-import WebSocket from "ws";
 
 const WEBSOCKET_USER_DATA_STREAM_URL = "wss://fstream.binancefuture.com";
 const WEBSOCKET_MARKET_STREAM_URL = "wss://fstream.binancefuture.com";
@@ -16,7 +17,7 @@ export function createWebSocketConnectionPlaceOrder() {
 
   // Open WebSocket connection
   ws.on("open", () => {
-    console.log("WebSocket connection PlaceOrder established");
+    loggerService.saveDebugAndClg("WebSocket connection PlaceOrder established");
   });
 
   // Handle incoming messages
@@ -24,12 +25,13 @@ export function createWebSocketConnectionPlaceOrder() {
 
   // Handle errors
   ws.on("error", (error) => {
+    loggerService.saveError(error)
     console.error("WebSocket error:", error);
   });
 
   // Handle connection close
   ws.on("close", () => {
-    console.log("WebSocket connection closed");
+    loggerService.saveDebugAndClg("WebSocket connection closed");
   });
 
   return ws;
@@ -41,7 +43,7 @@ export function createWebSocketConnectionGetAndUpdatePositions() {
 
   // Open WebSocket connection
   ws.on("open", () => {
-    console.log("WebSocket connection GetAndUpdatePositions established");
+    loggerService.saveDebugAndClg("WebSocket connection GetAndUpdatePositions established");
   });
 
   // Handle incoming messages
@@ -49,12 +51,13 @@ export function createWebSocketConnectionGetAndUpdatePositions() {
 
   // Handle errors
   ws.on("error", (error) => {
+    loggerService.saveError(error)
     console.error("WebSocket error:", error);
   });
 
   // Handle connection close
   ws.on("close", () => {
-    console.log("WebSocket connection closed");
+    loggerService.saveDebugAndClg("WebSocket connection closed");
   });
 
   return ws;
@@ -66,19 +69,20 @@ export function createWebSocketConnectionClosePositions() {
 
   // Open WebSocket connection
   ws.on("open", () => {
-    console.log("WebSocket connection ClosePositions established");
+    loggerService.saveDebugAndClg("WebSocket connection ClosePositions established");
   });
 
   // Handle incoming messages
 
   // Handle errors
   ws.on("error", (error) => {
+    loggerService.saveError(error)
     console.error("WebSocket error:", error);
   });
 
   // Handle connection close
   ws.on("close", () => {
-    console.log("WebSocket connection closed");
+    loggerService.saveDebugAndClg("WebSocket connection closed");
   });
 
   return ws;

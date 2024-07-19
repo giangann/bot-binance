@@ -4,9 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createWebSocketConnectionClosePositions = exports.createWebSocketConnectionGetAndUpdatePositions = exports.createWebSocketConnectionPlaceOrder = void 0;
+const ws_1 = __importDefault(require("ws"));
+const logger_service_1 = __importDefault(require("../services/logger.service"));
 const get_and_update_positions_handler_1 = require("../ultils/event-handler/get-and-update-positions-handler");
 const new_order_placed_handler_1 = require("../ultils/event-handler/new-order-placed.handler");
-const ws_1 = __importDefault(require("ws"));
 const WEBSOCKET_USER_DATA_STREAM_URL = "wss://fstream.binancefuture.com";
 const WEBSOCKET_MARKET_STREAM_URL = "wss://fstream.binancefuture.com";
 const WEBSOCKET_API_URL = "wss://testnet.binancefuture.com/ws-fapi/v1";
@@ -18,17 +19,18 @@ function createWebSocketConnectionPlaceOrder() {
     const ws = new ws_1.default(WEBSOCKET_API_URL);
     // Open WebSocket connection
     ws.on("open", () => {
-        console.log("WebSocket connection PlaceOrder established");
+        logger_service_1.default.saveDebugAndClg("WebSocket connection PlaceOrder established");
     });
     // Handle incoming messages
     ws.on("message", new_order_placed_handler_1.newOrderPlaceEvHandlerWs);
     // Handle errors
     ws.on("error", (error) => {
+        logger_service_1.default.saveError(error);
         console.error("WebSocket error:", error);
     });
     // Handle connection close
     ws.on("close", () => {
-        console.log("WebSocket connection closed");
+        logger_service_1.default.saveDebugAndClg("WebSocket connection closed");
     });
     return ws;
 }
@@ -38,17 +40,18 @@ function createWebSocketConnectionGetAndUpdatePositions() {
     const ws = new ws_1.default(WEBSOCKET_API_URL);
     // Open WebSocket connection
     ws.on("open", () => {
-        console.log("WebSocket connection GetAndUpdatePositions established");
+        logger_service_1.default.saveDebugAndClg("WebSocket connection GetAndUpdatePositions established");
     });
     // Handle incoming messages
     ws.on("message", get_and_update_positions_handler_1.getAndUpdatePositionsEventHandler);
     // Handle errors
     ws.on("error", (error) => {
+        logger_service_1.default.saveError(error);
         console.error("WebSocket error:", error);
     });
     // Handle connection close
     ws.on("close", () => {
-        console.log("WebSocket connection closed");
+        logger_service_1.default.saveDebugAndClg("WebSocket connection closed");
     });
     return ws;
 }
@@ -58,16 +61,17 @@ function createWebSocketConnectionClosePositions() {
     const ws = new ws_1.default(WEBSOCKET_API_URL);
     // Open WebSocket connection
     ws.on("open", () => {
-        console.log("WebSocket connection ClosePositions established");
+        logger_service_1.default.saveDebugAndClg("WebSocket connection ClosePositions established");
     });
     // Handle incoming messages
     // Handle errors
     ws.on("error", (error) => {
+        logger_service_1.default.saveError(error);
         console.error("WebSocket error:", error);
     });
     // Handle connection close
     ws.on("close", () => {
-        console.log("WebSocket connection closed");
+        logger_service_1.default.saveDebugAndClg("WebSocket connection closed");
     });
     return ws;
 }

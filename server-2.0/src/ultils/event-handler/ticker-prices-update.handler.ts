@@ -1,3 +1,4 @@
+import loggerService from "../../services/logger.service";
 import { BOT_RUN_INTERVAL } from "../../constants/constants";
 import {
   placeOrderWebsocket,
@@ -30,7 +31,7 @@ export const tickerPricesUpdateEvHandlerWs = (msg: any): void => {
     // update positions
     updatePositionsWebsocket();
   } catch (err) {
-    console.log(err);
+    loggerService.saveError(err)
   }
 };
 

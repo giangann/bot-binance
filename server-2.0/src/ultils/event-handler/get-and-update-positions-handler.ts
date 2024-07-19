@@ -1,6 +1,6 @@
+import loggerService from "../../services/logger.service";
 import {
-  TPositionWs,
-  TPositionWsResponse,
+  TPositionWsResponse
 } from "../../types/websocket/position.type";
 import { positionsToMap } from "../helper";
 
@@ -25,6 +25,6 @@ export const getAndUpdatePositionsEventHandler = (msg: any) => {
       throw new Error("Error occur in response of account.position resquest");
     }
   } catch (err) {
-    console.log(err);
+    loggerService.saveError(err)
   }
 };

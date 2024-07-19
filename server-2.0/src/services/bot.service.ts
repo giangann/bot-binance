@@ -3,10 +3,9 @@ import { TOrderInfo } from "../types/websocket/order-info.type";
 import {
   ableOrderSymbolsToMap,
   exchangeInfoSymbolsToMap,
-  fakeDelay,
   positionsToMap,
   symbolPricesToMap,
-  validateAmount
+  validateAmount,
 } from "../ultils/helper";
 import {
   closePositionWebSocket,
@@ -16,6 +15,7 @@ import {
   placeOrderWebsocket,
 } from "./binance.service";
 import CoinService from "./coin-price-1am.service";
+import loggerService from "./logger.service";
 import marketOrderChainService from "./market-order-chain.service";
 import marketOrderPieceService from "./market-order-piece.service";
 const active = async () => {
@@ -26,7 +26,7 @@ const active = async () => {
   const symbolTickerPricesNow = await getSymbolTickerPrices();
   const symbolPricesStart = await new CoinService().list();
   const positions = await getPositions();
-  
+
   // Process data
   const symbolPricesStartMap = symbolPricesToMap(symbolPricesStart);
   const { symbols } = exchangeInfo;
@@ -34,14 +34,14 @@ const active = async () => {
   const positionsMap = positionsToMap(positions);
   const ableOrderSymbols = Object.keys(symbolPricesStartMap);
   const ableOrderSymbolsMap = ableOrderSymbolsToMap(ableOrderSymbols);
-  
+
   // Update data in memory
   global.symbolTickerPricesNow = symbolTickerPricesNow;
   global.symbolPricesStart = symbolPricesStart;
   global.symbolPricesStartMap = symbolPricesStartMap;
   global.exchangeInfoSymbolsMap = exchangeInfoSymbolsMap;
   global.positionsMap = positionsMap;
-  global.ableOrderSymbolsMap = ableOrderSymbolsMap
+  global.ableOrderSymbolsMap = ableOrderSymbolsMap;
 
   // get opening chain
   const openingChain = global.openingChain;
@@ -99,6 +99,8 @@ const active = async () => {
   // Update status of Bot as active after a timeout
   setTimeout(() => {
     global.isBotActive = true;
+    // logger
+    loggerService.saveDebug("Bot actived");
   }, 3000);
   // global.isBotActive = true;
 };
@@ -143,7 +145,7 @@ const quit = async () => {
   global.orderPiecesMap = {};
   global.orderInfosMap = {};
   global.ableOrderSymbolsMap = {};
-  global.tickCount = 0
+  global.tickCount = 0;
 
   global.openingChain = null;
   global.symbolPricesStart = null;
@@ -151,6 +153,9 @@ const quit = async () => {
   global.symbolTickerPricesNow = null;
   global.exchangeInfoSymbolsMap = null;
   global.positionsMap = null;
+
+  // logger
+  loggerService.saveDebug("Bot quited");
 
   return orderPiecesCreatedResponse;
 };

@@ -14,6 +14,17 @@ const saveError = (error) => {
         logger_config_1.logger.error(content);
     }
 };
+const saveErrorAndClg = (error) => {
+    saveError(error);
+    console.log(error);
+};
+const saveDebug = (content) => {
+    logger_config_1.logger.debug(content);
+};
+const saveDebugAndClg = (content) => {
+    saveDebug(content);
+    console.log(content);
+};
 function errorToString(err) {
     const { name, message, cause, stack } = err;
     const shortStackTrace = stackTraceShorter(stack);
@@ -28,4 +39,4 @@ function stackTraceShorter(trace) {
     return `${firstTrace}  -  ${secondTrace}  -  ${thirdTrace}`;
 }
 exports.stackTraceShorter = stackTraceShorter;
-exports.default = { saveError };
+exports.default = { saveError, saveDebug, saveDebugAndClg, saveErrorAndClg };

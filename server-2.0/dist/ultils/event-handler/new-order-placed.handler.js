@@ -7,6 +7,7 @@ exports.isNeedRemove = exports.handleOrderError = exports.updateOrderPieces = ex
 const moment_1 = __importDefault(require("moment"));
 const binance_service_1 = require("../../services/binance.service");
 const helper_1 = require("../helper");
+const logger_service_1 = __importDefault(require("../../services/logger.service"));
 ////////////////////////////////////////////////////
 // handle when new order placed
 const newOrderPlaceEvHandlerWs = (msg) => {
@@ -44,7 +45,7 @@ const newOrderPlaceEvHandlerWs = (msg) => {
         }
     }
     catch (err) {
-        console.log('err', err);
+        logger_service_1.default.saveError(err);
     }
 };
 exports.newOrderPlaceEvHandlerWs = newOrderPlaceEvHandlerWs;

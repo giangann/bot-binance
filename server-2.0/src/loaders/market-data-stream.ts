@@ -4,6 +4,7 @@ import {
   TTickerPriceStream,
 } from "../types/websocket/binance-stream.type";
 import { binanceStreamToSymbolPrice } from "../ultils/helper";
+import loggerService from "../services/logger.service";
 
 const futurePriceStream = () => {
   const baseWs = "wss://fstream.binance.com";
@@ -11,24 +12,31 @@ const futurePriceStream = () => {
 
   const ws = new WebSocket(wsURL);
   ws.on("open", () => {
-    console.log("WebSocket Binance Future Market Data Stream connection established, ready to forward push message");
+    loggerService.saveDebugAndClg(
+      "WebSocket Binance Future Market Data Stream connection established, ready to forward push message"
+    );
   });
 
   ws.on("message", (msg: any) => {
-    const messageString = msg.toString(); // Convert buffer to string
-    const messageJSON: TMarkPriceStream | TTickerPriceStream =
-      JSON.parse(messageString); // Parse string as JSON
+    try {
+      const messageString = msg.toString(); // Convert buffer to string
+      const messageJSON: TMarkPriceStream | TTickerPriceStream =
+        JSON.parse(messageString); // Parse string as JSON
 
-    // prepare emit
-    const emitMsg = binanceStreamToSymbolPrice(messageJSON);
-    global.wsServerInstance.emit("future-binance-stream-forward", emitMsg);
+      // prepare emit
+      const emitMsg = binanceStreamToSymbolPrice(messageJSON);
+      global.wsServerInstance.emit("future-binance-stream-forward", emitMsg);
+    } catch (err) {
+      loggerService.saveError(err);
+    }
   });
 
   ws.on("error", (error: any) => {
+    loggerService.saveError(error);
     console.error("WebSocket error:", error);
   });
   ws.on("close", () => {
-    console.log("WebSocket connection closed.");
+    loggerService.saveDebugAndClg("WebSocket connection closed.");
   });
 };
 
@@ -39,31 +47,33 @@ const testnetPriceStream = () => {
 
     const ws = new WebSocket(wsURL);
     ws.on("open", () => {
-      console.log("WebSocket Binance Future <Testnet> Market Data Stream connection established, ready to forward push message");
+      loggerService.saveDebugAndClg(
+        "WebSocket Binance Future <Testnet> Market Data Stream connection established, ready to forward push message"
+      );
     });
     ws.on("message", (msg: any) => {
       try {
-      } catch (err) {
-        console.log("err", err, " with msg: ", err.message);
-        throw err;
-      }
-      const messageString = msg.toString(); // Convert buffer to string
-      const messageJSON: TMarkPriceStream | TTickerPriceStream =
-        JSON.parse(messageString); // Parse string as JSON
+        const messageString = msg.toString(); // Convert buffer to string
+        const messageJSON: TMarkPriceStream | TTickerPriceStream =
+          JSON.parse(messageString); // Parse string as JSON
 
-      // prepare emit
-      const emitMsg = binanceStreamToSymbolPrice(messageJSON);
-      global.wsServerInstance.emit("testnet-binance-stream-forward", emitMsg);
+        // prepare emit
+        const emitMsg = binanceStreamToSymbolPrice(messageJSON);
+        global.wsServerInstance.emit("testnet-binance-stream-forward", emitMsg);
+      } catch (err) {
+        loggerService.saveError(err);
+      }
     });
 
     ws.on("error", (error: any) => {
+      loggerService.saveError(error);
       console.error("WebSocket error:", error);
     });
     ws.on("close", () => {
-      console.log("WebSocket connection closed.");
+      loggerService.saveDebugAndClg("WebSocket connection closed.");
     });
   } catch (err) {
-    throw err;
+    loggerService.saveError(err)
   }
 };
 

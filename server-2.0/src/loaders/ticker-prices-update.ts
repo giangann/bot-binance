@@ -1,3 +1,4 @@
+import loggerService from "../services/logger.service";
 import { tickerPricesUpdateEvHandlerWs } from "../ultils/event-handler/ticker-prices-update.handler";
 import { WebSocket } from "ws";
 
@@ -7,16 +8,17 @@ const listenSymbolTickerPricesStreamWs = () => {
 
   const ws = new WebSocket(wsURL);
   ws.on("open", () => {
-    console.log("WebSocket Binance Market Data Stream (!ticker@arr) connection established, ready to place order each update");
+    loggerService.saveDebugAndClg("WebSocket Binance Market Data Stream (!ticker@arr) connection established, ready to place order each update");
   });
 
   ws.on("message", tickerPricesUpdateEvHandlerWs);
 
   ws.on("error", (error: any) => {
+    loggerService.saveError(error)
     console.error("WebSocket error:", error);
   });
   ws.on("close", () => {
-    console.log("WebSocket connection closed.");
+    loggerService.saveDebugAndClg("WebSocket connection closed.");
   });
 };
 

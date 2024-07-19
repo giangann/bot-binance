@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAndUpdatePositionsEventHandler = void 0;
+const logger_service_1 = __importDefault(require("../../services/logger.service"));
 const helper_1 = require("../helper");
 const getAndUpdatePositionsEventHandler = (msg) => {
     try {
@@ -23,7 +27,7 @@ const getAndUpdatePositionsEventHandler = (msg) => {
         }
     }
     catch (err) {
-        console.log(err);
+        logger_service_1.default.saveError(err);
     }
 };
 exports.getAndUpdatePositionsEventHandler = getAndUpdatePositionsEventHandler;

@@ -7,6 +7,7 @@ import {
 } from "../../types/websocket/order-place-response.type";
 import { errorWsApiResponseToString, rateLimitsArrayToString } from "../helper";
 import { TBinanceError } from "../../types/rest-api";
+import loggerService from "../../services/logger.service";
 
 ////////////////////////////////////////////////////
 // handle when new order placed
@@ -47,7 +48,7 @@ export const newOrderPlaceEvHandlerWs = (msg: any): void => {
       handleOrderError(generatedID,orderError)
     }
   }catch(err){
-    console.log('err',err)
+    loggerService.saveError(err)
   }
 };
 

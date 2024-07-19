@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const helper_1 = require("../ultils/helper");
 const binance_service_1 = require("./binance.service");
 const coin_price_1am_service_1 = __importDefault(require("./coin-price-1am.service"));
+const logger_service_1 = __importDefault(require("./logger.service"));
 const market_order_chain_service_1 = __importDefault(require("./market-order-chain.service"));
 const market_order_piece_service_1 = __importDefault(require("./market-order-piece.service"));
 const active = async () => {
@@ -82,6 +83,8 @@ const active = async () => {
     // Update status of Bot as active after a timeout
     setTimeout(() => {
         global.isBotActive = true;
+        // logger
+        logger_service_1.default.saveDebug("Bot actived");
     }, 3000);
     // global.isBotActive = true;
 };
@@ -126,6 +129,8 @@ const quit = async () => {
     global.symbolTickerPricesNow = null;
     global.exchangeInfoSymbolsMap = null;
     global.positionsMap = null;
+    // logger
+    logger_service_1.default.saveDebug("Bot quited");
     return orderPiecesCreatedResponse;
 };
 exports.default = { active, quit };
