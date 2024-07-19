@@ -126,6 +126,6 @@
     },
     "lib": ["ESNext", "es5", "es6", "dom"],
     "typeRoots": ["./node_modules/@types", "./src/types"]
-  }
-  // "include": ["src/**/*"]
+  },
+  "include": ["src/**/*"]
 }
