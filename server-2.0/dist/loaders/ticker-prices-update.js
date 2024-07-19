@@ -7,8 +7,10 @@ exports.listenSymbolTickerPricesStreamWs = void 0;
 const logger_service_1 = __importDefault(require("../services/logger.service"));
 const ticker_prices_update_handler_1 = require("../ultils/event-handler/ticker-prices-update.handler");
 const ws_1 = require("ws");
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const listenSymbolTickerPricesStreamWs = () => {
-    const baseWs = "wss://fstream.binance.com";
+    const baseWs = process.env.BINANCE_BASE_WS_API_URL;
     const wsURL = `${baseWs}/ws/!ticker@arr`; // default is 1s interval
     const ws = new ws_1.WebSocket(wsURL);
     ws.on("open", () => {

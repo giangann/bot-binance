@@ -1,3 +1,4 @@
+import { TSymbolTickerPrice } from "../types/rest-api";
 import { TSymbolTickerPriceWs } from "../types/websocket";
 import { mockWebSocketMessage1 } from "./symbol-ticker-price-ws";
 
@@ -9,15 +10,15 @@ import { mockWebSocketMessage1 } from "./symbol-ticker-price-ws";
 */
 
 export const symbols: string[] = [
-  "BTCUSDT",
-  "ETHUSDT",
-  "BCHUSDT",
-  "XRPUSDT",
-  "EOSUSDT",
   "LTCUSDT",
-  "TRXUSDT",
-  "ETCUSDT",
-  "LINKUSDT",
+  "BTCUSDT",
+  "XRPUSDT",
+  // "ETHUSDT",
+  // "BCHUSDT",
+  // "EOSUSDT",
+  // "TRXUSDT",
+  // "ETCUSDT",
+  // "LINKUSDT",
 ];
 
 export function genMessageWs(
@@ -61,6 +62,42 @@ export function genMessageWs(
   return message;
 }
 
+export function genMessageWsFromRest(symbolTickerPricesRest: TSymbolTickerPrice[]):TSymbolTickerPriceWs[]{
+  const message: TSymbolTickerPriceWs[] = [];
+
+  for (let symbol of symbols) {
+    const choice = randomNumber(1, 4);
+    const prevSymbolPrice = symbolTickerPricesRest.find(
+      (symbolPrice) => symbolPrice.symbol === symbol
+    );
+    const prevPrice = prevSymbolPrice.price;
+    const symbolPrice: TSymbolTickerPriceWs = {
+      s: symbol,
+      c: priceByChoice(prevPrice, choice),
+
+      // dont care
+      e: "24hrTicker",
+      E: Date.now(),
+      p: "0.00",
+      P: "0.00",
+      w: "0.00",
+      Q: "0.00",
+      o: "0.00",
+      h: "0.00",
+      l: "0.00",
+      v: "0.00",
+      q: "0.00",
+      O: 0,
+      C: 0,
+      F: 0,
+      L: 0,
+      n: 0,
+    };
+
+    message.push(symbolPrice);
+  }
+  return message
+}
 export function randomNumber(start: number, end: number): number {
   if (start > end) {
     throw new Error(
@@ -96,5 +133,5 @@ export function priceByChoice(prevPrice: string, choiceNumber: number) {
   const currPriceNumber = prevPriceNumber * (percentChangeByChoice / 100 + 1);
   const currPrice = currPriceNumber.toFixed(5);
 
-  return `${choiceNumber}:` + `${prevPriceNumber.toFixed(5)}:` + currPrice;
+  return currPrice;
 }

@@ -1,6 +1,5 @@
 import moment from "moment";
 import { IMarketOrderPieceEntity } from "../../interfaces/market-order-piece.interface";
-import { updatePositionsWebsocket } from "../../services/binance.service";
 import {
   TNewOrderPlaceResponse,
   TNewOrderPlaceResult,
@@ -8,34 +7,22 @@ import {
 import { errorWsApiResponseToString, rateLimitsArrayToString } from "../helper";
 import { TBinanceError } from "../../types/rest-api";
 import loggerService from "../../services/logger.service";
+import { updatePositionsWebsocket } from "../../services/binance.service";
 
 ////////////////////////////////////////////////////
 // handle when new order placed
 export const newOrderPlaceEvHandlerWs = (msg: any): void => {
-  try{
+  try {
     //-- Parse message
     const orderPlaceResponse: TNewOrderPlaceResponse = JSON.parse(msg.toString());
-  
-    //////////////////////////////////////////// --Log for debug //////////////////////////////////////////
-    const { id, status, error, result, rateLimits } = orderPlaceResponse;
-    let debugMsg = ''
-    if (error){
-      debugMsg = `ID: ${id}, STATUS: ${status}, ERROR: ${errorWsApiResponseToString(error)}, RATE_LIMITS: ${rateLimitsArrayToString(rateLimits)}`
-    }
-    if (result){
-      const {symbol, origQty, side} = result
-      debugMsg = `ID: ${id}, STATUS: ${status}, RESULT: ${side} ${origQty} ${symbol}, RATE_LIMITS: ${rateLimitsArrayToString(rateLimits)}`
-    }
-    console.log(debugMsg)
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
+
     //-- Check parsedMsg is success or error
     const resultKey = "result";
     const errorKey = "error";
+
     if (resultKey in orderPlaceResponse) {
       const generatedID = orderPlaceResponse.id;
-      const orderPlaceResult: TNewOrderPlaceResult =
-        orderPlaceResponse[resultKey];
+      const orderPlaceResult: TNewOrderPlaceResult = orderPlaceResponse[resultKey];
       // update order pieces store in memory
       updateOrderPieces(generatedID, orderPlaceResult);
       // update positions in memory
@@ -43,12 +30,13 @@ export const newOrderPlaceEvHandlerWs = (msg: any): void => {
     }
     if (errorKey in orderPlaceResponse) {
       // updateErrorLog()
-      const generatedID = orderPlaceResponse.id
-      const orderError = orderPlaceResponse[errorKey]
-      handleOrderError(generatedID,orderError)
+      const generatedID = orderPlaceResponse.id;
+      const orderError = orderPlaceResponse[errorKey];
+      handleOrderError(generatedID, orderError);
     }
-  }catch(err){
-    loggerService.saveError(err)
+  } catch (err) {
+    loggerService.saveError(err);
+    console.error("Error in newOrderPlaceEvHandlerWs:", err); // Debugging log
   }
 };
 
@@ -65,7 +53,8 @@ export const updateOrderPieces = (
   // Find order information in memory:
   const orderInfo = global.orderInfosMap[uuid];
 
-  console.log("global.orderInfosMap length:", Object.keys(global.orderInfosMap).length);
+  // log
+  loggerService.saveDebugAndClg(`${newOrder.side} ${newOrder.origQty} ${symbol} with prevPrice: ${orderInfo.prevPrice}, currPrice: ${orderInfo.currPrice}, percentChange: ${orderInfo.percentChange} `);
 
   // process data from newOrder
   const newOrderPieces: IMarketOrderPieceEntity = {
@@ -95,37 +84,31 @@ export const updateOrderPieces = (
   }
 
   // push newOrderpieces to array
-  global.orderPieces.push(newOrderPieces)
+  global.orderPieces.push(newOrderPieces);
 
   // emit to client
-  global.wsServerInstance.emit('new-order-placed',newOrderPieces)
-
-  console.log('global.orderPiecesMap length: ',Object.keys(global.orderPiecesMap).length)
-  console.log('global.orderPieces length: ',global.orderPieces.length)
+  // global.wsServerInstance.emit('new-order-placed', newOrderPieces);
 };
 
 /////////////////////////////////////////////////////////
 // handle error order
-export function handleOrderError(uuid: string, error: TBinanceError){
-    // Find order information in memory:
-    const orderInfo = global.orderInfosMap[uuid];
-    const { symbol, quantity } = orderInfo
-    const { code, msg } = error
+export function handleOrderError(uuid: string, error: TBinanceError) {
+  // Find order information in memory:
+  const orderInfo = global.orderInfosMap[uuid];
+  const { symbol, quantity } = orderInfo;
+  const { code, msg } = error;
+  loggerService.saveDebugAndClg(`${quantity} ${symbol} ${code} ${msg}`)
 
-    // Update able order symbol map
-    if (isNeedRemove(code)){
-      global.ableOrderSymbolsMap[symbol] = false
-      console.log(`Error order symbol removed, ${symbol} with errorCode: ${error}`)
-    } else {
-      // other handler
-      console.log(`Unknown error: ${symbol} ${quantity} ${code} - ${msg}`)
-    }
-
-    console.log(`Able symbols: ${Object.entries(global.ableOrderSymbolsMap).filter(([_symbol,able])=>able).length}`)
+  // Update able order symbol map
+  if (isNeedRemove(code)) {
+    global.ableOrderSymbolsMap[symbol] = false;
+  } else {
+    // other handler
+  }
 }
 
-export function isNeedRemove (errorCode: number){
-  const errorCodeNotAccept: number[] = [-4131,-2019,-2020]
-  if (errorCodeNotAccept.includes(errorCode)) return true
-  return false
+export function isNeedRemove(errorCode: number) {
+  const errorCodeNotAccept: number[] = [-4131,-4003, -2019, -2020];
+  if (errorCodeNotAccept.includes(errorCode)) return true;
+  return false;
 }

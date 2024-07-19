@@ -1,10 +1,11 @@
+import { TSymbolTickerPrice } from "../types/rest-api";
 import { TSymbolTickerPriceWs } from "../types/websocket";
-import { genMessageWs } from "./gen-message";
+import { genMessageWs, genMessageWsFromRest } from "./gen-message";
 import { mockWebSocketMessage1 } from "./symbol-ticker-price-ws";
 
-export const createListMessages = (): TSymbolTickerPriceWs[][] => {
+export const createListMessages = (symbolTickerPricesRest: TSymbolTickerPrice[]): TSymbolTickerPriceWs[][] => {
 
-  const message1 = mockWebSocketMessage1;
+  const message1 = genMessageWsFromRest(symbolTickerPricesRest);
   const message2 = genMessageWs(message1);
   const message3 = genMessageWs(message2);
   const message4 = genMessageWs(message3);

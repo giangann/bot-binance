@@ -8,12 +8,9 @@ const ws_1 = __importDefault(require("ws"));
 const logger_service_1 = __importDefault(require("../services/logger.service"));
 const get_and_update_positions_handler_1 = require("../ultils/event-handler/get-and-update-positions-handler");
 const new_order_placed_handler_1 = require("../ultils/event-handler/new-order-placed.handler");
-const WEBSOCKET_USER_DATA_STREAM_URL = "wss://fstream.binancefuture.com";
-const WEBSOCKET_MARKET_STREAM_URL = "wss://fstream.binancefuture.com";
-const WEBSOCKET_API_URL = "wss://testnet.binancefuture.com/ws-fapi/v1";
-const BINANCE_API_URL = process.env.BINANCE_BASE_URL;
-const apiKey = process.env.BINANCE_API_KEY;
-const apiSecret = process.env.BINANCE_API_SECRET;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const WEBSOCKET_API_URL = process.env.BINANCE_BASE_WS_API_URL;
 function createWebSocketConnectionPlaceOrder() {
     // WebSocket connection
     const ws = new ws_1.default(WEBSOCKET_API_URL);

@@ -6,6 +6,7 @@ import * as bodyParser from "body-parser";
 
 import Express from "express";
 import indexRoute from "../router/index.route";
+import loggerService from "../services/logger.service";
 
 const constructHttpServer = () => {
   const port = 5000;
@@ -45,7 +46,7 @@ const constructHttpServer = () => {
   app.use("/", indexRoute);
 
   return app.listen(port, () => {
-    console.log("Express App runing on port: ", port);
+    loggerService.saveDebugAndClg(`Express App runing on port: ${port}`)
   });
 };
 

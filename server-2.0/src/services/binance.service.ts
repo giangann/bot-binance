@@ -12,6 +12,8 @@ import {
   generateSignature,
   paramsToQueryWithSignature,
 } from "../ultils/helper";
+import { TNewOrder } from "../types/rest-api/order.type";
+import loggerService from "./logger.service";
 dotenv.config();
 
 const WEBSOCKET_API_URL = "wss://testnet.binancefuture.com/ws-fapi/v1";
@@ -88,7 +90,7 @@ const getAccountInfo = async (): Promise<TAccount> => {
 const getSymbolTickerPrices = async (): Promise<TSymbolTickerPrice[]> => {
   const endpoint = "/fapi/v2/ticker/price";
   const url = `${process.env.BINANCE_BASE_URL}${endpoint}`;
-  const response = await fetch(url)
+  const response = await fetch(url);
   const responseJson: TResponse<TSymbolTickerPrice[]> = await response.json();
 
   if (response.status !== 200) {
@@ -196,6 +198,46 @@ const updatePositionsWebsocket = () => {
   global.updatePositionsWsConnection.send(JSON.stringify(requestPayload));
 };
 
+const createMarketOrder = async (
+  symbol: string,
+  side: "BUY" | "SELL",
+  quantity: number,
+  type: string = "market",
+  _price?: number
+): Promise<TResponse<TNewOrder>> => {
+  try {
+    const endpoint = "/fapi/v1/order";
+    const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
+    let orderParams = {
+      symbol,
+      type,
+      quantity,
+      side,
+      ...paramsNow,
+    };
+    const queryString = paramsToQueryWithSignature(apiSecret, orderParams);
+    const url = `${process.env.BINANCE_BASE_URL}${endpoint}?${queryString}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "X-MBX-APIKEY": apiKey,
+        "Content-Type": "application/json",
+      },
+    });
+    const responseJson = await response.json()
+
+    if (response.status !== 200) {
+      throw new Error(JSON.stringify(responseJson));
+    }
+    if (response.status === 200) {
+      return responseJson as TNewOrder;
+    }
+  } catch (err) {
+    loggerService.saveError(err);
+  }
+};
+
 export {
   getExchangeInfo,
   getPositions,
@@ -205,4 +247,5 @@ export {
   placeOrderWebsocket,
   updatePositionsWebsocket,
   closePositionWebSocket,
+  createMarketOrder
 };

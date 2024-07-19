@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.priceByChoice = exports.randomNumber = exports.genMessageWs = exports.symbols = void 0;
-const symbol_ticker_price_ws_1 = require("./symbol-ticker-price-ws");
+exports.priceByChoice = exports.randomNumber = exports.genMessageWsFromRest = exports.genMessageWs = exports.symbols = void 0;
 /**
 1. Greater than the previous price by more than 1%
 2. Greater than the previous price by more than 5%
@@ -9,15 +8,15 @@ const symbol_ticker_price_ws_1 = require("./symbol-ticker-price-ws");
 4. Anything not covered by the above three choices
 */
 exports.symbols = [
-    "BTCUSDT",
-    "ETHUSDT",
-    "BCHUSDT",
-    "XRPUSDT",
-    "EOSUSDT",
     "LTCUSDT",
-    "TRXUSDT",
-    "ETCUSDT",
-    "LINKUSDT",
+    "BTCUSDT",
+    "XRPUSDT",
+    // "ETHUSDT",
+    // "BCHUSDT",
+    // "EOSUSDT",
+    // "TRXUSDT",
+    // "ETCUSDT",
+    // "LINKUSDT",
 ];
 function genMessageWs(prevMessage) {
     const message = [];
@@ -52,6 +51,38 @@ function genMessageWs(prevMessage) {
     return message;
 }
 exports.genMessageWs = genMessageWs;
+function genMessageWsFromRest(symbolTickerPricesRest) {
+    const message = [];
+    for (let symbol of exports.symbols) {
+        const choice = randomNumber(1, 4);
+        const prevSymbolPrice = symbolTickerPricesRest.find((symbolPrice) => symbolPrice.symbol === symbol);
+        const prevPrice = prevSymbolPrice.price;
+        const symbolPrice = {
+            s: symbol,
+            c: priceByChoice(prevPrice, choice),
+            // dont care
+            e: "24hrTicker",
+            E: Date.now(),
+            p: "0.00",
+            P: "0.00",
+            w: "0.00",
+            Q: "0.00",
+            o: "0.00",
+            h: "0.00",
+            l: "0.00",
+            v: "0.00",
+            q: "0.00",
+            O: 0,
+            C: 0,
+            F: 0,
+            L: 0,
+            n: 0,
+        };
+        message.push(symbolPrice);
+    }
+    return message;
+}
+exports.genMessageWsFromRest = genMessageWsFromRest;
 function randomNumber(start, end) {
     if (start > end) {
         throw new Error("The start number must be less than or equal to the end number.");
@@ -81,7 +112,6 @@ function priceByChoice(prevPrice, choiceNumber) {
     }
     const currPriceNumber = prevPriceNumber * (percentChangeByChoice / 100 + 1);
     const currPrice = currPriceNumber.toFixed(5);
-    return `${choiceNumber}:` + `${prevPriceNumber.toFixed(5)}:` + currPrice;
+    return currPrice;
 }
 exports.priceByChoice = priceByChoice;
-console.log(genMessageWs(symbol_ticker_price_ws_1.mockWebSocketMessage1));

@@ -2,14 +2,10 @@ import WebSocket from "ws";
 import loggerService from "../services/logger.service";
 import { getAndUpdatePositionsEventHandler } from "../ultils/event-handler/get-and-update-positions-handler";
 import { newOrderPlaceEvHandlerWs } from "../ultils/event-handler/new-order-placed.handler";
+import dotenv from "dotenv";
+dotenv.config();
 
-const WEBSOCKET_USER_DATA_STREAM_URL = "wss://fstream.binancefuture.com";
-const WEBSOCKET_MARKET_STREAM_URL = "wss://fstream.binancefuture.com";
-const WEBSOCKET_API_URL = "wss://testnet.binancefuture.com/ws-fapi/v1";
-
-const BINANCE_API_URL = process.env.BINANCE_BASE_URL;
-const apiKey = process.env.BINANCE_API_KEY;
-const apiSecret = process.env.BINANCE_API_SECRET;
+const WEBSOCKET_API_URL = process.env.BINANCE_BASE_WS_API_URL;
 
 export function createWebSocketConnectionPlaceOrder() {
   // WebSocket connection
@@ -17,7 +13,9 @@ export function createWebSocketConnectionPlaceOrder() {
 
   // Open WebSocket connection
   ws.on("open", () => {
-    loggerService.saveDebugAndClg("WebSocket connection PlaceOrder established");
+    loggerService.saveDebugAndClg(
+      "WebSocket connection PlaceOrder established"
+    );
   });
 
   // Handle incoming messages
@@ -25,7 +23,7 @@ export function createWebSocketConnectionPlaceOrder() {
 
   // Handle errors
   ws.on("error", (error) => {
-    loggerService.saveError(error)
+    loggerService.saveError(error);
     console.error("WebSocket error:", error);
   });
 
@@ -43,7 +41,9 @@ export function createWebSocketConnectionGetAndUpdatePositions() {
 
   // Open WebSocket connection
   ws.on("open", () => {
-    loggerService.saveDebugAndClg("WebSocket connection GetAndUpdatePositions established");
+    loggerService.saveDebugAndClg(
+      "WebSocket connection GetAndUpdatePositions established"
+    );
   });
 
   // Handle incoming messages
@@ -51,7 +51,7 @@ export function createWebSocketConnectionGetAndUpdatePositions() {
 
   // Handle errors
   ws.on("error", (error) => {
-    loggerService.saveError(error)
+    loggerService.saveError(error);
     console.error("WebSocket error:", error);
   });
 
@@ -69,14 +69,16 @@ export function createWebSocketConnectionClosePositions() {
 
   // Open WebSocket connection
   ws.on("open", () => {
-    loggerService.saveDebugAndClg("WebSocket connection ClosePositions established");
+    loggerService.saveDebugAndClg(
+      "WebSocket connection ClosePositions established"
+    );
   });
 
   // Handle incoming messages
 
   // Handle errors
   ws.on("error", (error) => {
-    loggerService.saveError(error)
+    loggerService.saveError(error);
     console.error("WebSocket error:", error);
   });
 

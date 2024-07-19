@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const data_prepare_bot_1 = __importDefault(require("../loaders/data-prepare-bot"));
 const bot_service_1 = __importDefault(require("../services/bot.service"));
 const market_order_chain_service_1 = __importDefault(require("../services/market-order-chain.service"));
 const server_response_ultil_1 = require("../ultils/server-response.ultil");
@@ -24,6 +25,7 @@ const active = async (req, res) => {
         });
         // update global data
         global.openingChain = newOrderChain;
+        await (0, data_prepare_bot_1.default)();
         // call to service
         await bot_service_1.default.active();
         server_response_ultil_1.ServerResponse.response(res, newOrderChain);

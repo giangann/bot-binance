@@ -2,9 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createListMessages = void 0;
 const gen_message_1 = require("./gen-message");
-const symbol_ticker_price_ws_1 = require("./symbol-ticker-price-ws");
-const createListMessages = () => {
-    const message1 = symbol_ticker_price_ws_1.mockWebSocketMessage1;
+const createListMessages = (symbolTickerPricesRest) => {
+    const message1 = (0, gen_message_1.genMessageWsFromRest)(symbolTickerPricesRest);
     const message2 = (0, gen_message_1.genMessageWs)(message1);
     const message3 = (0, gen_message_1.genMessageWs)(message2);
     const message4 = (0, gen_message_1.genMessageWs)(message3);

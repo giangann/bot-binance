@@ -33,6 +33,7 @@ const cors_1 = __importDefault(require("cors"));
 const bodyParser = __importStar(require("body-parser"));
 const express_1 = __importDefault(require("express"));
 const index_route_1 = __importDefault(require("../router/index.route"));
+const logger_service_1 = __importDefault(require("../services/logger.service"));
 const constructHttpServer = () => {
     const port = 5000;
     const app = (0, express_1.default)();
@@ -58,7 +59,7 @@ const constructHttpServer = () => {
     app.use(bodyParser.json());
     app.use("/", index_route_1.default);
     return app.listen(port, () => {
-        console.log("Express App runing on port: ", port);
+        logger_service_1.default.saveDebugAndClg(`Express App runing on port: ${port}`);
     });
 };
 exports.default = constructHttpServer;

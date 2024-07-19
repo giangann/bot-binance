@@ -3,10 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.closePositionWebSocket = exports.updatePositionsWebsocket = exports.placeOrderWebsocket = exports.getSymbolMarketPrices = exports.getSymbolTickerPrices = exports.getAccountInfo = exports.getPositions = exports.getExchangeInfo = void 0;
+exports.createMarketOrder = exports.closePositionWebSocket = exports.updatePositionsWebsocket = exports.placeOrderWebsocket = exports.getSymbolMarketPrices = exports.getSymbolTickerPrices = exports.getAccountInfo = exports.getPositions = exports.getExchangeInfo = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const uuid_1 = require("uuid");
 const helper_1 = require("../ultils/helper");
+const logger_service_1 = __importDefault(require("./logger.service"));
 dotenv_1.default.config();
 const WEBSOCKET_API_URL = "wss://testnet.binancefuture.com/ws-fapi/v1";
 const apiKey = process.env.BINANCE_API_KEY;
@@ -164,3 +165,36 @@ const updatePositionsWebsocket = () => {
     global.updatePositionsWsConnection.send(JSON.stringify(requestPayload));
 };
 exports.updatePositionsWebsocket = updatePositionsWebsocket;
+const createMarketOrder = async (symbol, side, quantity, type = "market", _price) => {
+    try {
+        const endpoint = "/fapi/v1/order";
+        const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
+        let orderParams = {
+            symbol,
+            type,
+            quantity,
+            side,
+            ...paramsNow,
+        };
+        const queryString = (0, helper_1.paramsToQueryWithSignature)(apiSecret, orderParams);
+        const url = `${process.env.BINANCE_BASE_URL}${endpoint}?${queryString}`;
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "X-MBX-APIKEY": apiKey,
+                "Content-Type": "application/json",
+            },
+        });
+        const responseJson = await response.json();
+        if (response.status !== 200) {
+            throw new Error(JSON.stringify(responseJson));
+        }
+        if (response.status === 200) {
+            return responseJson;
+        }
+    }
+    catch (err) {
+        logger_service_1.default.saveError(err);
+    }
+};
+exports.createMarketOrder = createMarketOrder;

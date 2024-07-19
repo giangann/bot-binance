@@ -15,6 +15,7 @@ const getAndUpdatePositionsEventHandler = (msg) => {
         const resultKey = "result";
         const errorKey = "error";
         if (resultKey in positionsResponse) {
+            logger_service_1.default.saveDebugAndClg('position response successed!');
             const positions = positionsResponse["result"];
             const positionsMap = (0, helper_1.positionsToMap)(positions);
             // update data memory

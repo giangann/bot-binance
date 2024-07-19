@@ -1,9 +1,11 @@
 import loggerService from "../services/logger.service";
 import { tickerPricesUpdateEvHandlerWs } from "../ultils/event-handler/ticker-prices-update.handler";
 import { WebSocket } from "ws";
+import dotenv from 'dotenv'
+dotenv.config()
 
 const listenSymbolTickerPricesStreamWs = () => {
-  const baseWs = "wss://fstream.binance.com";
+  const baseWs = process.env.BINANCE_BASE_WS_API_URL;
   const wsURL = `${baseWs}/ws/!ticker@arr`; // default is 1s interval
 
   const ws = new WebSocket(wsURL);

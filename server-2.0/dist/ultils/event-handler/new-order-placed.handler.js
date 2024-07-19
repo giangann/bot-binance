@@ -5,27 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isNeedRemove = exports.handleOrderError = exports.updateOrderPieces = exports.newOrderPlaceEvHandlerWs = void 0;
 const moment_1 = __importDefault(require("moment"));
-const binance_service_1 = require("../../services/binance.service");
-const helper_1 = require("../helper");
 const logger_service_1 = __importDefault(require("../../services/logger.service"));
+const binance_service_1 = require("../../services/binance.service");
 ////////////////////////////////////////////////////
 // handle when new order placed
 const newOrderPlaceEvHandlerWs = (msg) => {
     try {
         //-- Parse message
         const orderPlaceResponse = JSON.parse(msg.toString());
-        //////////////////////////////////////////// --Log for debug //////////////////////////////////////////
-        const { id, status, error, result, rateLimits } = orderPlaceResponse;
-        let debugMsg = '';
-        if (error) {
-            debugMsg = `ID: ${id}, STATUS: ${status}, ERROR: ${(0, helper_1.errorWsApiResponseToString)(error)}, RATE_LIMITS: ${(0, helper_1.rateLimitsArrayToString)(rateLimits)}`;
-        }
-        if (result) {
-            const { symbol, origQty, side } = result;
-            debugMsg = `ID: ${id}, STATUS: ${status}, RESULT: ${side} ${origQty} ${symbol}, RATE_LIMITS: ${(0, helper_1.rateLimitsArrayToString)(rateLimits)}`;
-        }
-        console.log(debugMsg);
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //-- Check parsedMsg is success or error
         const resultKey = "result";
         const errorKey = "error";
@@ -46,6 +33,7 @@ const newOrderPlaceEvHandlerWs = (msg) => {
     }
     catch (err) {
         logger_service_1.default.saveError(err);
+        console.error("Error in newOrderPlaceEvHandlerWs:", err); // Debugging log
     }
 };
 exports.newOrderPlaceEvHandlerWs = newOrderPlaceEvHandlerWs;
@@ -57,7 +45,8 @@ const updateOrderPieces = (uuid, newOrder) => {
     const openingChain = global.openingChain;
     // Find order information in memory:
     const orderInfo = global.orderInfosMap[uuid];
-    console.log("global.orderInfosMap length:", Object.keys(global.orderInfosMap).length);
+    // log
+    logger_service_1.default.saveDebugAndClg(`${newOrder.side} ${newOrder.origQty} ${symbol} with prevPrice: ${orderInfo.prevPrice}, currPrice: ${orderInfo.currPrice}, percentChange: ${orderInfo.percentChange} `);
     // process data from newOrder
     const newOrderPieces = {
         id: newOrder.orderId.toString(),
@@ -84,9 +73,7 @@ const updateOrderPieces = (uuid, newOrder) => {
     // push newOrderpieces to array
     global.orderPieces.push(newOrderPieces);
     // emit to client
-    global.wsServerInstance.emit('new-order-placed', newOrderPieces);
-    console.log('global.orderPiecesMap length: ', Object.keys(global.orderPiecesMap).length);
-    console.log('global.orderPieces length: ', global.orderPieces.length);
+    // global.wsServerInstance.emit('new-order-placed', newOrderPieces);
 };
 exports.updateOrderPieces = updateOrderPieces;
 /////////////////////////////////////////////////////////
@@ -96,20 +83,18 @@ function handleOrderError(uuid, error) {
     const orderInfo = global.orderInfosMap[uuid];
     const { symbol, quantity } = orderInfo;
     const { code, msg } = error;
+    logger_service_1.default.saveDebugAndClg(`${quantity} ${symbol} ${code} ${msg}`);
     // Update able order symbol map
     if (isNeedRemove(code)) {
         global.ableOrderSymbolsMap[symbol] = false;
-        console.log(`Error order symbol removed, ${symbol} with errorCode: ${error}`);
     }
     else {
         // other handler
-        console.log(`Unknown error: ${symbol} ${quantity} ${code} - ${msg}`);
     }
-    console.log(`Able symbols: ${Object.entries(global.ableOrderSymbolsMap).filter(([_symbol, able]) => able).length}`);
 }
 exports.handleOrderError = handleOrderError;
 function isNeedRemove(errorCode) {
-    const errorCodeNotAccept = [-4131, -2019, -2020];
+    const errorCodeNotAccept = [-4131, -4003, -2019, -2020];
     if (errorCodeNotAccept.includes(errorCode))
         return true;
     return false;

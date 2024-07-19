@@ -5,29 +5,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tickerPricesUpdateEvHandlerWs = void 0;
 const logger_service_1 = __importDefault(require("../../services/logger.service"));
-const constants_1 = require("../../constants/constants");
 const binance_service_1 = require("../../services/binance.service");
 const helper_1 = require("../helper");
 ////////////////////////////////////////////////////
 // handle when ticker price update
 const tickerPricesUpdateEvHandlerWs = (msg) => {
     try {
-        const isBotRunning = global.isBotActive;
-        if (isBotRunning === false)
-            return;
-        // update tick count
-        global.tickCount += 1;
-        if (global.tickCount % constants_1.BOT_RUN_INTERVAL !== 0)
-            return;
+        // const isBotRunning = global.isBotActive;
+        // console.log('isBotRunning',isBotRunning)
+        // if (!isBotRunning) return;
+        // // update tick count
+        // global.tickCount += 1;
+        // console.log('global.tickCount',global.tickCount)
+        // if (global.tickCount % BOT_RUN_INTERVAL !== 0) return;
         // evaluate and place order if bot is active
         const msgString = msg.toString();
         const symbolTickerPrices = JSON.parse(msgString);
         const numOfSymbols = symbolTickerPrices.length;
-        console.log(`Have ${numOfSymbols} symbols ticker price updated`);
         // call side-effect function
         evaluateAndPlaceOrderWs(symbolTickerPrices);
         // update positions
-        (0, binance_service_1.updatePositionsWebsocket)();
     }
     catch (err) {
         logger_service_1.default.saveError(err);
@@ -37,6 +34,10 @@ exports.tickerPricesUpdateEvHandlerWs = tickerPricesUpdateEvHandlerWs;
 /////////////////////////////////////////////////////////
 // helper function to evaluate and place order
 function evaluateAndPlaceOrderWs(symbolTickerPricesWs) {
+    // const ableSymbols = symbolTickerPricesWs
+    //   .filter(({ s }) => global.ableOrderSymbolsMap[s] === true)
+    //   .map(({ s }) => s);
+    // console.log("ableSymbolTickerPrices", ableSymbols);
     for (let symbolTickerPrice of symbolTickerPricesWs) {
         // -- Key is symbol property
         const symbol = symbolTickerPrice.s;
@@ -89,12 +90,15 @@ function evaluateAndPlaceOrderWs(symbolTickerPricesWs) {
         const percentToSell = openingChain.percent_to_sell;
         const percentToSellNumber = parseFloat(percentToSell);
         const isPercentAbleToSell = percentChange < percentToSellNumber;
-        const isAbleToSell = isPercentAbleToSell && orderPiecesOfSymbolLen > 2;
+        const isAbleToSell = isPercentAbleToSell && orderPiecesOfSymbolLen >= 2;
+        let debugMsg = `${symbol} prev: ${prevPrice}; curr: ${currPrice}; percent: ${percentChange}`;
         let direction = "";
         if (isAbleToBuy)
             direction = "BUY";
         if (isAbleToSell)
             direction = "SELL";
+        if (direction === "")
+            logger_service_1.default.saveDebugAndClg(debugMsg);
         if (direction === "")
             continue;
         // -- Define quantity
@@ -127,6 +131,8 @@ function evaluateAndPlaceOrderWs(symbolTickerPricesWs) {
         }
         const precision = exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
         const orderQtyValid = (0, helper_1.validateAmount)(orderQty, precision);
+        debugMsg += ` positionAmt: ${positionsMap[symbol].positionAmt}`;
+        logger_service_1.default.saveDebugAndClg(debugMsg);
         // -- Place order, get the id generated from uuidV4 for check order info purpose
         const clientOrderId = (0, binance_service_1.placeOrderWebsocket)(symbol, orderQtyValid, direction);
         // -- Save order info to memory
