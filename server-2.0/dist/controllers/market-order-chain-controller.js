@@ -14,7 +14,15 @@ const list = async (req, res) => {
             perpage: 5,
         };
         const totalItems = listChain.length;
-        const listChainWithPaginatedPieces = listChain.map((chain) => slicePiecesOfChainWithPagi(chain, piecesPagiInitial));
+        const listChainWithPaginatedPieces = listChain.map((chain) => chain.status === "open"
+            ? {
+                ...chain,
+                order_pieces: {
+                    data: chain.order_pieces,
+                    pagi: { totalItems: chain.order_pieces.length },
+                },
+            }
+            : slicePiecesOfChainWithPagi(chain, piecesPagiInitial));
         server_response_ultil_1.ServerResponse.response(res, listChainWithPaginatedPieces, 200, null, totalItems);
     }
     catch (err) {
@@ -55,20 +63,16 @@ const getPiecesById = async (req, res) => {
         };
         const chainIdInt = parseInt(chainId);
         const openingChain = global.openingChain;
-        if (openingChain) {
-            if (chainIdInt === openingChain.id) {
-                const piecesPartial = pagiPiecesOfChain(global.orderPieces, pagi);
-                const piecesPartialWithPagi = {
+        if (openingChain && openingChain?.id === chainIdInt) {
+            const piecesPartial = pagiPiecesOfChain(global.orderPieces, pagi);
+            const chainWithPaginatedPieces = {
+                ...openingChain,
+                order_pieces: {
                     data: piecesPartial,
                     pagi: { totalItems: global.orderPieces.length },
-                };
-                server_response_ultil_1.ServerResponse.response(res, piecesPartialWithPagi, 200, null);
-            }
-            if (chainIdInt !== openingChain.id) {
-                const chain = await market_order_chain_service_1.default.detail(chainIdInt);
-                const chainWithPaginatedPieces = slicePiecesOfChainWithPagi(chain, pagi);
-                server_response_ultil_1.ServerResponse.response(res, chainWithPaginatedPieces, 200, null);
-            }
+                },
+            };
+            server_response_ultil_1.ServerResponse.response(res, chainWithPaginatedPieces, 200, null);
         }
         else {
             const chain = await market_order_chain_service_1.default.detail(chainIdInt);

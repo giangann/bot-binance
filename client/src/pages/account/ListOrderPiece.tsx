@@ -4,7 +4,14 @@
 import { Typography, styled } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 import dayjs from "dayjs";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { toast } from "react-toastify";
 import { BasicTable } from "../../components/Table/BasicTable";
 import { CustomPagi } from "../../components/Table/CustomPagi";
@@ -19,6 +26,7 @@ import {
   TMarketOrderChainWithPiecesPagi,
   TOrderChainStatus,
 } from "../../shared/types/order";
+import { arraySliceByPagi } from "../../ultils/helper";
 
 type Props = {
   status: TOrderChainStatus;
@@ -39,8 +47,22 @@ export const ListOrderPiece: React.FC<Props> = ({
   pagi,
 }) => {
   const { totalItems: totalItemsInit } = pagi;
-  const [pieces, setPieces] = useState<IMarketOrderPieceRecord[]>(orderPieces);
   const [totalItems, setTotalItems] = useState(totalItemsInit);
+  const {
+    currPage,
+    onGoToStart,
+    onGoToEnd,
+    onPerPageChange,
+    perpage,
+    totalPage,
+    onNextPage,
+    onPrevPage,
+  } = usePagination({ rows: totalItems });
+  const [pieces, setPieces] = useState<IMarketOrderPieceRecord[]>(orderPieces);
+  const slicePieces = useMemo(
+    () => arraySliceByPagi(pieces, currPage, perpage),
+    [pieces, currPage, perpage]
+  );
 
   // if (pieces !== orderPieces) {
   //   setPieces(orderPieces);
@@ -52,17 +74,6 @@ export const ListOrderPiece: React.FC<Props> = ({
   const socket = useContext(SocketContext);
   const bot = useContext(BotContext);
   const { fetchOrderChains } = useContext(OrderChainContext);
-
-  const {
-    currPage,
-    onGoToStart,
-    onGoToEnd,
-    onPerPageChange,
-    perpage,
-    totalPage,
-    onNextPage,
-    onPrevPage,
-  } = usePagination({ rows: totalItems });
 
   const isInitialRender = useRef(true);
 
@@ -151,20 +162,26 @@ export const ListOrderPiece: React.FC<Props> = ({
       isInitialRender.current = false;
       return;
     }
+
+    // This effect don't use for open cain
+    if (status === "open") return;
+
     // If don't skip so refetch and update order pieces
     fetchOrderPieces({ currPage, perpage, chainId });
-  }, [currPage, perpage, chainId]);
+  }, [currPage, perpage, chainId, status]);
 
   useEffect(() => {
     if (status === "open") {
       socket?.on("new-order-placed", (msg: IMarketOrderPieceRecord) => {
+        // setPieces([msg, ...pieces]);
         setPieces([msg, ...pieces]);
+        setTotalItems(totalItems + 1);
       });
       return () => {
         socket?.off("new-order-placed");
       };
     }
-  }, [status, pieces]);
+  }, [status, pieces, totalItems]);
 
   useEffect(() => {
     if (status === "open") {
@@ -183,7 +200,7 @@ export const ListOrderPiece: React.FC<Props> = ({
     <>
       <BasicTable
         fields={orderPieceFields}
-        data={pieces}
+        data={status === "open" ? slicePieces : pieces}
         rowProps={({ direction }) => ({
           sx: {
             backgroundColor: direction === "BUY" ? green["50"] : red["50"],

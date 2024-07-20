@@ -36,7 +36,7 @@ export const OrderChains: React.FC<Props> = ({ orderChains }) => {
       ) : (
         <>
           {orderChains.map((chain) => (
-            <OrderChain {...chain} />
+            <OrderChain {...chain} key={chain.id} />
           ))}
         </>
       )}

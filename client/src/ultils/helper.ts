@@ -213,3 +213,12 @@ export function totalUnrealizedPnl(positions: TPosition[]) {
   }
   return result;
 }
+export function arraySliceByPagi(
+  array: any[],
+  currPage: number,
+  perpage: number
+) {
+  const startIndex = currPage * perpage - perpage;
+  const endIndex = currPage * perpage;
+  return array.slice(startIndex, endIndex);
+}

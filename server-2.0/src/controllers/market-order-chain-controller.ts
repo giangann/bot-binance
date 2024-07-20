@@ -18,7 +18,15 @@ const list: IController = async (req, res) => {
     const totalItems = listChain.length;
 
     const listChainWithPaginatedPieces = listChain.map((chain) =>
-      slicePiecesOfChainWithPagi(chain, piecesPagiInitial)
+      chain.status === "open"
+        ? {
+            ...chain,
+            order_pieces: {
+              data: chain.order_pieces,
+              pagi: { totalItems: chain.order_pieces.length },
+            },
+          }
+        : slicePiecesOfChainWithPagi(chain, piecesPagiInitial)
     );
 
     ServerResponse.response(
@@ -39,8 +47,8 @@ const update: IController = async (req, res) => {
     const pnl_to_stop = req.body.pnl_to_stop;
 
     // update memory
-    if (global.openingChain){
-      global.openingChain.pnl_to_stop = pnl_to_stop
+    if (global.openingChain) {
+      global.openingChain.pnl_to_stop = pnl_to_stop;
     }
 
     // update db
@@ -71,27 +79,18 @@ const getPiecesById: IController = async (req, res) => {
       perpage: perpageInt,
     };
     const chainIdInt = parseInt(chainId as string);
-
     const openingChain = global.openingChain;
 
-    if (openingChain) {
-      if (chainIdInt === openingChain.id) {
-        const piecesPartial = pagiPiecesOfChain(global.orderPieces, pagi);
-        const piecesPartialWithPagi = {
+    if (openingChain && openingChain?.id === chainIdInt) {
+      const piecesPartial = pagiPiecesOfChain(global.orderPieces, pagi);
+      const chainWithPaginatedPieces = {
+        ...openingChain,
+        order_pieces: {
           data: piecesPartial,
           pagi: { totalItems: global.orderPieces.length },
-        };
-        ServerResponse.response(res, piecesPartialWithPagi, 200, null);
-      }
-      if (chainIdInt !== openingChain.id) {
-        const chain = await marketOrderChainService.detail(chainIdInt);
-        const chainWithPaginatedPieces = slicePiecesOfChainWithPagi(
-          chain,
-          pagi
-        );
-
-        ServerResponse.response(res, chainWithPaginatedPieces, 200, null);
-      }
+        },
+      };
+      ServerResponse.response(res, chainWithPaginatedPieces, 200, null);
     } else {
       const chain = await marketOrderChainService.detail(chainIdInt);
       const chainWithPaginatedPieces = slicePiecesOfChainWithPagi(chain, pagi);

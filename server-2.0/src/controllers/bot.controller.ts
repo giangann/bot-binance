@@ -3,6 +3,7 @@ import IController from "../interfaces/IController";
 import botService from "../services/bot.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import { ServerResponse } from "../ultils/server-response.ultil";
+import { activeBot, quitBot } from "../mock/bot-control";
 
 const active: IController = async (req, res) => {
   try {
