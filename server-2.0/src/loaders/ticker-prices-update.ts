@@ -5,7 +5,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const listenSymbolTickerPricesStreamWs = () => {
-  const baseWs = process.env.BINANCE_BASE_WS_API_URL;
+  const baseWs = process.env.BINANCE_BASE_WS_MARK_URL;
   const wsURL = `${baseWs}/ws/!ticker@arr`; // default is 1s interval
 
   const ws = new WebSocket(wsURL);
@@ -20,7 +20,7 @@ const listenSymbolTickerPricesStreamWs = () => {
     console.error("WebSocket error:", error);
   });
   ws.on("close", () => {
-    loggerService.saveDebugAndClg("WebSocket connection closed.");
+    loggerService.saveDebugAndClg("WebSocket Binance Market Data Stream (!ticker@arr) closed.");
   });
 };
 

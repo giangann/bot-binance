@@ -20,7 +20,7 @@ declare global {
   var ableOrderSymbolsMap: Record<string, boolean>;
   var symbolPricesStartMap: ICoinPrice1AMMap | null;
 
-  var symbolTickerPricesNow: TSymbolTickerPrice[];
+  var symbolTickerPricesNow: TSymbolTickerPrice[]; // just use in test
   var symbolTickerPricesNowMap: TSymbolTickerPricesMap;
 
   var exchangeInfoSymbolsMap: TExchangeInfoSymbolsMap;
@@ -31,5 +31,8 @@ declare global {
   var orderPieces: IMarketOrderPieceEntity[] | null;
   var openingChain: IMarketOrderChainEntity | null;
   var isBotActive: boolean;
+
+  var botInterval: NodeJS.Timeout
+  var isRunTick: boolean
 }
 export {};

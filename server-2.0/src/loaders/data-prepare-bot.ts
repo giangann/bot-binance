@@ -13,6 +13,7 @@ import {
   ableOrderSymbolsToMap,
   exchangeInfoSymbolsToMap,
   positionsToMap,
+  symbolPriceTickersToMap,
   symbolPricesToMap,
 } from "../ultils/helper";
 
@@ -34,7 +35,7 @@ const prepareDataBot = async () => {
   const ableOrderSymbolsMap = ableOrderSymbolsToMap(ableOrderSymbols);
 
   global.symbolPricesStartMap = symbolPricesStartMap;
-  global.symbolTickerPricesNow = symbolTickerPricesNow;
+  global.symbolTickerPricesNowMap = symbolPriceTickersToMap(symbolTickerPricesNow);
   global.exchangeInfoSymbolsMap = exchangeInfoSymbolsMap;
   global.positionsMap = positionsMap;
   global.ableOrderSymbolsMap = ableOrderSymbolsMap;
@@ -43,7 +44,7 @@ const prepareDataBot = async () => {
   global.orderInfosMap = {};
   global.orderPieces = [];
   global.orderPiecesMap = {};
-  global.tickCount = 0;
+  global.isBotActive = true
 };
 
 export default prepareDataBot;

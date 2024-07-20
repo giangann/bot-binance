@@ -267,3 +267,12 @@ export const errorWsApiResponseToString = (error: TBinanceError) => {
   const { code, msg } = error;
   return `${code}: ${msg}`;
 };
+
+export const ableOrderSymbolsMapToArray = (
+  ableOrderSymbolsMap: Record<string, boolean>
+) => {
+  const symbols = Object.entries(ableOrderSymbolsMap)
+    .filter(([_symbol, isAble]) => isAble)
+    .map(([symbol, _isAble]) => symbol);
+  return symbols;
+};

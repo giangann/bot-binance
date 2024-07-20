@@ -16,7 +16,6 @@ import { TNewOrder } from "../types/rest-api/order.type";
 import loggerService from "./logger.service";
 dotenv.config();
 
-const WEBSOCKET_API_URL = "wss://testnet.binancefuture.com/ws-fapi/v1";
 const apiKey = process.env.BINANCE_API_KEY;
 const apiSecret = process.env.BINANCE_API_SECRET;
 

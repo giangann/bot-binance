@@ -1,8 +1,5 @@
+import { placeOrderWebsocket } from "../../services/binance.service";
 import loggerService from "../../services/logger.service";
-import { BOT_RUN_INTERVAL } from "../../constants/constants";
-import {
-  placeOrderWebsocket,
-} from "../../services/binance.service";
 import { TSymbolTickerPriceWs } from "../../types/websocket";
 import { TOrderInfo } from "../../types/websocket/order-info.type";
 import { validateAmount } from "../helper";
@@ -11,17 +8,14 @@ import { updateSymbolTickerPricesNowMap } from "../memory.ultil";
 // handle when ticker price update
 export const tickerPricesUpdateEvHandlerWs = (msg: any): void => {
   try {
-    // evaluate and place order if bot is active
-    const msgString = msg.toString();
-    const symbolTickerPrices: TSymbolTickerPriceWs[] = JSON.parse(msgString);
+    if (global.isBotActive) {
+      // evaluate and place order if bot is active
+      const msgString = msg.toString();
+      const symbolTickerPrices: TSymbolTickerPriceWs[] = JSON.parse(msgString);
 
-    // update memory
-    updateSymbolTickerPricesNowMap(symbolTickerPrices)
-    
-    // call side-effect function
-    evaluateAndPlaceOrderWs(symbolTickerPrices);
-
-    // update positions
+      // update memory
+      updateSymbolTickerPricesNowMap(symbolTickerPrices);
+    }
   } catch (err) {
     loggerService.saveError(err);
   }
@@ -89,7 +83,7 @@ function evaluateAndPlaceOrderWs(symbolTickerPricesWs: TSymbolTickerPriceWs[]) {
     const isPercentAbleToSell = percentChange < percentToSellNumber;
     const isAbleToSell = isPercentAbleToSell && orderPiecesOfSymbolLen >= 2;
 
-    let debugMsg = `${symbol} prev: ${prevPrice}; curr: ${currPrice}; percent: ${percentChange}`
+    let debugMsg = `${symbol} prev: ${prevPrice}; curr: ${currPrice}; percent: ${percentChange}`;
 
     let direction: "SELL" | "BUY" | "" = "";
     if (isAbleToBuy) direction = "BUY";
@@ -126,8 +120,8 @@ function evaluateAndPlaceOrderWs(symbolTickerPricesWs: TSymbolTickerPriceWs[]) {
     const precision = exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
     const orderQtyValid = validateAmount(orderQty, precision);
 
-    debugMsg +=` positionAmt: ${positionsMap[symbol].positionAmt}`
-    loggerService.saveDebugAndClg(debugMsg)
+    debugMsg += ` positionAmt: ${positionsMap[symbol].positionAmt}`;
+    loggerService.saveDebugAndClg(debugMsg);
 
     // -- Place order, get the id generated from uuidV4 for check order info purpose
     const clientOrderId = placeOrderWebsocket(symbol, orderQtyValid, direction);

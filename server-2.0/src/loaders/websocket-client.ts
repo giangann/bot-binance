@@ -29,7 +29,7 @@ export function createWebSocketConnectionPlaceOrder() {
 
   // Handle connection close
   ws.on("close", () => {
-    loggerService.saveDebugAndClg("WebSocket connection closed");
+    loggerService.saveDebugAndClg("WebSocket connection PlaceOrder closed");
   });
 
   return ws;
@@ -57,7 +57,7 @@ export function createWebSocketConnectionGetAndUpdatePositions() {
 
   // Handle connection close
   ws.on("close", () => {
-    loggerService.saveDebugAndClg("WebSocket connection closed");
+    loggerService.saveDebugAndClg("WebSocket connection GetAndUpdatePositions closed");
   });
 
   return ws;
@@ -84,7 +84,7 @@ export function createWebSocketConnectionClosePositions() {
 
   // Handle connection close
   ws.on("close", () => {
-    loggerService.saveDebugAndClg("WebSocket connection closed");
+    loggerService.saveDebugAndClg("WebSocket connection ClosePositions closed");
   });
 
   return ws;
