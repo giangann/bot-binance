@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.isNeedRemove = exports.handleOrderError = exports.updateOrderPieces = exports.newOrderPlaceEvHandlerWs = void 0;
 const moment_1 = __importDefault(require("moment"));
 const logger_service_1 = __importDefault(require("../../services/logger.service"));
-const binance_service_1 = require("../../services/binance.service");
 ////////////////////////////////////////////////////
 // handle when new order placed
 const newOrderPlaceEvHandlerWs = (msg) => {
@@ -22,7 +21,7 @@ const newOrderPlaceEvHandlerWs = (msg) => {
             // update order pieces store in memory
             (0, exports.updateOrderPieces)(generatedID, orderPlaceResult);
             // update positions in memory
-            (0, binance_service_1.updatePositionsWebsocket)();
+            // updatePositionsWebsocket();
         }
         if (errorKey in orderPlaceResponse) {
             // updateErrorLog()
@@ -46,7 +45,7 @@ const updateOrderPieces = (uuid, newOrder) => {
     // Find order information in memory:
     const orderInfo = global.orderInfosMap[uuid];
     // log
-    logger_service_1.default.saveDebugAndClg(`${newOrder.side} ${newOrder.origQty} ${symbol} with prevPrice: ${orderInfo.prevPrice}, currPrice: ${orderInfo.currPrice}, percentChange: ${orderInfo.percentChange} `);
+    logger_service_1.default.saveDebugAndClg(`${newOrder.side} ${newOrder.origQty} ${symbol} with prevPrice: ${orderInfo.prevPrice}, currPrice: ${orderInfo.currPrice}, percentChange: ${orderInfo.percentChange}, positionAmt: ${orderInfo.positionAmt} `);
     // process data from newOrder
     const newOrderPieces = {
         id: newOrder.orderId.toString(),
@@ -73,7 +72,7 @@ const updateOrderPieces = (uuid, newOrder) => {
     // push newOrderpieces to array
     global.orderPieces.push(newOrderPieces);
     // emit to client
-    // global.wsServerInstance.emit('new-order-placed', newOrderPieces);
+    global.wsServerInstance.emit('new-order-placed', newOrderPieces);
 };
 exports.updateOrderPieces = updateOrderPieces;
 /////////////////////////////////////////////////////////
@@ -81,9 +80,9 @@ exports.updateOrderPieces = updateOrderPieces;
 function handleOrderError(uuid, error) {
     // Find order information in memory:
     const orderInfo = global.orderInfosMap[uuid];
-    const { symbol, quantity } = orderInfo;
+    const { symbol, quantity, direction } = orderInfo;
     const { code, msg } = error;
-    logger_service_1.default.saveDebugAndClg(`${quantity} ${symbol} ${code} ${msg}`);
+    logger_service_1.default.saveDebugAndClg(`ERROR: ${direction} ${quantity} ${symbol} // ${code} ${msg}`);
     // Update able order symbol map
     if (isNeedRemove(code)) {
         global.ableOrderSymbolsMap[symbol] = false;

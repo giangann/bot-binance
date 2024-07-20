@@ -26,7 +26,7 @@ const prepareDataBot = async () => {
     const ableOrderSymbols = Object.keys(symbolPricesStartMap);
     const ableOrderSymbolsMap = (0, helper_1.ableOrderSymbolsToMap)(ableOrderSymbols);
     global.symbolPricesStartMap = symbolPricesStartMap;
-    global.symbolTickerPricesNow = symbolTickerPricesNow;
+    global.symbolTickerPricesNowMap = (0, helper_1.symbolPriceTickersToMap)(symbolTickerPricesNow);
     global.exchangeInfoSymbolsMap = exchangeInfoSymbolsMap;
     global.positionsMap = positionsMap;
     global.ableOrderSymbolsMap = ableOrderSymbolsMap;
@@ -34,6 +34,6 @@ const prepareDataBot = async () => {
     global.orderInfosMap = {};
     global.orderPieces = [];
     global.orderPiecesMap = {};
-    global.tickCount = 0;
+    global.isBotActive = true;
 };
 exports.default = prepareDataBot;

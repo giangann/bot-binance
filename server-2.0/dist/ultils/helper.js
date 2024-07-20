@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.errorWsApiResponseToString = exports.rateLimitsArrayToString = exports.filterPositionsNotZero = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.ableOrderSymbolsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.positionsToMap = exports.exchangeInfoSymbolsToMap = exports.symbolPricesToMap = exports.validateAmount = exports.binanceStreamToSymbolPrice = exports.paramsToQueryWithSignature = exports.generateSignature = exports.fakeDelay = void 0;
+exports.ableOrderSymbolsMapToArray = exports.errorWsApiResponseToString = exports.rateLimitsArrayToString = exports.filterPositionsNotZero = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.ableOrderSymbolsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.positionsToMap = exports.exchangeInfoSymbolsToMap = exports.symbolPricesToMap = exports.validateAmount = exports.binanceStreamToSymbolPrice = exports.paramsToQueryWithSignature = exports.generateSignature = exports.fakeDelay = void 0;
 const crypto_1 = require("crypto");
 const fakeDelay = async (seconds) => {
     await new Promise((resolve, _reject) => {
@@ -216,3 +216,10 @@ const errorWsApiResponseToString = (error) => {
     return `${code}: ${msg}`;
 };
 exports.errorWsApiResponseToString = errorWsApiResponseToString;
+const ableOrderSymbolsMapToArray = (ableOrderSymbolsMap) => {
+    const symbols = Object.entries(ableOrderSymbolsMap)
+        .filter(([_symbol, isAble]) => isAble)
+        .map(([symbol, _isAble]) => symbol);
+    return symbols;
+};
+exports.ableOrderSymbolsMapToArray = ableOrderSymbolsMapToArray;

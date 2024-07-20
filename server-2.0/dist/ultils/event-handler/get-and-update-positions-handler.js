@@ -6,20 +6,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAndUpdatePositionsEventHandler = void 0;
 const logger_service_1 = __importDefault(require("../../services/logger.service"));
 const helper_1 = require("../helper");
-const getAndUpdatePositionsEventHandler = (msg) => {
+const getAndUpdatePositionsEventHandler = async (msg) => {
     try {
         // process stream data
         const msgString = msg.toString();
         const positionsResponse = JSON.parse(msgString);
+        await (0, helper_1.fakeDelay)(Math.random());
         // process response
         const resultKey = "result";
         const errorKey = "error";
         if (resultKey in positionsResponse) {
-            logger_service_1.default.saveDebugAndClg('position response successed!');
+            logger_service_1.default.saveDebugAndClg("position response successed!");
+            // update memory
             const positions = positionsResponse["result"];
             const positionsMap = (0, helper_1.positionsToMap)(positions);
             // update data memory
             global.positionsMap = positionsMap;
+            // mark as able to run remain tick function
+            global.isRunTick = true;
         }
         if (errorKey in positionsResponse) {
             // handle error

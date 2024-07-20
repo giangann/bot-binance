@@ -10,7 +10,7 @@ const ws_1 = require("ws");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const listenSymbolTickerPricesStreamWs = () => {
-    const baseWs = process.env.BINANCE_BASE_WS_API_URL;
+    const baseWs = process.env.BINANCE_BASE_WS_MARK_URL;
     const wsURL = `${baseWs}/ws/!ticker@arr`; // default is 1s interval
     const ws = new ws_1.WebSocket(wsURL);
     ws.on("open", () => {
@@ -22,7 +22,7 @@ const listenSymbolTickerPricesStreamWs = () => {
         console.error("WebSocket error:", error);
     });
     ws.on("close", () => {
-        logger_service_1.default.saveDebugAndClg("WebSocket connection closed.");
+        logger_service_1.default.saveDebugAndClg("WebSocket Binance Market Data Stream (!ticker@arr) closed.");
     });
 };
 exports.listenSymbolTickerPricesStreamWs = listenSymbolTickerPricesStreamWs;

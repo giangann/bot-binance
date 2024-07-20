@@ -31,7 +31,7 @@ const futurePriceStream = () => {
         console.error("WebSocket error:", error);
     });
     ws.on("close", () => {
-        logger_service_1.default.saveDebugAndClg("WebSocket connection closed.");
+        logger_service_1.default.saveDebugAndClg("WebSocket Binance Future Market Data Stream connection closed.");
     });
 };
 const testnetPriceStream = () => {
@@ -59,7 +59,7 @@ const testnetPriceStream = () => {
             console.error("WebSocket error:", error);
         });
         ws.on("close", () => {
-            logger_service_1.default.saveDebugAndClg("WebSocket connection closed.");
+            logger_service_1.default.saveDebugAndClg("WebSocket Binance Future <Testnet> Market Data Stream connection closed.");
         });
     }
     catch (err) {

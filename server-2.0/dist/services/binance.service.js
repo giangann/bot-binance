@@ -9,7 +9,6 @@ const uuid_1 = require("uuid");
 const helper_1 = require("../ultils/helper");
 const logger_service_1 = __importDefault(require("./logger.service"));
 dotenv_1.default.config();
-const WEBSOCKET_API_URL = "wss://testnet.binancefuture.com/ws-fapi/v1";
 const apiKey = process.env.BINANCE_API_KEY;
 const apiSecret = process.env.BINANCE_API_SECRET;
 const getExchangeInfo = async () => {

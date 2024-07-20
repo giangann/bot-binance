@@ -27,7 +27,7 @@ function createWebSocketConnectionPlaceOrder() {
     });
     // Handle connection close
     ws.on("close", () => {
-        logger_service_1.default.saveDebugAndClg("WebSocket connection closed");
+        logger_service_1.default.saveDebugAndClg("WebSocket connection PlaceOrder closed");
     });
     return ws;
 }
@@ -48,7 +48,7 @@ function createWebSocketConnectionGetAndUpdatePositions() {
     });
     // Handle connection close
     ws.on("close", () => {
-        logger_service_1.default.saveDebugAndClg("WebSocket connection closed");
+        logger_service_1.default.saveDebugAndClg("WebSocket connection GetAndUpdatePositions closed");
     });
     return ws;
 }
@@ -68,7 +68,7 @@ function createWebSocketConnectionClosePositions() {
     });
     // Handle connection close
     ws.on("close", () => {
-        logger_service_1.default.saveDebugAndClg("WebSocket connection closed");
+        logger_service_1.default.saveDebugAndClg("WebSocket connection ClosePositions closed");
     });
     return ws;
 }
