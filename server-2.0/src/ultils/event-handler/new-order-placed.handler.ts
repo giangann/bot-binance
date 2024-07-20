@@ -6,6 +6,7 @@ import {
   TNewOrderPlaceResponse,
   TNewOrderPlaceResult,
 } from "../../types/websocket/order-place-response.type";
+import marketOrderPieceService from "../../services/market-order-piece.service";
 
 ////////////////////////////////////////////////////
 // handle when new order placed
@@ -55,7 +56,7 @@ export const updateOrderPieces = (
   loggerService.saveDebugAndClg(`${newOrder.side} ${newOrder.origQty} ${symbol} with prevPrice: ${orderInfo.prevPrice}, currPrice: ${orderInfo.currPrice}, percentChange: ${orderInfo.percentChange}, positionAmt: ${orderInfo.positionAmt} `);
 
   // process data from newOrder
-  const newOrderPieces: IMarketOrderPieceEntity = {
+  const newOrderPiece: IMarketOrderPieceEntity = {
     id: newOrder.orderId.toString(),
     symbol: symbol,
     direction: newOrder.side,
@@ -76,16 +77,19 @@ export const updateOrderPieces = (
 
   // update memory data: unshift newOrder to array (add to head)
   if (symbol in orderPiecesMap) {
-    global.orderPiecesMap[symbol].unshift(newOrderPieces);
+    global.orderPiecesMap[symbol].unshift(newOrderPiece);
   } else {
-    global.orderPiecesMap[symbol] = [newOrderPieces];
+    global.orderPiecesMap[symbol] = [newOrderPiece];
   }
 
-  // push newOrderpieces to array
-  global.orderPieces.push(newOrderPieces);
+  // push newOrderPiece to array
+  global.orderPieces.push(newOrderPiece);
+
+  // save to db
+  marketOrderPieceService.create(newOrderPiece)
 
   // emit to client
-  global.wsServerInstance.emit('new-order-placed', newOrderPieces);
+  global.wsServerInstance.emit('new-order-placed', newOrderPiece);
 };
 
 /////////////////////////////////////////////////////////

@@ -33,4 +33,11 @@ const create = async (params) => {
     const createdRecord = await (0, typeorm_1.getRepository)(market_order_piece_entity_1.MarketOrderPiece).save(paramsWithDateTime);
     return createdRecord;
 };
-exports.default = { list, create };
+const createMany = async (params) => {
+    const promises = params.map((param) => {
+        return create(param);
+    });
+    const responses = await Promise.all(promises);
+    return responses;
+};
+exports.default = { list, create, createMany };

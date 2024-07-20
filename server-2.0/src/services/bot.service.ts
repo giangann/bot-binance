@@ -1,9 +1,9 @@
-// // @ts-nocheck
 import dotenv from "dotenv";
 import { TOrderInfo } from "../types/websocket/order-info.type";
 import {
   ableOrderSymbolsMapToArray,
   fakeDelay,
+  orderPiecesToMap,
   totalPnlFromPositionsMap,
   validateAmount,
 } from "../ultils/helper";
@@ -33,7 +33,7 @@ const tick = async () => {
     return;
   }
 
-  console.log("after fake delay"); // check
+  loggerService.saveDebugAndClg(`tick able run: ${global.isRunTick}` ); // check
 
   // quit if pnl thres hold reach
   const totalPositionPnl = totalPnlFromPositionsMap(global.positionsMap);
@@ -46,7 +46,7 @@ const tick = async () => {
       stop_reason: stopMessage,
     });
     await quit();
-    loggerService.saveDebug(stopMessage)
+    loggerService.saveDebug(stopMessage);
     global.wsServerInstance.emit("bot-quit", stopMessage);
   }
 
@@ -182,12 +182,18 @@ const quit = async () => {
   const { id } = openingChain;
   await marketOrderChainService.update({ id, status: "closed" });
 
-  // store data from memory to database (order pieces)
-  const orderPieces = global.orderPieces;
-  const promiseArr = orderPieces.map((piece) => {
-    return marketOrderPieceService.create(piece);
-  });
-  const orderPiecesCreatedResponse = await Promise.all(promiseArr);
+  // -- store data from memory to database (order pieces)
+  //    check data in databaase
+  const orderPiecesMem = global.orderPieces;
+  const openingChainDetail = await marketOrderChainService.detail(id);
+  const piecesOfOpeningChain = openingChainDetail.order_pieces;
+  if (piecesOfOpeningChain.length < orderPiecesMem.length) {
+    const piecesMap = orderPiecesToMap(piecesOfOpeningChain);
+    const piecesToSave = orderPieces.filter(
+      ({ id: orderId }) => !(orderId in piecesMap)
+    );
+    await marketOrderPieceService.createMany(piecesToSave)
+  }
 
   // close positions
   // get positions
@@ -218,12 +224,13 @@ const quit = async () => {
   global.symbolPricesStartMap = null;
   global.exchangeInfoSymbolsMap = null;
   global.positionsMap = null;
+
   clearInterval(global.botInterval);
 
   // logger
   loggerService.saveDebug("Bot quited");
 
-  return orderPiecesCreatedResponse;
+  return true;
 };
 
 export default { active, quit };

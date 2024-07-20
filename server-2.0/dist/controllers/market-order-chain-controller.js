@@ -25,6 +25,11 @@ const update = async (req, res) => {
     try {
         const id = parseFloat(req.params?.id);
         const pnl_to_stop = req.body.pnl_to_stop;
+        // update memory
+        if (global.openingChain) {
+            global.openingChain.pnl_to_stop = pnl_to_stop;
+        }
+        // update db
         const updatedRecords = await market_order_chain_service_1.default.update({
             id,
             pnl_to_stop,

@@ -12,8 +12,6 @@ export const getAndUpdatePositionsEventHandler = async (msg: any) => {
     const resultKey = "result";
     const errorKey = "error";
     if (resultKey in positionsResponse) {
-      loggerService.saveDebugAndClg("position response successed!");
-
       // update memory
       const positions = positionsResponse["result"];
       const positionsMap = positionsToMap(positions);

@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.isNeedRemove = exports.handleOrderError = exports.updateOrderPieces = exports.newOrderPlaceEvHandlerWs = void 0;
 const moment_1 = __importDefault(require("moment"));
 const logger_service_1 = __importDefault(require("../../services/logger.service"));
+const market_order_piece_service_1 = __importDefault(require("../../services/market-order-piece.service"));
 ////////////////////////////////////////////////////
 // handle when new order placed
 const newOrderPlaceEvHandlerWs = (msg) => {
@@ -47,7 +48,7 @@ const updateOrderPieces = (uuid, newOrder) => {
     // log
     logger_service_1.default.saveDebugAndClg(`${newOrder.side} ${newOrder.origQty} ${symbol} with prevPrice: ${orderInfo.prevPrice}, currPrice: ${orderInfo.currPrice}, percentChange: ${orderInfo.percentChange}, positionAmt: ${orderInfo.positionAmt} `);
     // process data from newOrder
-    const newOrderPieces = {
+    const newOrderPiece = {
         id: newOrder.orderId.toString(),
         symbol: symbol,
         direction: newOrder.side,
@@ -64,15 +65,17 @@ const updateOrderPieces = (uuid, newOrder) => {
     };
     // update memory data: unshift newOrder to array (add to head)
     if (symbol in orderPiecesMap) {
-        global.orderPiecesMap[symbol].unshift(newOrderPieces);
+        global.orderPiecesMap[symbol].unshift(newOrderPiece);
     }
     else {
-        global.orderPiecesMap[symbol] = [newOrderPieces];
+        global.orderPiecesMap[symbol] = [newOrderPiece];
     }
-    // push newOrderpieces to array
-    global.orderPieces.push(newOrderPieces);
+    // push newOrderPiece to array
+    global.orderPieces.push(newOrderPiece);
+    // save to db
+    market_order_piece_service_1.default.create(newOrderPiece);
     // emit to client
-    global.wsServerInstance.emit('new-order-placed', newOrderPieces);
+    global.wsServerInstance.emit('new-order-placed', newOrderPiece);
 };
 exports.updateOrderPieces = updateOrderPieces;
 /////////////////////////////////////////////////////////

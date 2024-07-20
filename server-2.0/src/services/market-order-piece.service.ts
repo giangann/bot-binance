@@ -42,4 +42,12 @@ const create = async (params: IMarketOrderPieceCreate) => {
   return createdRecord;
 };
 
-export default { list, create };
+const createMany = async (params: IMarketOrderPieceCreate[]) => {
+  const promises = params.map((param) => {
+    return create(param);
+  });
+  const responses = await Promise.all(promises);
+  return responses
+};
+
+export default { list, create, createMany };

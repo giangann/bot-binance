@@ -20,6 +20,7 @@ import {
   TTickerPriceStream,
 } from "../types/websocket";
 import { TRateLimit } from "../types/websocket/ws-api-response.type";
+import { IMarketOrderPieceEntity } from "../interfaces/market-order-piece.interface";
 
 export const fakeDelay = async (seconds: number) => {
   await new Promise((resolve, _reject) => {
@@ -186,6 +187,20 @@ export function ableOrderSymbolsToMap(symbols: string[]) {
   }
   return res;
 }
+export function orderPiecesToMap(
+  orderPieces: IMarketOrderPieceEntity[]
+): Record<string, IMarketOrderPieceEntity> {
+  let res: Record<string, IMarketOrderPieceEntity> = {};
+
+  for (const piece of orderPieces) {
+    const orderId = piece.id;
+    if (!(orderId in res)) {
+      res[orderId] = piece;
+    }
+  }
+
+  return res;
+}
 
 ////////////////////////////////////
 type TTickerAndMarkPrice = TSymbolMarketPrice & TSymbolTickerPrice;
@@ -282,10 +297,10 @@ export const totalPnlFromPositionsMap = (positionsMap: TPositionsMap) => {
   const positionsMapEntries = Object.entries(positionsMap);
 
   for (const [_symbol, position] of positionsMapEntries) {
-    const pnl = position?.unRealizedProfit
-    if (pnl){
-      const pnlNumber = parseFloat(pnl)
-      result += pnlNumber
+    const pnl = position?.unRealizedProfit;
+    if (pnl) {
+      const pnlNumber = parseFloat(pnl);
+      result += pnlNumber;
     }
   }
 

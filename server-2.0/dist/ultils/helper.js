@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ableOrderSymbolsMapToArray = exports.errorWsApiResponseToString = exports.rateLimitsArrayToString = exports.filterPositionsNotZero = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.ableOrderSymbolsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.positionsToMap = exports.exchangeInfoSymbolsToMap = exports.symbolPricesToMap = exports.validateAmount = exports.binanceStreamToSymbolPrice = exports.paramsToQueryWithSignature = exports.generateSignature = exports.fakeDelay = void 0;
+exports.totalPnlFromPositionsMap = exports.ableOrderSymbolsMapToArray = exports.errorWsApiResponseToString = exports.rateLimitsArrayToString = exports.filterPositionsNotZero = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.orderPiecesToMap = exports.ableOrderSymbolsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.positionsToMap = exports.exchangeInfoSymbolsToMap = exports.symbolPricesToMap = exports.validateAmount = exports.binanceStreamToSymbolPrice = exports.paramsToQueryWithSignature = exports.generateSignature = exports.fakeDelay = void 0;
 const crypto_1 = require("crypto");
 const fakeDelay = async (seconds) => {
     await new Promise((resolve, _reject) => {
@@ -148,6 +148,17 @@ function ableOrderSymbolsToMap(symbols) {
     return res;
 }
 exports.ableOrderSymbolsToMap = ableOrderSymbolsToMap;
+function orderPiecesToMap(orderPieces) {
+    let res = {};
+    for (const piece of orderPieces) {
+        const orderId = piece.id;
+        if (!(orderId in res)) {
+            res[orderId] = piece;
+        }
+    }
+    return res;
+}
+exports.orderPiecesToMap = orderPiecesToMap;
 function mergeTicerPriceAndMarketPriceBySymbol(tickerPrices, marketPrices) {
     // Change array to map
     const tickerPricesMap = symbolPriceTickersToMap(tickerPrices);
@@ -223,3 +234,16 @@ const ableOrderSymbolsMapToArray = (ableOrderSymbolsMap) => {
     return symbols;
 };
 exports.ableOrderSymbolsMapToArray = ableOrderSymbolsMapToArray;
+const totalPnlFromPositionsMap = (positionsMap) => {
+    let result = 0;
+    const positionsMapEntries = Object.entries(positionsMap);
+    for (const [_symbol, position] of positionsMapEntries) {
+        const pnl = position?.unRealizedProfit;
+        if (pnl) {
+            const pnlNumber = parseFloat(pnl);
+            result += pnlNumber;
+        }
+    }
+    return result;
+};
+exports.totalPnlFromPositionsMap = totalPnlFromPositionsMap;

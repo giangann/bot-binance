@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// // @ts-nocheck
 const dotenv_1 = __importDefault(require("dotenv"));
 const helper_1 = require("../ultils/helper");
 const binance_service_1 = require("./binance.service");
@@ -23,7 +22,21 @@ const tick = async () => {
         global.isRunTick = true;
         return;
     }
-    console.log("after fake delay"); // check
+    logger_service_1.default.saveDebugAndClg(`tick able run: ${global.isRunTick}`); // check
+    // quit if pnl thres hold reach
+    const totalPositionPnl = (0, helper_1.totalPnlFromPositionsMap)(global.positionsMap);
+    const pnlToStop = global.openingChain?.pnl_to_stop;
+    const pnlToStopNumber = parseFloat(pnlToStop);
+    if (totalPositionPnl <= pnlToStopNumber) {
+        const stopMessage = `Reason: PNL = ${totalPositionPnl} <= ${pnlToStopNumber}`;
+        await market_order_chain_service_1.default.update({
+            id: global.openingChain?.id,
+            stop_reason: stopMessage,
+        });
+        await quit();
+        logger_service_1.default.saveDebug(stopMessage);
+        global.wsServerInstance.emit("bot-quit", stopMessage);
+    }
     // calculate and place order
     const ableSymbols = (0, helper_1.ableOrderSymbolsMapToArray)(global.ableOrderSymbolsMap);
     evaluateAndPlaceOrderWs(ableSymbols);
@@ -147,12 +160,16 @@ const quit = async () => {
     const openingChain = global.openingChain;
     const { id } = openingChain;
     await market_order_chain_service_1.default.update({ id, status: "closed" });
-    // store data from memory to database (order pieces)
-    const orderPieces = global.orderPieces;
-    const promiseArr = orderPieces.map((piece) => {
-        return market_order_piece_service_1.default.create(piece);
-    });
-    const orderPiecesCreatedResponse = await Promise.all(promiseArr);
+    // -- store data from memory to database (order pieces)
+    //    check data in databaase
+    const orderPiecesMem = global.orderPieces;
+    const openingChainDetail = await market_order_chain_service_1.default.detail(id);
+    const piecesOfOpeningChain = openingChainDetail.order_pieces;
+    if (piecesOfOpeningChain.length < orderPiecesMem.length) {
+        const piecesMap = (0, helper_1.orderPiecesToMap)(piecesOfOpeningChain);
+        const piecesToSave = orderPieces.filter(({ id: orderId }) => !(orderId in piecesMap));
+        await market_order_piece_service_1.default.createMany(piecesToSave);
+    }
     // close positions
     // get positions
     const positionsMap = global.positionsMap;
@@ -181,6 +198,6 @@ const quit = async () => {
     clearInterval(global.botInterval);
     // logger
     logger_service_1.default.saveDebug("Bot quited");
-    return orderPiecesCreatedResponse;
+    return true;
 };
 exports.default = { active, quit };
