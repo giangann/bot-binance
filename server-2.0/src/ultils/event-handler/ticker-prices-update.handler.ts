@@ -6,25 +6,18 @@ import {
 import { TSymbolTickerPriceWs } from "../../types/websocket";
 import { TOrderInfo } from "../../types/websocket/order-info.type";
 import { validateAmount } from "../helper";
+import { updateSymbolTickerPricesNowMap } from "../memory.ultil";
 ////////////////////////////////////////////////////
 // handle when ticker price update
 export const tickerPricesUpdateEvHandlerWs = (msg: any): void => {
   try {
-    // const isBotRunning = global.isBotActive;
-    // console.log('isBotRunning',isBotRunning)
-    // if (!isBotRunning) return;
-
-    // // update tick count
-    // global.tickCount += 1;
-    // console.log('global.tickCount',global.tickCount)
-    // if (global.tickCount % BOT_RUN_INTERVAL !== 0) return;
-
     // evaluate and place order if bot is active
     const msgString = msg.toString();
     const symbolTickerPrices: TSymbolTickerPriceWs[] = JSON.parse(msgString);
 
-    const numOfSymbols = symbolTickerPrices.length;
-
+    // update memory
+    updateSymbolTickerPricesNowMap(symbolTickerPrices)
+    
     // call side-effect function
     evaluateAndPlaceOrderWs(symbolTickerPrices);
 
@@ -37,11 +30,6 @@ export const tickerPricesUpdateEvHandlerWs = (msg: any): void => {
 /////////////////////////////////////////////////////////
 // helper function to evaluate and place order
 function evaluateAndPlaceOrderWs(symbolTickerPricesWs: TSymbolTickerPriceWs[]) {
-  // const ableSymbols = symbolTickerPricesWs
-  //   .filter(({ s }) => global.ableOrderSymbolsMap[s] === true)
-  //   .map(({ s }) => s);
-  // console.log("ableSymbolTickerPrices", ableSymbols);
-
   for (let symbolTickerPrice of symbolTickerPricesWs) {
     // -- Key is symbol property
     const symbol = symbolTickerPrice.s;

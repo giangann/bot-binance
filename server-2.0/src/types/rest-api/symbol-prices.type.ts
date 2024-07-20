@@ -14,3 +14,5 @@ export type TSymbolTickerPrice = {
   price: string;
   time: number;
 };
+
+export type TSymbolTickerPricesMap = Record<string, TSymbolTickerPrice>;

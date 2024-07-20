@@ -115,7 +115,6 @@ const quit = async () => {
   global.orderPiecesMap = {};
   global.orderInfosMap = {};
   global.ableOrderSymbolsMap = {};
-  global.tickCount = 0;
 
   global.openingChain = null;
   global.symbolPricesStartMap = null;
