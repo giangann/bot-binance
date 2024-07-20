@@ -26,7 +26,7 @@ export const newOrderPlaceEvHandlerWs = (msg: any): void => {
       // update order pieces store in memory
       updateOrderPieces(generatedID, orderPlaceResult);
       // update positions in memory
-      updatePositionsWebsocket();
+      // updatePositionsWebsocket();
     }
     if (errorKey in orderPlaceResponse) {
       // updateErrorLog()
@@ -54,7 +54,7 @@ export const updateOrderPieces = (
   const orderInfo = global.orderInfosMap[uuid];
 
   // log
-  loggerService.saveDebugAndClg(`${newOrder.side} ${newOrder.origQty} ${symbol} with prevPrice: ${orderInfo.prevPrice}, currPrice: ${orderInfo.currPrice}, percentChange: ${orderInfo.percentChange} `);
+  loggerService.saveDebugAndClg(`${newOrder.side} ${newOrder.origQty} ${symbol} with prevPrice: ${orderInfo.prevPrice}, currPrice: ${orderInfo.currPrice}, percentChange: ${orderInfo.percentChange}, positionAmt: ${orderInfo.positionAmt} `);
 
   // process data from newOrder
   const newOrderPieces: IMarketOrderPieceEntity = {
@@ -87,7 +87,7 @@ export const updateOrderPieces = (
   global.orderPieces.push(newOrderPieces);
 
   // emit to client
-  // global.wsServerInstance.emit('new-order-placed', newOrderPieces);
+  global.wsServerInstance.emit('new-order-placed', newOrderPieces);
 };
 
 /////////////////////////////////////////////////////////
@@ -95,9 +95,9 @@ export const updateOrderPieces = (
 export function handleOrderError(uuid: string, error: TBinanceError) {
   // Find order information in memory:
   const orderInfo = global.orderInfosMap[uuid];
-  const { symbol, quantity } = orderInfo;
+  const { symbol, quantity, direction } = orderInfo;
   const { code, msg } = error;
-  loggerService.saveDebugAndClg(`${quantity} ${symbol} ${code} ${msg}`)
+  loggerService.saveDebugAndClg(`ERROR: ${direction} ${quantity} ${symbol} // ${code} ${msg}`)
 
   // Update able order symbol map
   if (isNeedRemove(code)) {

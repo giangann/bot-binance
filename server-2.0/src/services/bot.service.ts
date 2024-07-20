@@ -103,7 +103,6 @@ const evaluateAndPlaceOrderWs = (symbols: string[]) => {
     let direction: "SELL" | "BUY" | "" = "";
     if (isAbleToBuy) direction = "BUY";
     if (isAbleToSell) direction = "SELL";
-    if (direction === "") loggerService.saveDebugAndClg(debugMsg);
     if (direction === "") continue;
 
     // -- Define quantity
@@ -134,9 +133,6 @@ const evaluateAndPlaceOrderWs = (symbols: string[]) => {
     }
     const precision = exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
     const orderQtyValid = validateAmount(orderQty, precision);
-
-    debugMsg += ` positionAmt: ${positionsMap[symbol].positionAmt}`;
-    loggerService.saveDebugAndClg(debugMsg);
 
     // -- Place order, get the id generated from uuidV4 for check order info purpose
     const clientOrderId = placeOrderWebsocket(symbol, orderQtyValid, direction);
