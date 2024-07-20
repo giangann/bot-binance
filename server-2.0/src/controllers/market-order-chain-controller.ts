@@ -38,6 +38,12 @@ const update: IController = async (req, res) => {
     const id = parseFloat(req.params?.id);
     const pnl_to_stop = req.body.pnl_to_stop;
 
+    // update memory
+    if (global.openingChain){
+      global.openingChain.pnl_to_stop = pnl_to_stop
+    }
+
+    // update db
     const updatedRecords = await marketOrderChainService.update({
       id,
       pnl_to_stop,

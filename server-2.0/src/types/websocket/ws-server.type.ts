@@ -9,6 +9,7 @@ export interface ServerToClientEvents {
   "testnet-binance-stream-forward": (msg: TBinanceMarkPriceStreamToWs) => void;
   "future-binance-stream-forward": (msg: TBinanceMarkPriceStreamToWs) => void;
   "new-order-placed": (msg: IMarketOrderPieceEntity) => void;
+  "bot-quit": (msg: string) => void;
 }
 
 export interface ClientToServerEvents {

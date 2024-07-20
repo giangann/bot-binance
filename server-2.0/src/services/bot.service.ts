@@ -4,6 +4,7 @@ import { TOrderInfo } from "../types/websocket/order-info.type";
 import {
   ableOrderSymbolsMapToArray,
   fakeDelay,
+  totalPnlFromPositionsMap,
   validateAmount,
 } from "../ultils/helper";
 import {
@@ -20,6 +21,7 @@ const active = async () => {
   const time = parseInt(process.env.BOT_RUN_INTERVAL) || 6; // second
   global.botInterval = setInterval(tick, time * 1000);
 };
+
 const tick = async () => {
   global.isRunTick = false;
 
@@ -32,6 +34,21 @@ const tick = async () => {
   }
 
   console.log("after fake delay"); // check
+
+  // quit if pnl thres hold reach
+  const totalPositionPnl = totalPnlFromPositionsMap(global.positionsMap);
+  const pnlToStop = global.openingChain?.pnl_to_stop;
+  const pnlToStopNumber = parseFloat(pnlToStop);
+  if (totalPositionPnl <= pnlToStopNumber) {
+    const stopMessage = `Reason: PNL = ${totalPositionPnl} <= ${pnlToStopNumber}`;
+    await marketOrderChainService.update({
+      id: global.openingChain?.id,
+      stop_reason: stopMessage,
+    });
+    await quit();
+    loggerService.saveDebug(stopMessage)
+    global.wsServerInstance.emit("bot-quit", stopMessage);
+  }
 
   // calculate and place order
   const ableSymbols = ableOrderSymbolsMapToArray(global.ableOrderSymbolsMap);

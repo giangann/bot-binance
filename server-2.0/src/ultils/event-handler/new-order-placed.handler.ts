@@ -1,13 +1,11 @@
 import moment from "moment";
 import { IMarketOrderPieceEntity } from "../../interfaces/market-order-piece.interface";
+import loggerService from "../../services/logger.service";
+import { TBinanceError } from "../../types/rest-api";
 import {
   TNewOrderPlaceResponse,
   TNewOrderPlaceResult,
 } from "../../types/websocket/order-place-response.type";
-import { errorWsApiResponseToString, rateLimitsArrayToString } from "../helper";
-import { TBinanceError } from "../../types/rest-api";
-import loggerService from "../../services/logger.service";
-import { updatePositionsWebsocket } from "../../services/binance.service";
 
 ////////////////////////////////////////////////////
 // handle when new order placed

@@ -276,3 +276,18 @@ export const ableOrderSymbolsMapToArray = (
     .map(([symbol, _isAble]) => symbol);
   return symbols;
 };
+
+export const totalPnlFromPositionsMap = (positionsMap: TPositionsMap) => {
+  let result = 0;
+  const positionsMapEntries = Object.entries(positionsMap);
+
+  for (const [_symbol, position] of positionsMapEntries) {
+    const pnl = position?.unRealizedProfit
+    if (pnl){
+      const pnlNumber = parseFloat(pnl)
+      result += pnlNumber
+    }
+  }
+
+  return result;
+};
