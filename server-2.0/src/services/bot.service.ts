@@ -26,7 +26,8 @@ const tick = async () => {
   global.isRunTick = false;
 
   updatePositionsWebsocket();
-  await fakeDelay(1);
+  const waitTime = parseInt(process.env.WAIT_POSITION) || 1
+  await fakeDelay(waitTime);
 
   if (global.isRunTick === false) {
     global.isRunTick = true;
@@ -146,7 +147,7 @@ const evaluateAndPlaceOrderWs = (symbols: string[]) => {
       const positionAmtNumber = parseFloat(positionAmt); // number (can be 0), or nan (if parse from undefined/null)
 
       if (!positionAmtNumber) continue;
-      if (positionAmtNumber) orderQty = positionAmtNumber / 2;
+      if (positionAmtNumber) orderQty = positionAmtNumber;
     }
     const precision = exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
     const orderQtyValid = validateAmount(orderQty, precision);
