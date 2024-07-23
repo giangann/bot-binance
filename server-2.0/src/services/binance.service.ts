@@ -18,6 +18,7 @@ dotenv.config();
 
 const apiKey = process.env.BINANCE_API_KEY;
 const apiSecret = process.env.BINANCE_API_SECRET;
+const recvWindow = process.env.RECV_WINDOW
 
 const getExchangeInfo = async (): Promise<TExchangeInfo> => {
   const endpoint = "/fapi/v1/exchangeInfo";
@@ -42,7 +43,7 @@ const getExchangeInfo = async (): Promise<TExchangeInfo> => {
 
 const getPositions = async (): Promise<TPosition[]> => {
   const endpoint = "/fapi/v2/positionRisk";
-  const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
+  const paramsNow = { recvWindow: recvWindow, timestamp: Date.now() };
 
   const queryString = paramsToQueryWithSignature(apiSecret, paramsNow);
   const url = `${process.env.BINANCE_BASE_URL}${endpoint}?${queryString}`;
@@ -66,7 +67,7 @@ const getPositions = async (): Promise<TPosition[]> => {
 
 const getAccountInfo = async (): Promise<TAccount> => {
   const endpoint = "/fapi/v2/account";
-  const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
+  const paramsNow = { recvWindow: recvWindow, timestamp: Date.now() };
   const queryString = paramsToQueryWithSignature(apiSecret, paramsNow);
   const url = `${process.env.BINANCE_BASE_URL}${endpoint}?${queryString}`;
   const response = await fetch(url, {
@@ -122,7 +123,7 @@ const placeOrderWebsocket = (
   const orderParams: Record<string, unknown> = {
     apiKey: apiKey,
     quantity: quantity.toString(),
-    recvWindow: 5000,
+    recvWindow: recvWindow,
     side: side,
     symbol: symbol,
     timestamp: Date.now(),
@@ -159,7 +160,7 @@ const closePositionWebSocket = (
   const orderParams: Record<string, unknown> = {
     apiKey: apiKey,
     quantity: quantity.toString(),
-    recvWindow: 5000,
+    recvWindow: recvWindow,
     side: side,
     symbol: symbol,
     timestamp: Date.now(),
@@ -183,7 +184,7 @@ const closePositionWebSocket = (
 const updatePositionsWebsocket = () => {
   const params: Record<string, unknown> = {
     apiKey: apiKey,
-    recvWindow: 5000,
+    recvWindow: recvWindow,
     timestamp: Date.now(),
   };
   const signature = generateSignature(params, apiSecret || "");
@@ -206,7 +207,7 @@ const createMarketOrder = async (
 ): Promise<TResponse<TNewOrder>> => {
   try {
     const endpoint = "/fapi/v1/order";
-    const paramsNow = { recvWindow: 20000, timestamp: Date.now() };
+    const paramsNow = { recvWindow: recvWindow, timestamp: Date.now() };
     let orderParams = {
       symbol,
       type,

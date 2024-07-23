@@ -26,8 +26,9 @@ const getAndUpdatePositionsEventHandler = async (msg) => {
         }
         if (errorKey in positionsResponse) {
             // handle error
-            console.log(positionsResponse[errorKey]);
-            throw new Error("Error occur in response of account.position resquest");
+            const binanceError = positionsResponse[errorKey];
+            const { code, msg } = binanceError;
+            throw new Error(`Error occur in response of account.position resquest: CODE ${code}; MSG ${msg}`);
         }
     }
     catch (err) {

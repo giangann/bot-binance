@@ -17,7 +17,8 @@ const active = async () => {
 const tick = async () => {
     global.isRunTick = false;
     (0, binance_service_1.updatePositionsWebsocket)();
-    await (0, helper_1.fakeDelay)(1);
+    const waitTime = parseInt(process.env.WAIT_POSITION) || 1;
+    await (0, helper_1.fakeDelay)(waitTime);
     if (global.isRunTick === false) {
         global.isRunTick = true;
         return;
