@@ -3,6 +3,7 @@
 // process and form the fetched data
 // save to ram by underlying the global variable
 
+import loggerService from "../services/logger.service";
 import {
   getExchangeInfo,
   getPositions,
@@ -16,6 +17,8 @@ import {
   symbolPriceTickersToMap,
   symbolPricesToMap,
 } from "../ultils/helper";
+import dotenv from 'dotenv'
+dotenv.config()
 
 const prepareDataBot = async () => {
   // Fetch data
@@ -45,6 +48,16 @@ const prepareDataBot = async () => {
   global.orderPieces = [];
   global.orderPiecesMap = {};
   global.isBotActive = true
+
+  // intitial other constant global variable
+  global.isMaxPnlReached = false
+  global.MAX_PNL = parseFloat(process.env.MAX_PNL) || 19;
+  global.MAX_PNL_THRESHOLD_TO_QUIT = parseFloat(process.env.MAX_PNL_THRESHOLD_TO_QUIT) || 0.59
+  
+  loggerService.saveDebugAndClg('test global and dotenv var:')
+  loggerService.saveDebugAndClg(`global.isMaxPnlReached: ${global.isMaxPnlReached}`)
+  loggerService.saveDebugAndClg(`global.MAX_PNL: ${global.MAX_PNL}`)
+  loggerService.saveDebugAndClg(`global.MAX_PNL_THRESHOLD_TO_QUIT: ${global.MAX_PNL_THRESHOLD_TO_QUIT}`)
 };
 
 export default prepareDataBot;

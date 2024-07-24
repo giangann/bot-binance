@@ -32,7 +32,12 @@ declare global {
   var openingChain: IMarketOrderChainEntity | null;
   var isBotActive: boolean;
 
-  var botInterval: NodeJS.Timeout
-  var isRunTick: boolean
+  var botInterval: NodeJS.Timeout;
+  var isRunTick: boolean;
+
+  // update for testing
+  var MAX_PNL: number;
+  var MAX_PNL_THRESHOLD_TO_QUIT: number; // <1
+  var isMaxPnlReached: boolean
 }
 export {};

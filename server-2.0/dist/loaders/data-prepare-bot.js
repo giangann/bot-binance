@@ -7,9 +7,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const logger_service_1 = __importDefault(require("../services/logger.service"));
 const binance_service_1 = require("../services/binance.service");
 const coin_price_1am_service_1 = __importDefault(require("../services/coin-price-1am.service"));
 const helper_1 = require("../ultils/helper");
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const prepareDataBot = async () => {
     // Fetch data
     // const promises = [getExchangeInfo(), getSymbolTickerPrices(), new CoinService().list(), getPositions()]
@@ -35,5 +38,13 @@ const prepareDataBot = async () => {
     global.orderPieces = [];
     global.orderPiecesMap = {};
     global.isBotActive = true;
+    // intitial other constant global variable
+    global.isMaxPnlReached = false;
+    global.MAX_PNL = parseFloat(process.env.MAX_PNL) || 19;
+    global.MAX_PNL_THRESHOLD_TO_QUIT = parseFloat(process.env.MAX_PNL_THRESHOLD_TO_QUIT) || 0.59;
+    logger_service_1.default.saveDebugAndClg('test global and dotenv var:');
+    logger_service_1.default.saveDebugAndClg(`global.isMaxPnlReached: ${global.isMaxPnlReached}`);
+    logger_service_1.default.saveDebugAndClg(`global.MAX_PNL: ${global.MAX_PNL}`);
+    logger_service_1.default.saveDebugAndClg(`global.MAX_PNL_THRESHOLD_TO_QUIT: ${global.MAX_PNL_THRESHOLD_TO_QUIT}`);
 };
 exports.default = prepareDataBot;

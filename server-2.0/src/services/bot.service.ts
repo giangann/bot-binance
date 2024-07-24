@@ -36,11 +36,20 @@ const tick = async () => {
 
   loggerService.saveDebugAndClg(`tick able run: ${global.isRunTick}`); // check
 
-  // quit if pnl thres hold reach
+  // -- Quit if pnl thres hold reach
   const totalPositionPnl = totalPnlFromPositionsMap(global.positionsMap);
   const pnlToStop = global.openingChain?.pnl_to_stop;
   const pnlToStopNumber = parseFloat(pnlToStop);
-  if (totalPositionPnl <= pnlToStopNumber) {
+  // calculate neccesary stats
+  if (totalPositionPnl >= global.MAX_PNL) global.isMaxPnlReached = true; // pnl reach top
+  const profitToQuit = global.MAX_PNL * global.MAX_PNL_THRESHOLD_TO_QUIT;
+  const isTotalPnlUnderThreshold = totalPositionPnl <= profitToQuit;
+  // decide able to quit or not
+  const isAbleToMakeProfit = global.isMaxPnlReached && isTotalPnlUnderThreshold;
+  const isAbleToCutLoss = totalPositionPnl <= pnlToStopNumber;
+  const isAbleToQuit = isAbleToCutLoss || isAbleToMakeProfit;
+
+  if (isAbleToQuit) {
     const stopMessage = `Reason: PNL = ${totalPositionPnl} <= ${pnlToStopNumber}`;
     await marketOrderChainService.update({
       id: global.openingChain?.id,
@@ -230,6 +239,9 @@ const quit = async () => {
   global.positionsMap = null;
 
   clearInterval(global.botInterval);
+
+  // clear variable for testing
+  global.isMaxPnlReached = false;
 
   // logger
   loggerService.saveDebug("Bot quited");
