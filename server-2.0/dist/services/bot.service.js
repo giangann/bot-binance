@@ -95,7 +95,9 @@ const evaluateAndPlaceOrderWs = (symbols) => {
         const percentToSell = openingChain.percent_to_sell;
         const percentToSellNumber = parseFloat(percentToSell);
         const isPercentAbleToSell = percentChange < percentToSellNumber;
-        const isAbleToSell = isPercentAbleToSell && orderPiecesOfSymbolLen >= 2;
+        const isHasTwoBuyOrderBefore = orderPiecesOfSymbol[0]?.direction === "BUY" &&
+            orderPiecesOfSymbol[1]?.direction === "BUY";
+        const isAbleToSell = isPercentAbleToSell && isHasTwoBuyOrderBefore;
         let debugMsg = `${symbol} prev: ${prevPrice}; curr: ${currPrice}; percent: ${percentChange}`;
         let direction = "";
         if (isAbleToBuy)
@@ -130,7 +132,7 @@ const evaluateAndPlaceOrderWs = (symbols) => {
             if (!positionAmtNumber)
                 continue;
             if (positionAmtNumber)
-                orderQty = positionAmtNumber / 2;
+                orderQty = positionAmtNumber;
         }
         const precision = exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
         const orderQtyValid = (0, helper_1.validateAmount)(orderQty, precision);

@@ -26,7 +26,7 @@ const tick = async () => {
   global.isRunTick = false;
 
   updatePositionsWebsocket();
-  const waitTime = parseInt(process.env.WAIT_POSITION) || 1
+  const waitTime = parseInt(process.env.WAIT_POSITION) || 1;
   await fakeDelay(waitTime);
 
   if (global.isRunTick === false) {
@@ -34,7 +34,7 @@ const tick = async () => {
     return;
   }
 
-  loggerService.saveDebugAndClg(`tick able run: ${global.isRunTick}` ); // check
+  loggerService.saveDebugAndClg(`tick able run: ${global.isRunTick}`); // check
 
   // quit if pnl thres hold reach
   const totalPositionPnl = totalPnlFromPositionsMap(global.positionsMap);
@@ -114,7 +114,10 @@ const evaluateAndPlaceOrderWs = (symbols: string[]) => {
     const percentToSell = openingChain.percent_to_sell;
     const percentToSellNumber = parseFloat(percentToSell);
     const isPercentAbleToSell = percentChange < percentToSellNumber;
-    const isAbleToSell = isPercentAbleToSell && orderPiecesOfSymbolLen >= 2;
+    const isHasTwoBuyOrderBefore =
+      orderPiecesOfSymbol[0]?.direction === "BUY" &&
+      orderPiecesOfSymbol[1]?.direction === "BUY";
+    const isAbleToSell = isPercentAbleToSell && isHasTwoBuyOrderBefore;
 
     let debugMsg = `${symbol} prev: ${prevPrice}; curr: ${currPrice}; percent: ${percentChange}`;
 
@@ -193,7 +196,7 @@ const quit = async () => {
     const piecesToSave = orderPieces.filter(
       ({ id: orderId }) => !(orderId in piecesMap)
     );
-    await marketOrderPieceService.createMany(piecesToSave)
+    await marketOrderPieceService.createMany(piecesToSave);
   }
 
   // close positions
