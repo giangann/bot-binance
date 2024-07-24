@@ -29,23 +29,33 @@ const tick = async () => {
     const pnlToStop = global.openingChain?.pnl_to_stop;
     const pnlToStopNumber = parseFloat(pnlToStop);
     // calculate neccesary stats
-    if (totalPositionPnl >= global.MAX_PNL)
-        global.isMaxPnlReached = true; // pnl reach top
-    const profitToQuit = global.MAX_PNL * global.MAX_PNL_THRESHOLD_TO_QUIT;
-    const isTotalPnlUnderThreshold = totalPositionPnl <= profitToQuit;
+    if (totalPositionPnl >= global.MAX_PNL) {
+        global.isMaxPnlReached = true;
+        logger_service_1.default.saveDebug(`totalPnl reach MAX_PNL: ${global.MAX_PNL}`);
+    } // pnl reach top
     // decide able to quit or not
-    const isAbleToMakeProfit = global.isMaxPnlReached && isTotalPnlUnderThreshold;
+    let isAbleToMakeProfit = false;
+    if (global.isMaxPnlReached) {
+        if (totalPositionPnl <= global.MAX_PNL * global.MAX_PNL_THRESHOLD_TO_QUIT)
+            isAbleToMakeProfit = true;
+        if (totalPositionPnl > global.MAX_PNL)
+            global.MAX_PNL = totalPositionPnl;
+    }
     const isAbleToCutLoss = totalPositionPnl <= pnlToStopNumber;
     const isAbleToQuit = isAbleToCutLoss || isAbleToMakeProfit;
     if (isAbleToQuit) {
-        const stopMessage = `Reason: PNL = ${totalPositionPnl} <= ${pnlToStopNumber}`;
+        let stopReason = "";
+        if (isAbleToCutLoss)
+            stopReason = `Cut loss: PNL = ${totalPositionPnl} <= ${pnlToStopNumber}`;
+        if (isAbleToMakeProfit)
+            stopReason = `Make profit: PNL = ${totalPositionPnl}, MAX_PNL = ${global.MAX_PNL}, THRESHOLD = ${global.MAX_PNL_THRESHOLD_TO_QUIT}`;
         await market_order_chain_service_1.default.update({
             id: global.openingChain?.id,
-            stop_reason: stopMessage,
+            stop_reason: stopReason,
         });
         await quit();
-        logger_service_1.default.saveDebug(stopMessage);
-        global.wsServerInstance.emit("bot-quit", stopMessage);
+        logger_service_1.default.saveDebug(stopReason);
+        global.wsServerInstance.emit("bot-quit", stopReason);
     }
     // calculate and place order
     const ableSymbols = (0, helper_1.ableOrderSymbolsMapToArray)(global.ableOrderSymbolsMap);
