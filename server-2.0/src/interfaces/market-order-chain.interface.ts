@@ -1,7 +1,7 @@
 import { IMarketOrderPieceRecord } from "./market-order-piece.interface";
 
 export type TOrderChainStatus = "open" | "closed";
-
+export type TOrderChainPriceType = "market" | "ticker";
 export interface IMarketOrderChainRecord {
   id: number;
   status: TOrderChainStatus;
@@ -20,6 +20,7 @@ export interface IMarketOrderChainRecord {
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
   is_max_pnl_start_reached: boolean;
+  price_type: TOrderChainPriceType;
   createdAt: string;
   updatedAt: string;
 }
@@ -39,6 +40,7 @@ export interface IMarketOrderChainCreate {
   pnl_to_stop: string;
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
+  price_type: TOrderChainPriceType;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -53,5 +55,6 @@ export interface IMarketOrderChainUpdate {
   is_over_pnl_to_stop?: boolean;
   stop_reason?: string;
   is_max_pnl_start_reached?: boolean;
+  price_type?: TOrderChainPriceType;
   updatedAt?: string;
 }

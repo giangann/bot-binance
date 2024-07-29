@@ -1,20 +1,23 @@
 import loggerService from "../../services/logger.service";
-import { TSymbolTickerPriceWs } from "../../types/websocket";
-import { updateSymbolTickerPricesNowMap } from "../memory.ultil";
+import { TSymbolMarketPriceWs } from "../../types/websocket";
+import {
+  updateSymbolMarketPricesNowMap,
+  updateSymbolTickerPricesNowMap,
+} from "../memory.ultil";
 ////////////////////////////////////////////////////
 // handle when ticker price update
 export const tickerPricesUpdateEvHandlerWs = (msg: any): void => {
   try {
     if (global.isBotActive) {
       const openingChain = global.openingChain;
-      if (openingChain.price_type === "ticker") {
+      if (openingChain.price_type === "market") {
         // evaluate and place order if bot is active
         const msgString = msg.toString();
-        const symbolTickerPrices: TSymbolTickerPriceWs[] =
+        const symbolMarketPrices: TSymbolMarketPriceWs[] =
           JSON.parse(msgString);
 
         // update memory
-        updateSymbolTickerPricesNowMap(symbolTickerPrices);
+        updateSymbolMarketPricesNowMap(symbolMarketPrices);
       }
     }
   } catch (err) {

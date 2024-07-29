@@ -5,7 +5,12 @@ import {
   IMarketOrderPieceEntity,
   TOrderPiecesMap,
 } from "../interfaces/market-order-piece.interface";
-import { TSymbolTickerPrice, TSymbolTickerPricesMap } from "./rest-api";
+import {
+  TSymbolMarketPrice,
+  TSymbolMarketPricesMap,
+  TSymbolTickerPrice,
+  TSymbolTickerPricesMap,
+} from "./rest-api";
 import { TExchangeInfoSymbolsMap } from "./rest-api/exchange-info.type";
 import { TPositionsMap } from "./rest-api/position.type";
 import { TOrderInfosMap } from "./websocket/order-info.type";
@@ -22,6 +27,8 @@ declare global {
 
   var symbolTickerPricesNow: TSymbolTickerPrice[]; // just use in test
   var symbolTickerPricesNowMap: TSymbolTickerPricesMap;
+  var symbolMarketPricesNow: TSymbolMarketPrice[];
+  var symbolMarketPricesNowMap: TSymbolMarketPricesMap;
 
   var exchangeInfoSymbolsMap: TExchangeInfoSymbolsMap;
   var positionsMap: TPositionsMap;

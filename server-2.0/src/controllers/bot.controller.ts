@@ -1,9 +1,8 @@
-import prepareDataBot from "../loaders/data-prepare-bot";
 import IController from "../interfaces/IController";
+import prepareDataBot from "../loaders/data-prepare-bot";
 import botService from "../services/bot.service";
 import marketOrderChainService from "../services/market-order-chain.service";
 import { ServerResponse } from "../ultils/server-response.ultil";
-import { activeBot, quitBot } from "../mock/bot-control";
 
 const active: IController = async (req, res) => {
   try {
@@ -14,7 +13,8 @@ const active: IController = async (req, res) => {
       percent_to_sell: req.body.percent_to_sell,
       pnl_to_stop: req.body.pnl_to_stop,
       max_pnl_start: req.body.max_pnl_start,
-      max_pnl_threshold_to_quit: req.body.max_pnl_threshold_to_quit
+      max_pnl_threshold_to_quit: req.body.max_pnl_threshold_to_quit,
+      price_type: req.body.price_type,
     };
 
     // create new chain

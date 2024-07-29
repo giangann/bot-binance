@@ -7,6 +7,7 @@ import loggerService from "../services/logger.service";
 import {
   getExchangeInfo,
   getPositions,
+  getSymbolMarketPrices,
   getSymbolTickerPrices,
 } from "../services/binance.service";
 import CoinService from "../services/coin-price-1am.service";
@@ -14,6 +15,7 @@ import {
   ableOrderSymbolsToMap,
   exchangeInfoSymbolsToMap,
   positionsToMap,
+  symbolPriceMarketsToMap,
   symbolPriceTickersToMap,
   symbolPricesToMap,
 } from "../ultils/helper";
@@ -26,6 +28,7 @@ const prepareDataBot = async () => {
   // const [exchangeInfo,symbolTickerPricesNow,symbolPricesStart,positions ] = await Promise.all(promises)
   const exchangeInfo = await getExchangeInfo();
   const symbolTickerPricesNow = await getSymbolTickerPrices();
+  const symbolMarketPricesNow = await getSymbolMarketPrices();
   const symbolPricesStart = await new CoinService().list();
   const positions = await getPositions();
 
@@ -40,6 +43,9 @@ const prepareDataBot = async () => {
   global.symbolPricesStartMap = symbolPricesStartMap;
   global.symbolTickerPricesNowMap = symbolPriceTickersToMap(
     symbolTickerPricesNow
+  );
+  global.symbolMarketPricesNowMap = symbolPriceMarketsToMap(
+    symbolMarketPricesNow
   );
   global.exchangeInfoSymbolsMap = exchangeInfoSymbolsMap;
   global.positionsMap = positionsMap;

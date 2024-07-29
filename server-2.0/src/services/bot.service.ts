@@ -39,7 +39,7 @@ const tick = async () => {
   // get opening chain
   const openingChain = global.openingChain;
   if (!openingChain) return;
-  
+
   // -- Quit if pnl thres hold reach
   const totalPositionPnl = totalPnlFromPositionsMap(global.positionsMap);
   const pnlToStop = openingChain?.pnl_to_stop;
@@ -96,8 +96,10 @@ const evaluateAndPlaceOrderWs = (symbols: string[]) => {
     const orderPiecesMap = global.orderPiecesMap;
     // -- Get symbolPricesMapStart
     const symbolPricesStartMap = global.symbolPricesStartMap;
-    // -- Get symbolPricesMapNow
+    // -- Get symbolTickerPricesMapNow
     const symbolTickerPricesNowMap = global.symbolTickerPricesNowMap;
+    // -- Get symbolMarketPricesMapNow
+    const symbolMarketPricesNowMap = global.symbolMarketPricesNowMap;
 
     // -- Calculate prevPrice
     let prevPrice: string | null | undefined = null;
@@ -114,13 +116,20 @@ const evaluateAndPlaceOrderWs = (symbols: string[]) => {
       prevPrice = lastOrderPiece.price;
     } else {
       const symbolPriceStart = symbolPricesStartMap[symbol];
-      prevPrice = symbolPriceStart?.price;
+      prevPrice =
+        openingChain.price_type === "market"
+          ? symbolPriceStart?.mark_price
+          : symbolPriceStart?.price;
     }
     if (!prevPrice) continue;
 
     // -- Calculate currPrice
+    const symbolMarketPriceNow = symbolMarketPricesNowMap[symbol];
     const symbolTickerPriceNow = symbolTickerPricesNowMap[symbol];
-    const currPrice = symbolTickerPriceNow?.price;
+    const currPrice =
+      openingChain.price_type === "market"
+        ? symbolMarketPriceNow?.markPrice
+        : symbolTickerPriceNow?.price;
     if (!currPrice) continue;
 
     // -- Calculate percentChange

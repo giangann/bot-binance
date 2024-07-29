@@ -8,7 +8,10 @@ import {
 import { BaseEntity } from "./base.entity";
 import { MarketOrderPiece } from "./market-order-piece.entity";
 import { Log } from "./log.entity";
-import { TOrderChainStatus } from "../interfaces/market-order-chain.interface";
+import {
+  TOrderChainPriceType,
+  TOrderChainStatus,
+} from "../interfaces/market-order-chain.interface";
 
 // Entities
 
@@ -64,6 +67,9 @@ export class MarketOrderChain extends BaseEntity {
 
   @Column({ nullable: false, default: false })
   is_max_pnl_start_reached: boolean;
+
+  @Column({ nullable: false })
+  price_type: TOrderChainPriceType;
 
   @OneToMany(() => MarketOrderPiece, (piece) => piece.order_chain)
   @JoinColumn({ name: "id", referencedColumnName: "market_order_chains_id" })
