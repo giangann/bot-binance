@@ -6,14 +6,20 @@ import {
   Grid,
   Stack,
 } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormLabel from "@mui/material/FormLabel";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { BaseInput } from "../../components/Input";
 import { BotContext } from "../../context/BotContext";
+import { OrderChainContext } from "../../context/OrderChainContext";
 import { SocketContext } from "../../context/SocketContext";
 import { getApi, postApi } from "../../request/request";
-import { OrderChainContext } from "../../context/OrderChainContext";
+import { TOrderChainPriceType } from "../../shared/types/order";
 
 type TNewOrderChain = {
   transaction_size: string;
@@ -23,6 +29,7 @@ type TNewOrderChain = {
   pnl_to_stop: string;
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
+  price_type: TOrderChainPriceType;
 };
 
 const defaultValue: TNewOrderChain = {
@@ -33,12 +40,15 @@ const defaultValue: TNewOrderChain = {
   pnl_to_stop: "10",
   max_pnl_start: "20",
   max_pnl_threshold_to_quit: "0.6",
+  price_type: "ticker",
 };
 
 export const NewOrderChain = () => {
   const [open, setOpen] = useState(false);
+  const [priceType, setPriceType] = useState<TOrderChainPriceType>("ticker");
   const socket = useContext(SocketContext);
   const bot = useContext(BotContext);
+
   const { fetchOrderChains } = useContext(OrderChainContext);
   const {
     register,
@@ -48,6 +58,7 @@ export const NewOrderChain = () => {
     defaultValues: defaultValue,
   });
   const onCreate = async (values: TNewOrderChain) => {
+    values["price_type"] = priceType;
     console.log("values ", values);
     try {
       const response = await postApi<TNewOrderChain>("bot/active", values);
@@ -171,6 +182,32 @@ export const NewOrderChain = () => {
                 label="Max Pnl Threshold To Quit"
                 placeholder="vd: 0.5, 0.6, 0.7... (>0 and <1)"
               />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl>
+                <FormLabel id="demo-row-radio-buttons-group-label">
+                  Chọn kiểu giá
+                </FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby="demo-row-radio-buttons-group-label"
+                  onChange={(ev) =>
+                    setPriceType(ev.target.value as TOrderChainPriceType)
+                  }
+                  value={priceType}
+                >
+                  <FormControlLabel
+                    control={<Radio />}
+                    label="Ticker"
+                    value={"ticker"}
+                  />
+                  <FormControlLabel
+                    control={<Radio />}
+                    label="Market"
+                    value={"market"}
+                  />
+                </RadioGroup>
+              </FormControl>
             </Grid>
           </Grid>
           <Stack direction="row" spacing={1}>

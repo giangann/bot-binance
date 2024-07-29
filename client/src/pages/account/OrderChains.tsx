@@ -90,6 +90,7 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
     stop_reason,
     max_pnl_start,
     max_pnl_threshold_to_quit,
+    price_type,
     updatedAt,
   } = chainInfo;
   const [isEdit, setIsEdit] = useState(false);
@@ -161,6 +162,12 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
             max_pnl_threshold_to_quit:{" "}
             <Typography sx={{ fontWeight: 600 }} component={"span"}>
               {max_pnl_threshold_to_quit}
+            </Typography>
+          </Typography>
+          <Typography>
+            price_type:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {price_type}
             </Typography>
           </Typography>
 

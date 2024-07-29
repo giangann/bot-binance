@@ -1,6 +1,7 @@
 import { Modify, TResponseWithPagiSimple } from "./base";
 
 export type TOrderChainStatus = "open" | "closed";
+export type TOrderChainPriceType = "market" | "ticker";
 
 export interface IMarketOrderChainRecord {
   id: number;
@@ -16,6 +17,7 @@ export interface IMarketOrderChainRecord {
   stop_reason?: string;
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
+  price_type: TOrderChainPriceType;
   order_pieces: IMarketOrderPieceRecord[];
   createdAt: string;
   updatedAt: string;
