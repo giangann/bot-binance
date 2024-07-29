@@ -1,11 +1,5 @@
 import ArticleIcon from "@mui/icons-material/Article";
-import {
-  Box,
-  IconButton,
-  Stack,
-  Typography,
-  styled
-} from "@mui/material";
+import { Box, IconButton, Stack, Typography, styled } from "@mui/material";
 import { blue, grey } from "@mui/material/colors";
 import dayjs from "dayjs";
 import { useRef, useState } from "react";
@@ -13,7 +7,7 @@ import { toast } from "react-toastify";
 import { BaseInput } from "../../components/Input";
 import {
   IcOutlineKeyboardReturn,
-  IcSharpFileDownloadDone
+  IcSharpFileDownloadDone,
 } from "../../icons/Icons";
 import { putApi } from "../../request/request";
 import { TMarketOrderChainWithPiecesPagi } from "../../shared/types/order";
@@ -94,6 +88,8 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
     percent_to_sell,
     pnl_to_stop,
     stop_reason,
+    max_pnl_start,
+    max_pnl_threshold_to_quit,
     updatedAt,
   } = chainInfo;
   const [isEdit, setIsEdit] = useState(false);
@@ -153,6 +149,18 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
             percent_to_sell:{" "}
             <Typography sx={{ fontWeight: 600 }} component={"span"}>
               {percent_to_sell}%
+            </Typography>
+          </Typography>
+          <Typography>
+            max_pnl_start:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {max_pnl_start}$
+            </Typography>
+          </Typography>
+          <Typography>
+            max_pnl_threshold_to_quit:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {max_pnl_threshold_to_quit}
             </Typography>
           </Typography>
 

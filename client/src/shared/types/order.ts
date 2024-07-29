@@ -14,6 +14,8 @@ export interface IMarketOrderChainRecord {
   percent_change?: string;
   pnl_to_stop: string;
   stop_reason?: string;
+  max_pnl_start: string;
+  max_pnl_threshold_to_quit: string;
   order_pieces: IMarketOrderPieceRecord[];
   createdAt: string;
   updatedAt: string;
