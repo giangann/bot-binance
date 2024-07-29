@@ -18,6 +18,7 @@ const prepareDataBot = async () => {
     // const [exchangeInfo,symbolTickerPricesNow,symbolPricesStart,positions ] = await Promise.all(promises)
     const exchangeInfo = await (0, binance_service_1.getExchangeInfo)();
     const symbolTickerPricesNow = await (0, binance_service_1.getSymbolTickerPrices)();
+    const symbolMarketPricesNow = await (0, binance_service_1.getSymbolMarketPrices)();
     const symbolPricesStart = await new coin_price_1am_service_1.default().list();
     const positions = await (0, binance_service_1.getPositions)();
     // Process data
@@ -29,6 +30,7 @@ const prepareDataBot = async () => {
     const ableOrderSymbolsMap = (0, helper_1.ableOrderSymbolsToMap)(ableOrderSymbols);
     global.symbolPricesStartMap = symbolPricesStartMap;
     global.symbolTickerPricesNowMap = (0, helper_1.symbolPriceTickersToMap)(symbolTickerPricesNow);
+    global.symbolMarketPricesNowMap = (0, helper_1.symbolPriceMarketsToMap)(symbolMarketPricesNow);
     global.exchangeInfoSymbolsMap = exchangeInfoSymbolsMap;
     global.positionsMap = positionsMap;
     global.ableOrderSymbolsMap = ableOrderSymbolsMap;

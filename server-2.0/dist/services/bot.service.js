@@ -76,8 +76,10 @@ const evaluateAndPlaceOrderWs = (symbols) => {
         const orderPiecesMap = global.orderPiecesMap;
         // -- Get symbolPricesMapStart
         const symbolPricesStartMap = global.symbolPricesStartMap;
-        // -- Get symbolPricesMapNow
+        // -- Get symbolTickerPricesMapNow
         const symbolTickerPricesNowMap = global.symbolTickerPricesNowMap;
+        // -- Get symbolMarketPricesMapNow
+        const symbolMarketPricesNowMap = global.symbolMarketPricesNowMap;
         // -- Calculate prevPrice
         let prevPrice = null;
         if (!orderPiecesMap[symbol]) {
@@ -93,13 +95,19 @@ const evaluateAndPlaceOrderWs = (symbols) => {
         }
         else {
             const symbolPriceStart = symbolPricesStartMap[symbol];
-            prevPrice = symbolPriceStart?.price;
+            prevPrice =
+                openingChain.price_type === "market"
+                    ? symbolPriceStart?.mark_price
+                    : symbolPriceStart?.price;
         }
         if (!prevPrice)
             continue;
         // -- Calculate currPrice
+        const symbolMarketPriceNow = symbolMarketPricesNowMap[symbol];
         const symbolTickerPriceNow = symbolTickerPricesNowMap[symbol];
-        const currPrice = symbolTickerPriceNow?.price;
+        const currPrice = openingChain.price_type === "market"
+            ? symbolMarketPriceNow?.markPrice
+            : symbolTickerPriceNow?.price;
         if (!currPrice)
             continue;
         // -- Calculate percentChange

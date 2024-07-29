@@ -12,12 +12,12 @@ const tickerPricesUpdateEvHandlerWs = (msg) => {
     try {
         if (global.isBotActive) {
             const openingChain = global.openingChain;
-            if (openingChain.price_type === "ticker") {
+            if (openingChain.price_type === "market") {
                 // evaluate and place order if bot is active
                 const msgString = msg.toString();
-                const symbolTickerPrices = JSON.parse(msgString);
+                const symbolMarketPrices = JSON.parse(msgString);
                 // update memory
-                (0, memory_ultil_1.updateSymbolTickerPricesNowMap)(symbolTickerPrices);
+                (0, memory_ultil_1.updateSymbolMarketPricesNowMap)(symbolMarketPrices);
             }
         }
     }
