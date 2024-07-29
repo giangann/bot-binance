@@ -17,6 +17,9 @@ export interface IMarketOrderChainRecord {
   pnl_to_stop: string;
   is_over_pnl_to_stop: boolean;
   stop_reason?: string;
+  max_pnl_start: string;
+  max_pnl_threshold_to_quit: string;
+  is_max_pnl_start_reached: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,6 +37,8 @@ export interface IMarketOrderChainCreate {
   percent_to_sell: string;
   price_start?: string;
   pnl_to_stop: string;
+  max_pnl_start: string;
+  max_pnl_threshold_to_quit: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -47,5 +52,6 @@ export interface IMarketOrderChainUpdate {
   pnl_to_stop?: string;
   is_over_pnl_to_stop?: boolean;
   stop_reason?: string;
+  is_max_pnl_start_reached?: boolean;
   updatedAt?: string;
 }

@@ -28,7 +28,7 @@ export class MarketOrderChain extends BaseEntity {
 
   @Column({ nullable: false })
   percent_to_first_buy: string;
-  
+
   @Column({ nullable: false })
   percent_to_buy: string;
 
@@ -55,6 +55,15 @@ export class MarketOrderChain extends BaseEntity {
 
   @Column({ nullable: true })
   stop_reason: string;
+
+  @Column({ nullable: false })
+  max_pnl_start: string;
+
+  @Column({ nullable: false })
+  max_pnl_threshold_to_quit: string;
+
+  @Column({ nullable: false, default: false })
+  is_max_pnl_start_reached: boolean;
 
   @OneToMany(() => MarketOrderPiece, (piece) => piece.order_chain)
   @JoinColumn({ name: "id", referencedColumnName: "market_order_chains_id" })
