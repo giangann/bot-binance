@@ -15,6 +15,8 @@ const active = async (req, res) => {
             percent_to_buy: req.body.percent_to_buy,
             percent_to_sell: req.body.percent_to_sell,
             pnl_to_stop: req.body.pnl_to_stop,
+            max_pnl_start: req.body.max_pnl_start,
+            max_pnl_threshold_to_quit: req.body.max_pnl_threshold_to_quit
         };
         // create new chain
         const newOrderChain = await market_order_chain_service_1.default.create({

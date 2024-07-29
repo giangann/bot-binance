@@ -30,6 +30,9 @@ let MarketOrderChain = class MarketOrderChain extends base_entity_1.BaseEntity {
     pnl_to_stop;
     is_over_pnl_to_stop;
     stop_reason;
+    max_pnl_start;
+    max_pnl_threshold_to_quit;
+    is_max_pnl_start_reached;
     order_pieces;
     logs;
 };
@@ -90,6 +93,18 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], MarketOrderChain.prototype, "stop_reason", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], MarketOrderChain.prototype, "max_pnl_start", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], MarketOrderChain.prototype, "max_pnl_threshold_to_quit", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: false, default: false }),
+    __metadata("design:type", Boolean)
+], MarketOrderChain.prototype, "is_max_pnl_start_reached", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => market_order_piece_entity_1.MarketOrderPiece, (piece) => piece.order_chain),
     (0, typeorm_1.JoinColumn)({ name: "id", referencedColumnName: "market_order_chains_id" }),

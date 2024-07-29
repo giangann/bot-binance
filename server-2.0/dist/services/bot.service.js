@@ -24,22 +24,28 @@ const tick = async () => {
         return;
     }
     logger_service_1.default.saveDebugAndClg(`tick able run: ${global.isRunTick}`); // check
+    // get opening chain
+    const openingChain = global.openingChain;
+    if (!openingChain)
+        return;
     // -- Quit if pnl thres hold reach
     const totalPositionPnl = (0, helper_1.totalPnlFromPositionsMap)(global.positionsMap);
-    const pnlToStop = global.openingChain?.pnl_to_stop;
+    const pnlToStop = openingChain?.pnl_to_stop;
     const pnlToStopNumber = parseFloat(pnlToStop);
+    const maxPnlStartNumber = parseFloat(openingChain?.max_pnl_start);
+    const maxPnlThresholdToQuitNumber = parseFloat(openingChain?.max_pnl_threshold_to_quit);
     // calculate neccesary stats
-    if (totalPositionPnl >= global.MAX_PNL) {
-        global.isMaxPnlReached = true;
-        logger_service_1.default.saveDebug(`totalPnl reach MAX_PNL: ${global.MAX_PNL}`);
+    if (totalPositionPnl >= maxPnlStartNumber) {
+        openingChain.is_max_pnl_start_reached = true;
+        logger_service_1.default.saveDebug(`totalPnl reach MAX_PNL_START: ${maxPnlStartNumber}`);
     } // pnl reach top
     // decide able to quit or not
     let isAbleToMakeProfit = false;
-    if (global.isMaxPnlReached) {
-        if (totalPositionPnl <= global.MAX_PNL * global.MAX_PNL_THRESHOLD_TO_QUIT)
+    if (openingChain.is_max_pnl_start_reached) {
+        if (totalPositionPnl <= maxPnlStartNumber * maxPnlThresholdToQuitNumber)
             isAbleToMakeProfit = true;
-        if (totalPositionPnl > global.MAX_PNL)
-            global.MAX_PNL = totalPositionPnl;
+        if (totalPositionPnl > maxPnlStartNumber)
+            openingChain.max_pnl_start = totalPositionPnl.toString();
     }
     const isAbleToCutLoss = totalPositionPnl <= pnlToStopNumber;
     const isAbleToQuit = isAbleToCutLoss || isAbleToMakeProfit;
@@ -48,10 +54,11 @@ const tick = async () => {
         if (isAbleToCutLoss)
             stopReason = `Cut loss: PNL = ${totalPositionPnl} <= ${pnlToStopNumber}`;
         if (isAbleToMakeProfit)
-            stopReason = `Make profit: PNL = ${totalPositionPnl}, MAX_PNL = ${global.MAX_PNL}, THRESHOLD = ${global.MAX_PNL_THRESHOLD_TO_QUIT}`;
+            stopReason = `Make profit: PNL = ${totalPositionPnl}, MAX_PNL_START = ${maxPnlStartNumber}, THRESHOLD = ${maxPnlThresholdToQuitNumber}`;
         await market_order_chain_service_1.default.update({
-            id: global.openingChain?.id,
+            id: openingChain?.id,
             stop_reason: stopReason,
+            is_max_pnl_start_reached: openingChain.is_max_pnl_start_reached,
         });
         await quit();
         logger_service_1.default.saveDebug(stopReason);
@@ -218,8 +225,6 @@ const quit = async () => {
     global.exchangeInfoSymbolsMap = null;
     global.positionsMap = null;
     clearInterval(global.botInterval);
-    // clear variable for testing
-    global.isMaxPnlReached = false;
     // logger
     logger_service_1.default.saveDebug("Bot quited");
     return true;
