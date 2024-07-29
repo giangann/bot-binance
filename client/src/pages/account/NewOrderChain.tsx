@@ -21,6 +21,8 @@ type TNewOrderChain = {
   percent_to_buy: string;
   percent_to_sell: string;
   pnl_to_stop: string;
+  max_pnl_start: string;
+  max_pnl_threshold_to_quit: string;
 };
 
 const defaultValue: TNewOrderChain = {
@@ -29,6 +31,8 @@ const defaultValue: TNewOrderChain = {
   percent_to_buy: "5",
   percent_to_sell: "-2",
   pnl_to_stop: "10",
+  max_pnl_start: "20",
+  max_pnl_threshold_to_quit: "0.6",
 };
 
 export const NewOrderChain = () => {
@@ -152,6 +156,20 @@ export const NewOrderChain = () => {
                 {...register("pnl_to_stop")}
                 label="Đóng lệnh khi pnl nhỏ hơn: ($)"
                 placeholder="vd: 20, -10, ..."
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <BaseInput
+                {...register("max_pnl_start")}
+                label="Max Pnl start ($)"
+                placeholder="vd: 20, 30,... (greater than 0)"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <BaseInput
+                {...register("max_pnl_threshold_to_quit")}
+                label="Max Pnl Threshold To Quit"
+                placeholder="vd: 0.5, 0.6, 0.7... (>0 and <1)"
               />
             </Grid>
           </Grid>
