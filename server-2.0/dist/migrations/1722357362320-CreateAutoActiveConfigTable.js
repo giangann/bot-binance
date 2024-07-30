@@ -1,0 +1,79 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CreateAutoActiveConfigTable1722357362320 = void 0;
+const typeorm_1 = require("typeorm");
+class CreateAutoActiveConfigTable1722357362320 {
+    async up(queryRunner) {
+        await queryRunner.createTable(new typeorm_1.Table({
+            name: "auto_active_config",
+            columns: [
+                {
+                    name: "id",
+                    type: "int",
+                    isGenerated: true,
+                    generationStrategy: "increment",
+                    isPrimary: true,
+                },
+                {
+                    name: "auto_active_decrease_price",
+                    type: "varchar",
+                    isNullable: false,
+                },
+                {
+                    name: "max_pnl_start",
+                    type: "varchar",
+                    isNullable: false,
+                },
+                {
+                    name: "max_pnl_threshold_to_quit",
+                    type: "varchar",
+                    isNullable: false,
+                },
+                {
+                    name: "percent_to_buy",
+                    type: "varchar",
+                    isNullable: false,
+                },
+                {
+                    name: "percent_to_first_buy",
+                    type: "varchar",
+                    isNullable: false,
+                },
+                {
+                    name: "percent_to_sell",
+                    type: "varchar",
+                    isNullable: false,
+                },
+                {
+                    name: "pnl_to_stop",
+                    type: "varchar",
+                    isNullable: false,
+                },
+                {
+                    name: "price_type",
+                    type: "varchar",
+                    isNullable: false,
+                },
+                {
+                    name: "transaction_size_start",
+                    type: "int",
+                    isNullable: false,
+                },
+                {
+                    name: "createdAt",
+                    type: "datetime",
+                    default: "CURRENT_TIMESTAMP",
+                },
+                {
+                    name: "updatedAt",
+                    type: "datetime",
+                    default: "CURRENT_TIMESTAMP",
+                },
+            ],
+        }));
+    }
+    async down(queryRunner) {
+        await queryRunner.dropTable("auto_active_config");
+    }
+}
+exports.CreateAutoActiveConfigTable1722357362320 = CreateAutoActiveConfigTable1722357362320;

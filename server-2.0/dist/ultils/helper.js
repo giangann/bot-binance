@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.totalPnlFromPositionsMap = exports.ableOrderSymbolsMapToArray = exports.errorWsApiResponseToString = exports.rateLimitsArrayToString = exports.filterPositionsNotZero = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.orderPiecesToMap = exports.ableOrderSymbolsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.positionsToMap = exports.exchangeInfoSymbolsToMap = exports.symbolPricesToMap = exports.validateAmount = exports.binanceStreamToSymbolPrice = exports.paramsToQueryWithSignature = exports.generateSignature = exports.fakeDelay = void 0;
+exports.removeNullUndefinedProperties = exports.totalPnlFromPositionsMap = exports.ableOrderSymbolsMapToArray = exports.errorWsApiResponseToString = exports.rateLimitsArrayToString = exports.filterPositionsNotZero = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.orderPiecesToMap = exports.ableOrderSymbolsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.positionsToMap = exports.exchangeInfoSymbolsToMap = exports.symbolPricesToMap = exports.validateAmount = exports.binanceStreamToSymbolPrice = exports.paramsToQueryWithSignature = exports.generateSignature = exports.fakeDelay = void 0;
 const crypto_1 = require("crypto");
 const fakeDelay = async (seconds) => {
     await new Promise((resolve, _reject) => {
@@ -247,3 +247,7 @@ const totalPnlFromPositionsMap = (positionsMap) => {
     return result;
 };
 exports.totalPnlFromPositionsMap = totalPnlFromPositionsMap;
+function removeNullUndefinedProperties(obj) {
+    return Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== null && value !== undefined));
+}
+exports.removeNullUndefinedProperties = removeNullUndefinedProperties;
