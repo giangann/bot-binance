@@ -56,3 +56,6 @@ export interface IAutoActiveConfigUpdate {
 
   updatedAt?: string;
 }
+
+export interface IAutoActiveConfigUpdateOne
+  extends Omit<IAutoActiveConfigUpdate, "id"> {}

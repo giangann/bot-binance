@@ -3,9 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const moment_1 = __importDefault(require("moment"));
 const typeorm_1 = require("typeorm");
 const auto_active_config_entity_1 = require("../entities/auto-active-config.entity");
-const moment_1 = __importDefault(require("moment"));
 const getOne = async () => {
     const repo = (0, typeorm_1.getRepository)(auto_active_config_entity_1.AutoActiveConfig).createQueryBuilder();
     const record = await repo.getOne();

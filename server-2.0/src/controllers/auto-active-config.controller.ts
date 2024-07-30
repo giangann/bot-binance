@@ -1,8 +1,8 @@
-import { ServerResponse } from "../ultils/server-response.ultil";
 import IController from "../interfaces/IController";
+import { IAutoActiveConfigUpdateOne } from "../interfaces/auto-active-config.interface";
 import autoActiveConfigService from "../services/auto-active-config.service";
-import { IAutoActiveConfigUpdate } from "../interfaces/auto-active-config.interface";
 import { removeNullUndefinedProperties } from "../ultils/helper";
+import { ServerResponse } from "../ultils/server-response.ultil";
 
 const getOne: IController = async (req, res) => {
   try {
@@ -15,7 +15,7 @@ const getOne: IController = async (req, res) => {
 
 const updateOne: IController = async (req, res) => {
   try {
-    const params: Omit<IAutoActiveConfigUpdate, "id"> = {
+    const params: IAutoActiveConfigUpdateOne = {
       auto_active_decrease_price: req.body?.auto_active_decrease_price,
       max_pnl_start: req.body?.max_pnl_start,
       max_pnl_threshold_to_quit: req.body?.max_pnl_threshold_to_quit,

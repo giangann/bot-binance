@@ -15,6 +15,7 @@ const base_entity_1 = require("./base.entity");
 // Entities
 let AutoActiveConfig = class AutoActiveConfig extends base_entity_1.BaseEntity {
     id;
+    auto_active;
     auto_active_decrease_price;
     max_pnl_start;
     max_pnl_threshold_to_quit;
@@ -30,6 +31,10 @@ __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], AutoActiveConfig.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], AutoActiveConfig.prototype, "auto_active", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", String)

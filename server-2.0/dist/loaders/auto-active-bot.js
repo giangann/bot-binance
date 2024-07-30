@@ -20,25 +20,25 @@ const autoActiveStart = async () => {
     const autoActiveCheckInterval = setInterval(checkpoint, 5000);
     global.autoActiveCheckInterval = autoActiveCheckInterval;
     // logger to track
-    const loggerMessage = `AutoActive when price decrease >= ${autoActiveBotConfig.auto_active_decrease_price}`;
+    const autoActiveStatus = autoActiveBotConfig.auto_active;
+    const loggerMessage = `AutoActive: ${autoActiveStatus} when price decrease >= ${autoActiveBotConfig.auto_active_decrease_price}`;
     logger_service_1.default.saveDebug(loggerMessage);
 };
 exports.autoActiveStart = autoActiveStart;
 const checkpoint = async () => {
     try {
-        // skip if bot already running
+        // skip if bot already running or auto active is turn off
         if (global.isBotActive)
             return;
         // get data, calculate price
         const klines = await (0, binance_service_1.getMarketPriceKlines)();
         const maxPrice = (0, helper_1.maxMarketPriceKlineFromArray)(klines);
         const currPrice = (0, helper_1.currentMarketPriceKlineFromArray)(klines);
-        // //////////////////
-        const debugMsg = `market price: max ${maxPrice} curr ${currPrice}`;
-        logger_service_1.default.saveDebugAndClg(debugMsg);
-        // ///////////////////////////
         // emit price to client
         global.wsServerInstance.emit("auto-active-check", { maxPrice, currPrice });
+        // still need to emit price to cient even status on or off
+        if (autoActiveBotConfig.auto_active === "off")
+            return;
         // decide able to active
         const decreasePrice = maxPrice - currPrice;
         const decreasePriceToActive = autoActiveBotConfig.auto_active_decrease_price;

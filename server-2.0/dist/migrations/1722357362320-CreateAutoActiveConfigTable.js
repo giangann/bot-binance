@@ -15,6 +15,11 @@ class CreateAutoActiveConfigTable1722357362320 {
                     isPrimary: true,
                 },
                 {
+                    name: "auto_active",
+                    type: "varchar",
+                    isNullable: false,
+                },
+                {
                     name: "auto_active_decrease_price",
                     type: "varchar",
                     isNullable: false,

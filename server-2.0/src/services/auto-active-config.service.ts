@@ -1,7 +1,7 @@
+import moment from "moment";
 import { UpdateResult, getRepository } from "typeorm";
 import { AutoActiveConfig } from "../entities/auto-active-config.entity";
-import { IAutoActiveConfigUpdate } from "../interfaces/auto-active-config.interface";
-import moment from "moment";
+import { IAutoActiveConfigUpdateOne } from "../interfaces/auto-active-config.interface";
 
 const getOne = async (): Promise<Omit<AutoActiveConfig, "id">> => {
   const repo = getRepository(AutoActiveConfig).createQueryBuilder();
@@ -12,7 +12,7 @@ const getOne = async (): Promise<Omit<AutoActiveConfig, "id">> => {
 };
 
 const updateOne = async (
-  params: Omit<IAutoActiveConfigUpdate, "id">
+  params: IAutoActiveConfigUpdateOne
 ): Promise<UpdateResult> => {
   const repo = getRepository(AutoActiveConfig);
 
