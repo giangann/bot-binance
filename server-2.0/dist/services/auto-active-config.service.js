@@ -9,7 +9,8 @@ const moment_1 = __importDefault(require("moment"));
 const getOne = async () => {
     const repo = (0, typeorm_1.getRepository)(auto_active_config_entity_1.AutoActiveConfig).createQueryBuilder();
     const record = await repo.getOne();
-    return record;
+    const { id, ...recordWithoutId } = record;
+    return recordWithoutId;
 };
 const updateOne = async (params) => {
     const repo = (0, typeorm_1.getRepository)(auto_active_config_entity_1.AutoActiveConfig);

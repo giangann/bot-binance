@@ -3,10 +3,12 @@ import { AutoActiveConfig } from "../entities/auto-active-config.entity";
 import { IAutoActiveConfigUpdate } from "../interfaces/auto-active-config.interface";
 import moment from "moment";
 
-const getOne = async () => {
+const getOne = async (): Promise<Omit<AutoActiveConfig, "id">> => {
   const repo = getRepository(AutoActiveConfig).createQueryBuilder();
   const record = await repo.getOne();
-  return record;
+  const { id, ...recordWithoutId } = record;
+
+  return recordWithoutId;
 };
 
 const updateOne = async (

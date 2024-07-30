@@ -29,7 +29,13 @@ const updateOne = async (req, res) => {
             transaction_size_start: req.body?.transaction_size_start,
         };
         const validParams = (0, helper_1.removeNullUndefinedProperties)(params);
+        // update database
         const updatedRecord = await auto_active_config_service_1.default.updateOne(validParams);
+        // update memory
+        global.autoActiveBotConfig = {
+            ...global.autoActiveBotConfig,
+            ...validParams,
+        };
         server_response_ultil_1.ServerResponse.response(res, updatedRecord);
     }
     catch (error) {

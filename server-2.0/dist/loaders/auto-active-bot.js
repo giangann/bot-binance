@@ -19,6 +19,9 @@ const autoActiveStart = async () => {
     // start interval, save interval to memory
     const autoActiveCheckInterval = setInterval(checkpoint, 5000);
     global.autoActiveCheckInterval = autoActiveCheckInterval;
+    // logger to track
+    const loggerMessage = `AutoActive when price decrease >= ${autoActiveBotConfig.auto_active_decrease_price}`;
+    logger_service_1.default.saveDebug(loggerMessage);
 };
 exports.autoActiveStart = autoActiveStart;
 const checkpoint = async () => {
@@ -30,6 +33,10 @@ const checkpoint = async () => {
         const klines = await (0, binance_service_1.getMarketPriceKlines)();
         const maxPrice = (0, helper_1.maxMarketPriceKlineFromArray)(klines);
         const currPrice = (0, helper_1.currentMarketPriceKlineFromArray)(klines);
+        // //////////////////
+        const debugMsg = `market price: max ${maxPrice} curr ${currPrice}`;
+        logger_service_1.default.saveDebugAndClg(debugMsg);
+        // ///////////////////////////
         // emit price to client
         global.wsServerInstance.emit("auto-active-check", { maxPrice, currPrice });
         // decide able to active
@@ -39,11 +46,13 @@ const checkpoint = async () => {
         const isAbleToActive = decreasePrice >= decreasePriceToActiveNumber;
         // if able then active
         if (isAbleToActive) {
+            const activeReason = `BTCUSDT market price - Now: ${currPrice}, Max: ${maxPrice}`;
             // create new chain
             const newOrderChain = await market_order_chain_service_1.default.create({
                 status: "open",
                 price_start: "0.000", // can't defined
                 total_balance_start: "0.000", // can't defined
+                start_reason: activeReason,
                 ...autoActiveBotConfig,
             });
             // update global data
@@ -52,7 +61,6 @@ const checkpoint = async () => {
             // call to service
             await bot_service_1.default.active();
             // emit event to notify to client
-            const activeReason = `BTCUSDT market price - Now: ${currPrice}, Max: ${maxPrice}`;
             global.wsServerInstance.emit("bot-active", activeReason);
             // save log
             logger_service_1.default.saveDebug(activeReason);

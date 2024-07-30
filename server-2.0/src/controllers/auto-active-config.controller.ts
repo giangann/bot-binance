@@ -26,9 +26,16 @@ const updateOne: IController = async (req, res) => {
       price_type: req.body?.price_type,
       transaction_size_start: req.body?.transaction_size_start,
     };
-
     const validParams = removeNullUndefinedProperties(params);
+
+    // update database
     const updatedRecord = await autoActiveConfigService.updateOne(validParams);
+    // update memory
+    global.autoActiveBotConfig = {
+      ...global.autoActiveBotConfig,
+      ...validParams,
+    };
+
     ServerResponse.response(res, updatedRecord);
   } catch (error: any) {
     ServerResponse.error(res, error.message);

@@ -15,8 +15,13 @@ export interface IAutoActiveConfigRecord {
   createdAt: string;
   updatedAt: string;
 }
-
 export interface IAutoActiveConfigEntity extends IAutoActiveConfigRecord {}
+
+// interface without id
+export interface IAutoActiveConfigRecordWithoutId
+  extends Omit<IAutoActiveConfigRecord, "id"> {}
+export interface IAutoActiveConfigEntitywithoutId
+  extends Omit<IAutoActiveConfigEntity, "id"> {}
 
 export interface IAutoActiveConfigCreate {
   auto_active_decrease_price: string;
