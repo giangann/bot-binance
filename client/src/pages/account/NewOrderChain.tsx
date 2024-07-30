@@ -22,7 +22,7 @@ import { getApi, postApi } from "../../request/request";
 import { TOrderChainPriceType } from "../../shared/types/order";
 
 type TNewOrderChain = {
-  transaction_size: string;
+  transaction_size_start: string;
   percent_to_first_buy: string;
   percent_to_buy: string;
   percent_to_sell: string;
@@ -34,7 +34,7 @@ type TNewOrderChain = {
 
 const defaultValue: TNewOrderChain = {
   percent_to_first_buy: "1",
-  transaction_size: "20",
+  transaction_size_start: "20",
   percent_to_buy: "5",
   percent_to_sell: "-2",
   pnl_to_stop: "10",
@@ -135,7 +135,7 @@ export const NewOrderChain = () => {
           <Grid container spacing={2} mb={2}>
             <Grid item xs={12} sm={6}>
               <BaseInput
-                {...register("transaction_size")}
+                {...register("transaction_size_start")}
                 label="Giá trị lệnh (USD)"
                 placeholder="Nhập số"
               />

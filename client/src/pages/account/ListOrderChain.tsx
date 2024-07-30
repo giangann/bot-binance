@@ -9,6 +9,7 @@ import { Balance } from "./Balance";
 import { NewOrderChain } from "./NewOrderChain";
 import { OrderChains } from "./OrderChains";
 import { Position } from "./Position";
+import { AutoActive } from "./AutoActive";
 
 export const ListOrderChain = () => {
   const [orderChains, setOrderChains] = useState<
@@ -39,6 +40,7 @@ export const ListOrderChain = () => {
     <OrderChainContext.Provider value={{ fetchOrderChains }}>
       <Box>
         <BalanceAndPosition />
+        <AutoActive/>
         <TitleAndNewChainBtn />
         <OrderChains orderChains={orderChains} />
       </Box>
@@ -49,10 +51,10 @@ export const ListOrderChain = () => {
 const BalanceAndPosition = () => {
   return (
     <Grid container columnGap={2}>
-      <Grid xs={12} sm={3.5}>
+      <Grid item xs={12} sm={3.5}>
         <Balance />
       </Grid>
-      <Grid xs={12} sm={8}>
+      <Grid item xs={12} sm={8}>
         <Position />
       </Grid>
     </Grid>

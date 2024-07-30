@@ -222,3 +222,11 @@ export function arraySliceByPagi(
   const endIndex = currPage * perpage;
   return array.slice(startIndex, endIndex);
 }
+
+export const fakeDelay = async (seconds: number) => {
+  await new Promise((resolve, _reject) => {
+    setTimeout(() => {
+      resolve("");
+    }, seconds * 1000);
+  });
+};
