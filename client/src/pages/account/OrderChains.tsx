@@ -91,6 +91,7 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
     max_pnl_start,
     max_pnl_threshold_to_quit,
     price_type,
+    start_reason,
     updatedAt,
   } = chainInfo;
   const [isEdit, setIsEdit] = useState(false);
@@ -128,6 +129,12 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
             </Typography>
           </Typography>
           {/*  */}
+          <Typography whiteSpace={"nowrap"}>
+            start_reason:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {start_reason ?? "null"}
+            </Typography>
+          </Typography>
           <Typography>
             transaction_size_start:{" "}
             <Typography sx={{ fontWeight: 600 }} component={"span"}>

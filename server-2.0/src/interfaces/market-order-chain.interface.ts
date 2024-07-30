@@ -21,6 +21,7 @@ export interface IMarketOrderChainRecord {
   max_pnl_threshold_to_quit: string;
   is_max_pnl_start_reached: boolean;
   price_type: TOrderChainPriceType;
+  start_reason?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,6 +42,7 @@ export interface IMarketOrderChainCreate {
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
   price_type: TOrderChainPriceType;
+  start_reason?: string;
   createdAt?: string;
   updatedAt?: string;
 }

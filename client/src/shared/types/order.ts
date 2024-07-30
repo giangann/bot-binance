@@ -18,6 +18,7 @@ export interface IMarketOrderChainRecord {
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
   price_type: TOrderChainPriceType;
+  start_reason?: string;
   order_pieces: IMarketOrderPieceRecord[];
   createdAt: string;
   updatedAt: string;
