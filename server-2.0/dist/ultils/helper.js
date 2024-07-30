@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeNullUndefinedProperties = exports.totalPnlFromPositionsMap = exports.ableOrderSymbolsMapToArray = exports.errorWsApiResponseToString = exports.rateLimitsArrayToString = exports.filterPositionsNotZero = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.orderPiecesToMap = exports.ableOrderSymbolsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.positionsToMap = exports.exchangeInfoSymbolsToMap = exports.symbolPricesToMap = exports.validateAmount = exports.binanceStreamToSymbolPrice = exports.paramsToQueryWithSignature = exports.generateSignature = exports.fakeDelay = void 0;
+exports.currentMarketPriceKlineFromArray = exports.maxMarketPriceKlineFromArray = exports.removeNullUndefinedProperties = exports.totalPnlFromPositionsMap = exports.ableOrderSymbolsMapToArray = exports.errorWsApiResponseToString = exports.rateLimitsArrayToString = exports.filterPositionsNotZero = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.orderPiecesToMap = exports.ableOrderSymbolsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.positionsToMap = exports.exchangeInfoSymbolsToMap = exports.symbolPricesToMap = exports.validateAmount = exports.binanceStreamToSymbolPrice = exports.paramsToQueryWithSignature = exports.generateSignature = exports.fakeDelay = void 0;
 const crypto_1 = require("crypto");
 const fakeDelay = async (seconds) => {
     await new Promise((resolve, _reject) => {
@@ -251,3 +251,25 @@ function removeNullUndefinedProperties(obj) {
     return Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== null && value !== undefined));
 }
 exports.removeNullUndefinedProperties = removeNullUndefinedProperties;
+function maxMarketPriceKlineFromArray(marketPriceKlinesArray) {
+    let maxPrice = 0;
+    for (let kline of marketPriceKlinesArray) {
+        // get close price
+        const closePrice = parseFloat(kline[4]);
+        if (closePrice > maxPrice)
+            maxPrice = closePrice;
+    }
+    return maxPrice;
+}
+exports.maxMarketPriceKlineFromArray = maxMarketPriceKlineFromArray;
+function currentMarketPriceKlineFromArray(marketPriceKlinesArray) {
+    const firstKlineEl = marketPriceKlinesArray[0];
+    const lastKlineEl = marketPriceKlinesArray[marketPriceKlinesArray.length - 1];
+    // compare timestamp
+    // first kline element is the lastest
+    const lastestKline = firstKlineEl[0] > lastKlineEl[0] ? firstKlineEl : lastKlineEl;
+    // get close price of lastest kline
+    const currentMarketPrice = parseFloat(lastestKline[4]);
+    return currentMarketPrice;
+}
+exports.currentMarketPriceKlineFromArray = currentMarketPriceKlineFromArray;

@@ -1,3 +1,4 @@
+import { autoActiveStart } from "./loaders/auto-active-bot";
 import { connectDatabase } from "./loaders/db-connect";
 import constructHttpServer from "./loaders/http-server";
 import { subcribeAndForwardBinanceStream } from "./loaders/market-data-stream";
@@ -23,6 +24,7 @@ const start = async () => {
     subcribeAndForwardBinanceStream();
     listenSymbolTickerPricesStreamWs();
 
+    autoActiveStart()
   } catch (err) {
     console.log(err);
   }

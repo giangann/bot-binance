@@ -3,6 +3,7 @@ import {
   ICoinPrice1AM,
   ICoinPrice1AMMap,
 } from "../interfaces/coin-price-1am.interface";
+import { IMarketOrderPieceEntity } from "../interfaces/market-order-piece.interface";
 import {
   TBinanceError,
   TSymbolMarketPrice,
@@ -13,6 +14,7 @@ import {
   TExchangeInfoSymbolsMap,
 } from "../types/rest-api/exchange-info.type";
 import { TPosition, TPositionsMap } from "../types/rest-api/position.type";
+import { TSymbolMarketPriceKline } from "../types/rest-api/symbol-prices-kline.type";
 import {
   TMarkPriceStream,
   TSymbolMarketPriceWs,
@@ -20,7 +22,6 @@ import {
   TTickerPriceStream,
 } from "../types/websocket";
 import { TRateLimit } from "../types/websocket/ws-api-response.type";
-import { IMarketOrderPieceEntity } from "../interfaces/market-order-piece.interface";
 
 export const fakeDelay = async (seconds: number) => {
   await new Promise((resolve, _reject) => {
@@ -315,4 +316,34 @@ export function removeNullUndefinedProperties(
       ([_, value]) => value !== null && value !== undefined
     )
   );
+}
+
+export function maxMarketPriceKlineFromArray(
+  marketPriceKlinesArray: TSymbolMarketPriceKline[]
+) {
+  let maxPrice = 0;
+  for (let kline of marketPriceKlinesArray) {
+    // get close price
+    const closePrice = parseFloat(kline[4]);
+    if (closePrice > maxPrice) maxPrice = closePrice;
+  }
+
+  return maxPrice;
+}
+
+export function currentMarketPriceKlineFromArray(
+  marketPriceKlinesArray: TSymbolMarketPriceKline[]
+) {
+  const firstKlineEl = marketPriceKlinesArray[0];
+  const lastKlineEl = marketPriceKlinesArray[marketPriceKlinesArray.length - 1];
+
+  // compare timestamp
+  // first kline element is the lastest
+  const lastestKline =
+    firstKlineEl[0] > lastKlineEl[0] ? firstKlineEl : lastKlineEl;
+
+  // get close price of lastest kline
+  const currentMarketPrice = parseFloat(lastestKline[4]);
+
+  return currentMarketPrice;
 }

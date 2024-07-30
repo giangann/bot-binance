@@ -14,11 +14,12 @@ import {
 } from "../ultils/helper";
 import { TNewOrder } from "../types/rest-api/order.type";
 import loggerService from "./logger.service";
+import { TSymbolMarketPriceKline } from "../types/rest-api/symbol-prices-kline.type";
 dotenv.config();
 
 const apiKey = process.env.BINANCE_API_KEY;
 const apiSecret = process.env.BINANCE_API_SECRET;
-const recvWindow = process.env.RECV_WINDOW
+const recvWindow = process.env.RECV_WINDOW;
 
 const getExchangeInfo = async (): Promise<TExchangeInfo> => {
   const endpoint = "/fapi/v1/exchangeInfo";
@@ -111,6 +112,22 @@ const getSymbolMarketPrices = async (): Promise<TSymbolMarketPrice[]> => {
   }
   if (response.status === 200) {
     return responseJson as TSymbolMarketPrice[];
+  }
+};
+
+const getMarketPriceKlines = async (): Promise<TSymbolMarketPriceKline[]> => {
+  const endpoint = "/fapi/v1/markPriceKlines";
+  const queryString = `symbol=BTCUSDT&interval=1m&limit=60`;
+  const url = `${process.env.BINANCE_BASE_URL}${endpoint}?${queryString}`;
+
+  const response = await fetch(url);
+  const responseJson: TResponse<TSymbolMarketPriceKline[]> =
+    await response.json();
+  if (response.status !== 200) {
+    throw new Error(JSON.stringify(responseJson));
+  }
+  if (response.status === 200) {
+    return responseJson as TSymbolMarketPriceKline[];
   }
 };
 
@@ -225,7 +242,7 @@ const createMarketOrder = async (
         "Content-Type": "application/json",
       },
     });
-    const responseJson = await response.json()
+    const responseJson = await response.json();
 
     if (response.status !== 200) {
       throw new Error(JSON.stringify(responseJson));
@@ -244,8 +261,9 @@ export {
   getAccountInfo,
   getSymbolTickerPrices,
   getSymbolMarketPrices,
+  getMarketPriceKlines,
   placeOrderWebsocket,
   updatePositionsWebsocket,
   closePositionWebSocket,
-  createMarketOrder
+  createMarketOrder,
 };

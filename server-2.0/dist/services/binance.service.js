@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createMarketOrder = exports.closePositionWebSocket = exports.updatePositionsWebsocket = exports.placeOrderWebsocket = exports.getSymbolMarketPrices = exports.getSymbolTickerPrices = exports.getAccountInfo = exports.getPositions = exports.getExchangeInfo = void 0;
+exports.createMarketOrder = exports.closePositionWebSocket = exports.updatePositionsWebsocket = exports.placeOrderWebsocket = exports.getMarketPriceKlines = exports.getSymbolMarketPrices = exports.getSymbolTickerPrices = exports.getAccountInfo = exports.getPositions = exports.getExchangeInfo = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const uuid_1 = require("uuid");
 const helper_1 = require("../ultils/helper");
@@ -98,6 +98,20 @@ const getSymbolMarketPrices = async () => {
     }
 };
 exports.getSymbolMarketPrices = getSymbolMarketPrices;
+const getMarketPriceKlines = async () => {
+    const endpoint = "/fapi/v1/markPriceKlines";
+    const queryString = `symbol=BTCUSDT&interval=1m&limit=60`;
+    const url = `${process.env.BINANCE_BASE_URL}${endpoint}?${queryString}`;
+    const response = await fetch(url);
+    const responseJson = await response.json();
+    if (response.status !== 200) {
+        throw new Error(JSON.stringify(responseJson));
+    }
+    if (response.status === 200) {
+        return responseJson;
+    }
+};
+exports.getMarketPriceKlines = getMarketPriceKlines;
 const placeOrderWebsocket = (symbol, quantity, side, cb) => {
     const orderParams = {
         apiKey: apiKey,
