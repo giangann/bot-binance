@@ -1,7 +1,9 @@
 import { TOrderChainPriceType } from "./market-order-chain.interface";
 
+export type TAutoActiveStatus = "on" | "off";
 export interface IAutoActiveConfigRecord {
   id: number;
+  auto_active: TAutoActiveStatus;
   auto_active_decrease_price: string;
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
@@ -24,6 +26,7 @@ export interface IAutoActiveConfigEntitywithoutId
   extends Omit<IAutoActiveConfigEntity, "id"> {}
 
 export interface IAutoActiveConfigCreate {
+  auto_active: TAutoActiveStatus;
   auto_active_decrease_price: string;
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
@@ -40,6 +43,7 @@ export interface IAutoActiveConfigCreate {
 
 export interface IAutoActiveConfigUpdate {
   id: number;
+  auto_active?: TAutoActiveStatus;
   auto_active_decrease_price?: string;
   max_pnl_start?: string;
   max_pnl_threshold_to_quit?: string;

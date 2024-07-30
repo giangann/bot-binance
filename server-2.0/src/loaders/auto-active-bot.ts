@@ -20,13 +20,14 @@ const autoActiveStart = async () => {
   global.autoActiveCheckInterval = autoActiveCheckInterval;
 
   // logger to track
-  const loggerMessage = `AutoActive when price decrease >= ${autoActiveBotConfig.auto_active_decrease_price}`;
+  const autoActiveStatus = autoActiveBotConfig.auto_active;
+  const loggerMessage = `AutoActive: ${autoActiveStatus} when price decrease >= ${autoActiveBotConfig.auto_active_decrease_price}`;
   loggerService.saveDebug(loggerMessage);
 };
 
 const checkpoint = async () => {
   try {
-    // skip if bot already running
+    // skip if bot already running or auto active is turn off
     if (global.isBotActive) return;
 
     // get data, calculate price
@@ -34,13 +35,11 @@ const checkpoint = async () => {
     const maxPrice = maxMarketPriceKlineFromArray(klines);
     const currPrice = currentMarketPriceKlineFromArray(klines);
 
-    // //////////////////
-    const debugMsg = `market price: max ${maxPrice} curr ${currPrice}`;
-    loggerService.saveDebugAndClg(debugMsg);
-    // ///////////////////////////
-
     // emit price to client
     global.wsServerInstance.emit("auto-active-check", { maxPrice, currPrice });
+
+    // still need to emit price to cient even status on or off
+    if (autoActiveBotConfig.auto_active === "off") return;
 
     // decide able to active
     const decreasePrice = maxPrice - currPrice;

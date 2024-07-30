@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { TAutoActiveStatus } from "../interfaces/auto-active-config.interface";
 import { TOrderChainPriceType } from "../interfaces/market-order-chain.interface";
 import { BaseEntity } from "./base.entity";
 
@@ -8,6 +9,9 @@ import { BaseEntity } from "./base.entity";
 export class AutoActiveConfig extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ nullable: false })
+  auto_active: TAutoActiveStatus;
 
   @Column({ nullable: false })
   auto_active_decrease_price: string;

@@ -25,6 +25,7 @@ const updateOne: IController = async (req, res) => {
       pnl_to_stop: req.body?.pnl_to_stop,
       price_type: req.body?.price_type,
       transaction_size_start: req.body?.transaction_size_start,
+      auto_active: req.body?.auto_active,
     };
     const validParams = removeNullUndefinedProperties(params);
 
