@@ -10,6 +10,11 @@ export interface ServerToClientEvents {
   "future-binance-stream-forward": (msg: TBinanceMarkPriceStreamToWs) => void;
   "new-order-placed": (msg: IMarketOrderPieceEntity) => void;
   "bot-quit": (msg: string) => void;
+  "bot-active": (activeReason: string) => void;
+  "auto-active-check": (msg: {
+    maxPrice: number;
+    currPrice: number;
+  }) => void;
 }
 
 export interface ClientToServerEvents {

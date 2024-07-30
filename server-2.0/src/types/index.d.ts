@@ -1,3 +1,4 @@
+import { IAutoActiveConfigEntity } from "../interfaces/auto-active-config.interface";
 import WebSocket from "ws";
 import { ICoinPrice1AMMap } from "../interfaces/coin-price-1am.interface";
 import { IMarketOrderChainEntity } from "../interfaces/market-order-chain.interface";
@@ -39,7 +40,11 @@ declare global {
   var openingChain: IMarketOrderChainEntity | null;
   var isBotActive: boolean;
 
-  var botInterval: NodeJS.Timeout;
+  var botInterval: NodeJS.Timeout | null;
   var isRunTick: boolean;
+
+  var autoActiveBotConfig: IAutoActiveConfigEntity | null
+  var autoActiveCheckInterval: NodeJS.Timeout | null
 }
-export {};
+export { };
+
