@@ -12,17 +12,22 @@ const market_order_chain_service_1 = __importDefault(require("../services/market
 const data_prepare_bot_1 = __importDefault(require("./data-prepare-bot"));
 const bot_service_1 = __importDefault(require("../services/bot.service"));
 const autoActiveStart = async () => {
-    // query data from DB
-    const autoActiveBotConfig = await auto_active_config_service_1.default.getOne();
-    // update memory data
-    global.autoActiveBotConfig = autoActiveBotConfig;
-    // start interval, save interval to memory
-    const autoActiveCheckInterval = setInterval(checkpoint, 5000);
-    global.autoActiveCheckInterval = autoActiveCheckInterval;
-    // logger to track
-    const autoActiveStatus = autoActiveBotConfig.auto_active;
-    const loggerMessage = `AutoActive: ${autoActiveStatus} when price decrease >= ${autoActiveBotConfig.auto_active_decrease_price}`;
-    logger_service_1.default.saveDebug(loggerMessage);
+    try {
+        // query data from DB
+        const autoActiveBotConfig = await auto_active_config_service_1.default.getOne();
+        // update memory data
+        global.autoActiveBotConfig = autoActiveBotConfig;
+        // start interval, save interval to memory
+        const autoActiveCheckInterval = setInterval(checkpoint, 5000);
+        global.autoActiveCheckInterval = autoActiveCheckInterval;
+        // logger to track
+        const autoActiveStatus = autoActiveBotConfig.auto_active;
+        const loggerMessage = `AutoActive: ${autoActiveStatus} when price decrease >= ${autoActiveBotConfig.auto_active_decrease_price}`;
+        logger_service_1.default.saveDebug(loggerMessage);
+    }
+    catch (error) {
+        logger_service_1.default.saveError(error);
+    }
 };
 exports.autoActiveStart = autoActiveStart;
 const checkpoint = async () => {

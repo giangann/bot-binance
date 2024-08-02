@@ -10,25 +10,29 @@ import prepareDataBot from "./data-prepare-bot";
 import botService from "../services/bot.service";
 
 const autoActiveStart = async () => {
-  // query data from DB
-  const autoActiveBotConfig = await autoActiveConfigService.getOne();
-  // update memory data
-  global.autoActiveBotConfig = autoActiveBotConfig;
+  try {
+    // query data from DB
+    const autoActiveBotConfig = await autoActiveConfigService.getOne();
+    // update memory data
+    global.autoActiveBotConfig = autoActiveBotConfig;
 
-  // start interval, save interval to memory
-  const autoActiveCheckInterval = setInterval(checkpoint, 5000);
-  global.autoActiveCheckInterval = autoActiveCheckInterval;
+    // start interval, save interval to memory
+    const autoActiveCheckInterval = setInterval(checkpoint, 5000);
+    global.autoActiveCheckInterval = autoActiveCheckInterval;
 
-  // logger to track
-  const autoActiveStatus = autoActiveBotConfig.auto_active;
-  const loggerMessage = `AutoActive: ${autoActiveStatus} when price decrease >= ${autoActiveBotConfig.auto_active_decrease_price}`;
-  loggerService.saveDebug(loggerMessage);
+    // logger to track
+    const autoActiveStatus = autoActiveBotConfig.auto_active;
+    const loggerMessage = `AutoActive: ${autoActiveStatus} when price decrease >= ${autoActiveBotConfig.auto_active_decrease_price}`;
+    loggerService.saveDebug(loggerMessage);
+  } catch (error: any) {
+    loggerService.saveError(error);
+  }
 };
 
 const checkpoint = async () => {
   try {
     // skip if bot already running or auto active is turn off
-    loggerService.saveDebug(`global.isBotActive: ${global.isBotActive}`)
+    loggerService.saveDebug(`global.isBotActive: ${global.isBotActive}`);
     if (global.isBotActive) return;
 
     // get data, calculate price
