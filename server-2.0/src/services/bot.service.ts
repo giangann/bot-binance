@@ -25,69 +25,73 @@ const active = async () => {
 };
 
 const tick = async () => {
-  global.isRunTick = false;
+  try {
+    global.isRunTick = false;
 
-  updatePositionsWebsocket();
-  const waitTime = parseInt(process.env.WAIT_POSITION) || 1;
-  await fakeDelay(waitTime);
+    updatePositionsWebsocket();
+    const waitTime = parseInt(process.env.WAIT_POSITION) || 1;
+    await fakeDelay(waitTime);
 
-  if (global.isRunTick === false) {
-    global.isRunTick = true;
-    return;
-  }
+    if (global.isRunTick === false) {
+      global.isRunTick = true;
+      return;
+    }
 
-  loggerService.saveDebugAndClg(`tick able run: ${global.isRunTick}`); // check
+    loggerService.saveDebugAndClg(`tick able run: ${global.isRunTick}`); // check
 
-  // get opening chain
-  const openingChain = global.openingChain;
-  if (!openingChain) return;
+    // get opening chain
+    const openingChain = global.openingChain;
+    if (!openingChain) return;
 
-  // -- Quit if pnl thres hold reach
-  const totalPositionPnl = totalPnlFromPositionsMap(global.positionsMap);
-  const pnlToStop = openingChain?.pnl_to_stop;
-  const pnlToStopNumber = parseFloat(pnlToStop);
-  const maxPnlStartNumber = parseFloat(openingChain?.max_pnl_start);
-  const maxPnlThresholdToQuitNumber = parseFloat(
-    openingChain?.max_pnl_threshold_to_quit
-  );
-  // calculate neccesary stats
-  if (totalPositionPnl >= maxPnlStartNumber) {
-    openingChain.is_max_pnl_start_reached = true;
-    loggerService.saveDebug(
-      `totalPnl reach MAX_PNL_START: ${maxPnlStartNumber}`
+    // -- Quit if pnl thres hold reach
+    const totalPositionPnl = totalPnlFromPositionsMap(global.positionsMap);
+    const pnlToStop = openingChain?.pnl_to_stop;
+    const pnlToStopNumber = parseFloat(pnlToStop);
+    const maxPnlStartNumber = parseFloat(openingChain?.max_pnl_start);
+    const maxPnlThresholdToQuitNumber = parseFloat(
+      openingChain?.max_pnl_threshold_to_quit
     );
-  } // pnl reach top
-  // decide able to quit or not
-  let isAbleToMakeProfit = false;
-  if (openingChain.is_max_pnl_start_reached) {
-    if (totalPositionPnl <= maxPnlStartNumber * maxPnlThresholdToQuitNumber)
-      isAbleToMakeProfit = true;
-    if (totalPositionPnl > maxPnlStartNumber)
-      openingChain.max_pnl_start = totalPositionPnl.toString();
+    // calculate neccesary stats
+    if (totalPositionPnl >= maxPnlStartNumber) {
+      openingChain.is_max_pnl_start_reached = true;
+      loggerService.saveDebug(
+        `totalPnl reach MAX_PNL_START: ${maxPnlStartNumber}`
+      );
+    } // pnl reach top
+    // decide able to quit or not
+    let isAbleToMakeProfit = false;
+    if (openingChain.is_max_pnl_start_reached) {
+      if (totalPositionPnl <= maxPnlStartNumber * maxPnlThresholdToQuitNumber)
+        isAbleToMakeProfit = true;
+      if (totalPositionPnl > maxPnlStartNumber)
+        openingChain.max_pnl_start = totalPositionPnl.toString();
+    }
+    const isAbleToCutLoss = totalPositionPnl <= pnlToStopNumber;
+    const isAbleToQuit = isAbleToCutLoss || isAbleToMakeProfit;
+
+    if (isAbleToQuit) {
+      let stopReason = "";
+      if (isAbleToCutLoss)
+        stopReason = `Cut loss: PNL = ${totalPositionPnl} <= ${pnlToStopNumber}`;
+      if (isAbleToMakeProfit)
+        stopReason = `Make profit: PNL = ${totalPositionPnl}, MAX_PNL_START = ${maxPnlStartNumber}, THRESHOLD = ${maxPnlThresholdToQuitNumber}`;
+
+      await marketOrderChainService.update({
+        id: openingChain?.id,
+        stop_reason: stopReason,
+        is_max_pnl_start_reached: openingChain.is_max_pnl_start_reached,
+      });
+      await quit();
+      loggerService.saveDebug(stopReason);
+      global.wsServerInstance.emit("bot-quit", stopReason);
+    }
+
+    // calculate and place order
+    const ableSymbols = ableOrderSymbolsMapToArray(global.ableOrderSymbolsMap);
+    evaluateAndPlaceOrderWs(ableSymbols);
+  } catch (error: any) {
+    loggerService.saveError(error);
   }
-  const isAbleToCutLoss = totalPositionPnl <= pnlToStopNumber;
-  const isAbleToQuit = isAbleToCutLoss || isAbleToMakeProfit;
-
-  if (isAbleToQuit) {
-    let stopReason = "";
-    if (isAbleToCutLoss)
-      stopReason = `Cut loss: PNL = ${totalPositionPnl} <= ${pnlToStopNumber}`;
-    if (isAbleToMakeProfit)
-      stopReason = `Make profit: PNL = ${totalPositionPnl}, MAX_PNL_START = ${maxPnlStartNumber}, THRESHOLD = ${maxPnlThresholdToQuitNumber}`;
-
-    await marketOrderChainService.update({
-      id: openingChain?.id,
-      stop_reason: stopReason,
-      is_max_pnl_start_reached: openingChain.is_max_pnl_start_reached,
-    });
-    await quit();
-    loggerService.saveDebug(stopReason);
-    global.wsServerInstance.emit("bot-quit", stopReason);
-  }
-
-  // calculate and place order
-  const ableSymbols = ableOrderSymbolsMapToArray(global.ableOrderSymbolsMap);
-  evaluateAndPlaceOrderWs(ableSymbols);
 };
 
 const evaluateAndPlaceOrderWs = (symbols: string[]) => {
@@ -147,7 +151,8 @@ const evaluateAndPlaceOrderWs = (symbols: string[]) => {
     const percentToFirstBuyNumber = parseFloat(percentToFirstBuy);
 
     const isPercentAbleToFirstBuy = percentChange > percentToFirstBuyNumber;
-    const isPercentAbleToBuyMore = percentChange > percentToBuyNumber || percentChange < -2;
+    const isPercentAbleToBuyMore =
+      percentChange > percentToBuyNumber || percentChange < -2;
 
     const isAbleToFirstBuy = isPercentAbleToFirstBuy && !isSymbolHasOrder;
     const isAbleToBuyMore = isPercentAbleToBuyMore && isSymbolHasOrder;
@@ -166,9 +171,12 @@ const evaluateAndPlaceOrderWs = (symbols: string[]) => {
     const symbolPositionPnl = pnlOfSymbolFromPositionsMap(positionsMap, symbol);
     const isPnlAbleToSell = symbolPositionPnl < -5;
 
-    const isAbleToSellFirstCondition = isPercentAbleToSell && isHasTwoBuyOrderBefore;
-    const isAbleToSellSecondCondition = isHasAtLeastOneOrderBefore && isPnlAbleToSell;
-    const isAbleToSell = isAbleToSellFirstCondition || isAbleToSellSecondCondition;
+    const isAbleToSellFirstCondition =
+      isPercentAbleToSell && isHasTwoBuyOrderBefore;
+    const isAbleToSellSecondCondition =
+      isHasAtLeastOneOrderBefore && isPnlAbleToSell;
+    const isAbleToSell =
+      isAbleToSellFirstCondition || isAbleToSellSecondCondition;
 
     let direction: "SELL" | "BUY" | "" = "";
     if (isAbleToBuy) direction = "BUY";

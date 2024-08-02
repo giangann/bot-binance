@@ -28,6 +28,7 @@ const autoActiveStart = async () => {
 const checkpoint = async () => {
   try {
     // skip if bot already running or auto active is turn off
+    loggerService.saveDebug(`global.isBotActive: ${global.isBotActive}`)
     if (global.isBotActive) return;
 
     // get data, calculate price
