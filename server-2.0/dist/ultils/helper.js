@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.currentMarketPriceKlineFromArray = exports.maxMarketPriceKlineFromArray = exports.removeNullUndefinedProperties = exports.totalPnlFromPositionsMap = exports.ableOrderSymbolsMapToArray = exports.errorWsApiResponseToString = exports.rateLimitsArrayToString = exports.filterPositionsNotZero = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.orderPiecesToMap = exports.ableOrderSymbolsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.positionsToMap = exports.exchangeInfoSymbolsToMap = exports.symbolPricesToMap = exports.validateAmount = exports.binanceStreamToSymbolPrice = exports.paramsToQueryWithSignature = exports.generateSignature = exports.fakeDelay = void 0;
+exports.numberOfBuyOrder = exports.currentMarketPriceKlineFromArray = exports.maxMarketPriceKlineFromArray = exports.removeNullUndefinedProperties = exports.pnlOfSymbolFromPositionsMap = exports.totalPnlFromPositionsMap = exports.ableOrderSymbolsMapToArray = exports.errorWsApiResponseToString = exports.rateLimitsArrayToString = exports.filterPositionsNotZero = exports.mergeTicerPriceAndMarketPriceBySymbol = exports.orderPiecesToMap = exports.ableOrderSymbolsToMap = exports.symbolPriceMarketsToMap = exports.symbolPriceTickersToMap = exports.positionsToMap = exports.exchangeInfoSymbolsToMap = exports.symbolPricesToMap = exports.validateAmount = exports.binanceStreamToSymbolPrice = exports.paramsToQueryWithSignature = exports.generateSignature = exports.fakeDelay = void 0;
 const crypto_1 = require("crypto");
 const fakeDelay = async (seconds) => {
     await new Promise((resolve, _reject) => {
@@ -247,6 +247,17 @@ const totalPnlFromPositionsMap = (positionsMap) => {
     return result;
 };
 exports.totalPnlFromPositionsMap = totalPnlFromPositionsMap;
+const pnlOfSymbolFromPositionsMap = (positionsMap, symbol) => {
+    const symbolPosition = positionsMap[symbol];
+    if (!symbolPosition)
+        throw new Error(`${symbol}: no position found`);
+    const positionPnl = symbolPosition?.unRealizedProfit;
+    if (positionPnl === null || positionPnl === undefined)
+        throw new Error(`${symbol}: position object dont have unRealizedProfit property`);
+    const positionPnlNumber = parseFloat(positionPnl);
+    return positionPnlNumber;
+};
+exports.pnlOfSymbolFromPositionsMap = pnlOfSymbolFromPositionsMap;
 function removeNullUndefinedProperties(obj) {
     return Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== null && value !== undefined));
 }
@@ -273,3 +284,17 @@ function currentMarketPriceKlineFromArray(marketPriceKlinesArray) {
     return currentMarketPrice;
 }
 exports.currentMarketPriceKlineFromArray = currentMarketPriceKlineFromArray;
+function numberOfBuyOrder(orderPieces) {
+    if (!orderPieces)
+        throw new Error("Order Pieces Not Yet Initialzied!");
+    if (orderPieces.length === 0)
+        return 0;
+    let numberOfBuyOrder = 0;
+    for (let piece of orderPieces) {
+        if (piece.direction === "BUY") {
+            numberOfBuyOrder += 1;
+        }
+    }
+    return numberOfBuyOrder;
+}
+exports.numberOfBuyOrder = numberOfBuyOrder;

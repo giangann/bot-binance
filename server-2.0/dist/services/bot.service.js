@@ -121,7 +121,7 @@ const evaluateAndPlaceOrderWs = (symbols) => {
         const percentToBuyNumber = parseFloat(percentToBuy);
         const percentToFirstBuyNumber = parseFloat(percentToFirstBuy);
         const isPercentAbleToFirstBuy = percentChange > percentToFirstBuyNumber;
-        const isPercentAbleToBuyMore = percentChange > percentToBuyNumber;
+        const isPercentAbleToBuyMore = percentChange > percentToBuyNumber || percentChange < -2;
         const isAbleToFirstBuy = isPercentAbleToFirstBuy && !isSymbolHasOrder;
         const isAbleToBuyMore = isPercentAbleToBuyMore && isSymbolHasOrder;
         const isAbleToBuy = isAbleToFirstBuy || isAbleToBuyMore;
@@ -129,10 +129,15 @@ const evaluateAndPlaceOrderWs = (symbols) => {
         const percentToSell = openingChain.percent_to_sell;
         const percentToSellNumber = parseFloat(percentToSell);
         const isPercentAbleToSell = percentChange < percentToSellNumber;
-        const isHasTwoBuyOrderBefore = orderPiecesOfSymbol[0]?.direction === "BUY" &&
-            orderPiecesOfSymbol[1]?.direction === "BUY";
-        const isAbleToSell = isPercentAbleToSell && isHasTwoBuyOrderBefore;
-        let debugMsg = `${symbol} prev: ${prevPrice}; curr: ${currPrice}; percent: ${percentChange}`;
+        const numberOfBuyOrderSymbol = (0, helper_1.numberOfBuyOrder)(orderPiecesOfSymbol);
+        const isHasTwoBuyOrderBefore = numberOfBuyOrderSymbol >= 2;
+        // If pnl <5$, sell all
+        const isHasAtLeastOneOrderBefore = numberOfBuyOrderSymbol >= 1;
+        const symbolPositionPnl = (0, helper_1.pnlOfSymbolFromPositionsMap)(positionsMap, symbol);
+        const isPnlAbleToSell = symbolPositionPnl < -5;
+        const isAbleToSellFirstCondition = isPercentAbleToSell && isHasTwoBuyOrderBefore;
+        const isAbleToSellSecondCondition = isHasAtLeastOneOrderBefore && isPnlAbleToSell;
+        const isAbleToSell = isAbleToSellFirstCondition || isAbleToSellSecondCondition;
         let direction = "";
         if (isAbleToBuy)
             direction = "BUY";

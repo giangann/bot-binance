@@ -308,6 +308,24 @@ export const totalPnlFromPositionsMap = (positionsMap: TPositionsMap) => {
   return result;
 };
 
+export const pnlOfSymbolFromPositionsMap = (
+  positionsMap: TPositionsMap,
+  symbol: string
+) => {
+  const symbolPosition = positionsMap[symbol];
+  if (!symbolPosition) throw new Error(`${symbol}: no position found`);
+
+  const positionPnl = symbolPosition?.unRealizedProfit;
+
+  if (positionPnl === null || positionPnl === undefined)
+    throw new Error(
+      `${symbol}: position object dont have unRealizedProfit property`
+    );
+
+  const positionPnlNumber = parseFloat(positionPnl);
+  return positionPnlNumber;
+};
+
 export function removeNullUndefinedProperties(
   obj: Record<string, unknown>
 ): Record<string, unknown> {
@@ -346,4 +364,21 @@ export function currentMarketPriceKlineFromArray(
   const currentMarketPrice = parseFloat(lastestKline[4]);
 
   return currentMarketPrice;
+}
+
+export function numberOfBuyOrder(
+  orderPieces: IMarketOrderPieceEntity[]
+): number {
+  if (!orderPieces) throw new Error("Order Pieces Not Yet Initialzied!");
+  if (orderPieces.length === 0) return 0;
+
+  let numberOfBuyOrder: number = 0;
+
+  for (let piece of orderPieces) {
+    if (piece.direction === "BUY") {
+      numberOfBuyOrder += 1;
+    }
+  }
+
+  return numberOfBuyOrder;
 }
