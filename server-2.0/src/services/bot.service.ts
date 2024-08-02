@@ -96,141 +96,152 @@ const tick = async () => {
 
 const evaluateAndPlaceOrderWs = (symbols: string[]) => {
   for (const symbol of symbols) {
-    // -- Get PositionsMap
-    const positionsMap = global.positionsMap;
-    // -- Get OrderPiecesMap
-    const orderPiecesMap = global.orderPiecesMap;
-    // -- Get symbolPricesMapStart
-    const symbolPricesStartMap = global.symbolPricesStartMap;
-    // -- Get symbolTickerPricesMapNow
-    const symbolTickerPricesNowMap = global.symbolTickerPricesNowMap;
-    // -- Get symbolMarketPricesMapNow
-    const symbolMarketPricesNowMap = global.symbolMarketPricesNowMap;
+    try {
+      // -- Get PositionsMap
+      const positionsMap = global.positionsMap;
+      // -- Get OrderPiecesMap
+      const orderPiecesMap = global.orderPiecesMap;
+      // -- Get symbolPricesMapStart
+      const symbolPricesStartMap = global.symbolPricesStartMap;
+      // -- Get symbolTickerPricesMapNow
+      const symbolTickerPricesNowMap = global.symbolTickerPricesNowMap;
+      // -- Get symbolMarketPricesMapNow
+      const symbolMarketPricesNowMap = global.symbolMarketPricesNowMap;
 
-    // -- Calculate prevPrice
-    let prevPrice: string | null | undefined = null;
-    if (!orderPiecesMap[symbol]) {
-      // initial pieces for this symbol
-      orderPiecesMap[symbol] = [];
-    }
-    const orderPiecesOfSymbol = orderPiecesMap[symbol];
-    const orderPiecesOfSymbolLen = orderPiecesOfSymbol.length;
-    const isSymbolHasOrder = orderPiecesOfSymbolLen > 0;
+      // -- Calculate prevPrice
+      let prevPrice: string | null | undefined = null;
+      if (!orderPiecesMap[symbol]) {
+        // initial pieces for this symbol
+        orderPiecesMap[symbol] = [];
+      }
+      const orderPiecesOfSymbol = orderPiecesMap[symbol];
+      const orderPiecesOfSymbolLen = orderPiecesOfSymbol.length;
+      const isSymbolHasOrder = orderPiecesOfSymbolLen > 0;
 
-    if (orderPiecesOfSymbol && isSymbolHasOrder) {
-      const lastOrderPiece = orderPiecesOfSymbol[0];
-      prevPrice = lastOrderPiece.price;
-    } else {
-      const symbolPriceStart = symbolPricesStartMap[symbol];
-      prevPrice =
+      if (orderPiecesOfSymbol && isSymbolHasOrder) {
+        const lastOrderPiece = orderPiecesOfSymbol[0];
+        prevPrice = lastOrderPiece.price;
+      } else {
+        const symbolPriceStart = symbolPricesStartMap[symbol];
+        prevPrice =
+          openingChain.price_type === "market"
+            ? symbolPriceStart?.mark_price
+            : symbolPriceStart?.price;
+      }
+      if (!prevPrice) continue;
+
+      // -- Calculate currPrice
+      const symbolMarketPriceNow = symbolMarketPricesNowMap[symbol];
+      const symbolTickerPriceNow = symbolTickerPricesNowMap[symbol];
+      const currPrice =
         openingChain.price_type === "market"
-          ? symbolPriceStart?.mark_price
-          : symbolPriceStart?.price;
-    }
-    if (!prevPrice) continue;
+          ? symbolMarketPriceNow?.markPrice
+          : symbolTickerPriceNow?.price;
+      if (!currPrice) continue;
 
-    // -- Calculate currPrice
-    const symbolMarketPriceNow = symbolMarketPricesNowMap[symbol];
-    const symbolTickerPriceNow = symbolTickerPricesNowMap[symbol];
-    const currPrice =
-      openingChain.price_type === "market"
-        ? symbolMarketPriceNow?.markPrice
-        : symbolTickerPriceNow?.price;
-    if (!currPrice) continue;
+      // -- Calculate percentChange
+      const prevPriceNumber = parseFloat(prevPrice);
+      const currPriceNumber = parseFloat(currPrice);
+      const percentChange = (currPriceNumber / prevPriceNumber - 1) * 100;
 
-    // -- Calculate percentChange
-    const prevPriceNumber = parseFloat(prevPrice);
-    const currPriceNumber = parseFloat(currPrice);
-    const percentChange = (currPriceNumber / prevPriceNumber - 1) * 100;
+      // -- Define direction
+      // Buy
+      const percentToFirstBuy = openingChain.percent_to_first_buy;
+      const percentToBuy = openingChain.percent_to_buy;
+      const percentToBuyNumber = parseFloat(percentToBuy);
+      const percentToFirstBuyNumber = parseFloat(percentToFirstBuy);
 
-    // -- Define direction
-    // Buy
-    const percentToFirstBuy = openingChain.percent_to_first_buy;
-    const percentToBuy = openingChain.percent_to_buy;
-    const percentToBuyNumber = parseFloat(percentToBuy);
-    const percentToFirstBuyNumber = parseFloat(percentToFirstBuy);
+      const isPercentAbleToFirstBuy = percentChange > percentToFirstBuyNumber;
+      const isPercentAbleToBuyMore =
+        percentChange > percentToBuyNumber || percentChange < -2;
 
-    const isPercentAbleToFirstBuy = percentChange > percentToFirstBuyNumber;
-    const isPercentAbleToBuyMore =
-      percentChange > percentToBuyNumber || percentChange < -2;
+      const isAbleToFirstBuy = isPercentAbleToFirstBuy && !isSymbolHasOrder;
+      const isAbleToBuyMore = isPercentAbleToBuyMore && isSymbolHasOrder;
+      const isAbleToBuy = isAbleToFirstBuy || isAbleToBuyMore;
 
-    const isAbleToFirstBuy = isPercentAbleToFirstBuy && !isSymbolHasOrder;
-    const isAbleToBuyMore = isPercentAbleToBuyMore && isSymbolHasOrder;
-    const isAbleToBuy = isAbleToFirstBuy || isAbleToBuyMore;
+      // Sell
+      const percentToSell = openingChain.percent_to_sell;
+      const percentToSellNumber = parseFloat(percentToSell);
+      const isPercentAbleToSell = percentChange < percentToSellNumber;
 
-    // Sell
-    const percentToSell = openingChain.percent_to_sell;
-    const percentToSellNumber = parseFloat(percentToSell);
-    const isPercentAbleToSell = percentChange < percentToSellNumber;
+      const numberOfBuyOrderSymbol = numberOfBuyOrder(orderPiecesOfSymbol);
+      const isHasTwoBuyOrderBefore = numberOfBuyOrderSymbol >= 2;
 
-    const numberOfBuyOrderSymbol = numberOfBuyOrder(orderPiecesOfSymbol);
-    const isHasTwoBuyOrderBefore = numberOfBuyOrderSymbol >= 2;
+      // If pnl <5$, sell all
+      const isHasAtLeastOneOrderBefore = numberOfBuyOrderSymbol >= 1;
+      const symbolPositionPnl = pnlOfSymbolFromPositionsMap(
+        positionsMap,
+        symbol
+      );
+      const isPnlAbleToSell = symbolPositionPnl < -5;
 
-    // If pnl <5$, sell all
-    const isHasAtLeastOneOrderBefore = numberOfBuyOrderSymbol >= 1;
-    const symbolPositionPnl = pnlOfSymbolFromPositionsMap(positionsMap, symbol);
-    const isPnlAbleToSell = symbolPositionPnl < -5;
+      const isAbleToSellFirstCondition =
+        isPercentAbleToSell && isHasTwoBuyOrderBefore;
+      const isAbleToSellSecondCondition =
+        isHasAtLeastOneOrderBefore && isPnlAbleToSell;
+      const isAbleToSell =
+        isAbleToSellFirstCondition || isAbleToSellSecondCondition;
 
-    const isAbleToSellFirstCondition =
-      isPercentAbleToSell && isHasTwoBuyOrderBefore;
-    const isAbleToSellSecondCondition =
-      isHasAtLeastOneOrderBefore && isPnlAbleToSell;
-    const isAbleToSell =
-      isAbleToSellFirstCondition || isAbleToSellSecondCondition;
+      let direction: "SELL" | "BUY" | "" = "";
+      if (isAbleToBuy) direction = "BUY";
+      if (isAbleToSell) direction = "SELL";
+      if (direction === "") continue;
 
-    let direction: "SELL" | "BUY" | "" = "";
-    if (isAbleToBuy) direction = "BUY";
-    if (isAbleToSell) direction = "SELL";
-    if (direction === "") continue;
+      // -- Define quantity
+      const transactionSizeStart = openingChain.transaction_size_start;
+      const orderQtyStart = transactionSizeStart / currPriceNumber;
+      let orderQty: number = orderQtyStart;
 
-    // -- Define quantity
-    const transactionSizeStart = openingChain.transaction_size_start;
-    const orderQtyStart = transactionSizeStart / currPriceNumber;
-    let orderQty: number = orderQtyStart;
-
-    if (isAbleToBuy) {
-      if (isAbleToBuyMore) {
+      if (isAbleToBuy) {
+        if (isAbleToBuyMore) {
+          const symbolPosition = positionsMap[symbol];
+          const positionAmt = symbolPosition?.positionAmt;
+          const positionAmtNumber = parseFloat(positionAmt); // number (can be 0), or nan
+          // for some precision reason make "has order" symbol have positionAmt =0
+          if (!positionAmtNumber) orderQty = orderQtyStart;
+          if (positionAmtNumber) orderQty = positionAmtNumber;
+        }
+        if (isAbleToFirstBuy) {
+          orderQty = orderQtyStart;
+        }
+      }
+      if (isAbleToSell) {
         const symbolPosition = positionsMap[symbol];
         const positionAmt = symbolPosition?.positionAmt;
-        const positionAmtNumber = parseFloat(positionAmt); // number (can be 0), or nan
-        // for some precision reason make "has order" symbol have positionAmt =0
-        if (!positionAmtNumber) orderQty = orderQtyStart;
+        const positionAmtNumber = parseFloat(positionAmt); // number (can be 0), or nan (if parse from undefined/null)
+
+        if (!positionAmtNumber) continue;
         if (positionAmtNumber) orderQty = positionAmtNumber;
       }
-      if (isAbleToFirstBuy) {
-        orderQty = orderQtyStart;
-      }
+      const precision = exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
+      const orderQtyValid = validateAmount(orderQty, precision);
+
+      // -- Place order, get the id generated from uuidV4 for check order info purpose
+      const clientOrderId = placeOrderWebsocket(
+        symbol,
+        orderQtyValid,
+        direction
+      );
+
+      // -- Save order info to memory
+      // prepare
+      const newOrderInfo: TOrderInfo = {
+        symbol: symbol,
+        amount: orderQtyValid * currPriceNumber, // is transaction size
+        currPrice: currPriceNumber,
+        prevPrice: prevPriceNumber,
+        percentChange: percentChange,
+        direction: direction,
+        isFirstOrder: !isSymbolHasOrder,
+        positionAmt: parseFloat(positionsMap[symbol]?.positionAmt),
+        quantity: orderQtyValid,
+        quantityPrecision: precision,
+      };
+      // add new key-val
+      global.orderInfosMap[clientOrderId] = newOrderInfo;
+    } catch (error: any) {
+      loggerService.saveError(error);
     }
-    if (isAbleToSell) {
-      const symbolPosition = positionsMap[symbol];
-      const positionAmt = symbolPosition?.positionAmt;
-      const positionAmtNumber = parseFloat(positionAmt); // number (can be 0), or nan (if parse from undefined/null)
-
-      if (!positionAmtNumber) continue;
-      if (positionAmtNumber) orderQty = positionAmtNumber;
-    }
-    const precision = exchangeInfoSymbolsMap[symbol]?.quantityPrecision;
-    const orderQtyValid = validateAmount(orderQty, precision);
-
-    // -- Place order, get the id generated from uuidV4 for check order info purpose
-    const clientOrderId = placeOrderWebsocket(symbol, orderQtyValid, direction);
-
-    // -- Save order info to memory
-    // prepare
-    const newOrderInfo: TOrderInfo = {
-      symbol: symbol,
-      amount: orderQtyValid * currPriceNumber, // is transaction size
-      currPrice: currPriceNumber,
-      prevPrice: prevPriceNumber,
-      percentChange: percentChange,
-      direction: direction,
-      isFirstOrder: !isSymbolHasOrder,
-      positionAmt: parseFloat(positionsMap[symbol]?.positionAmt),
-      quantity: orderQtyValid,
-      quantityPrecision: precision,
-    };
-    // add new key-val
-    global.orderInfosMap[clientOrderId] = newOrderInfo;
   }
 };
 
