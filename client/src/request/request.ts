@@ -80,6 +80,23 @@ export const putApi = async <T>(
   return respond.json();
 };
 
+export const patchApi = async <T>(
+  endpoint: string,
+  data: any
+): Promise<TResponse<T>> => {
+  const fullUrl = baseURL + "/" + endpoint;
+  const respond = await fetch(fullUrl, {
+    method: "PATCH", // or 'PUT'
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+    credentials: "include", // if don't have this, token can't be set to cookies
+  });
+
+  return respond.json();
+};
+
 export const deleteApi = async <T>(endpoint: string): Promise<TResponse<T>> => {
   const fullUrl = baseURL + "/" + endpoint;
   const respond = await fetch(fullUrl, {
