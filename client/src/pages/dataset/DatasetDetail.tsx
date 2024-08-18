@@ -207,24 +207,26 @@ export const DatasetDetail = () => {
   return (
     <Box>
       <BackToHomePage />
-      <Typography>Dataset</Typography>
+      <Typography>Dataset Detail - ID:{datasetId}</Typography>
 
       <Box component="form" onSubmit={handleSubmit(onSaveEdit)}>
-        {!isEdit && (
-          <Button onClick={onToggle} startIcon={<EditNoteIcon />}>
-            Edit
+        <Box my={2}>
+          {!isEdit && (
+            <Button onClick={onToggle} startIcon={<EditNoteIcon />}>
+              Edit
+            </Button>
+          )}
+          {isEdit && (
+            <Button onClick={onToggle} variant="outlined" color="inherit" startIcon={<NotInterestedIcon />} sx={{ mr: 2 }}>
+              Cancel
+            </Button>
+          )}
+          <Button type="submit" variant="contained" color="warning" disabled={!isEdit || !formState.isDirty}>
+            Save
           </Button>
-        )}
-        {isEdit && (
-          <Button onClick={onToggle} variant="outlined" color="inherit" startIcon={<NotInterestedIcon />} sx={{ mr: 2 }}>
-            Cancel
-          </Button>
-        )}
-        <Button type="submit" variant="contained" color="warning" disabled={!isEdit || !formState.isDirty}>
-          Save
-        </Button>
 
-        {!isEdit ? <Typography>{dataset?.name ?? "No data"}</Typography> : <BaseInput {...register("name")} defaultValue={dataset?.name} />}
+          {!isEdit ? <Typography>{dataset?.name ?? "No data"}</Typography> : <BaseInput {...register("name")} defaultValue={dataset?.name} />}
+        </Box>
 
         <BasicTable data={datasetItems} fields={fields} />
       </Box>
@@ -235,13 +237,13 @@ export const DatasetDetail = () => {
           <Box mb={2} />
 
           <Stack direction="row" spacing={1} justifyContent={"flex-end"} alignItems={"center"}>
-            <Button onClick={dialogHandlers.onCancel} variant="contained">
+            <Button onClick={dialogHandlers.onCancel} variant="outlined">
               Close
             </Button>
             <Button
               onClick={dialogHandlers.onConfirm}
               startIcon={isDeleting && <CircularProgress color="inherit" size={14} />}
-              variant="outlined"
+              variant="contained"
               color="error"
             >
               Xóa
@@ -291,8 +293,6 @@ export const NewPriceItem: React.FC<Props> = ({ datasetId, fetchDatasets }) => {
 
   const onSaveNewItems = async (value: IDatasetUpdateCreateItems) => {
     try {
-      console.log("value", value);
-
       const createdItems = value.dataset_items?.map((item) => {
         if ("id" in item) {
           const { id, ...rest } = item;
