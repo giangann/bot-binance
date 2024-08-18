@@ -1,18 +1,38 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import NotInterestedIcon from "@mui/icons-material/NotInterested";
-import { Box, Button, CircularProgress, Dialog, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  IconButton,
+  Stack,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  styled,
+} from "@mui/material";
 import dayjs from "dayjs";
 import { useCallback, useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { BackToHomePage } from "../../components/BackHome/BackToHomePage";
-import { BasicTable } from "../../components/Table/BasicTable";
+import { BaseInput } from "../../components/Input";
+import { BasicTable, DEFAULT_CELL_WIDTH } from "../../components/Table/BasicTable";
 import { StrictField } from "../../components/Table/Customtable";
 import { deleteApi, getApi, patchApi } from "../../request/request";
-import { IDatasetCreate, IDatasetEntity, IDatasetItemRecord, IDatasetItemUpdate, IDatasetUpdate } from "../../shared/types/dataset";
-import { useForm } from "react-hook-form";
-import { BaseInput } from "../../components/Input";
+import {
+  IDatasetEntity,
+  IDatasetItemCreate,
+  IDatasetItemRecord,
+  IDatasetUpdateCreateItems,
+  IDatasetUpdateModifyItems,
+} from "../../shared/types/dataset";
 
 export const DatasetDetail = () => {
   const [dataset, setDataset] = useState<IDatasetEntity | null>(null);
@@ -79,10 +99,10 @@ export const DatasetDetail = () => {
     }
   };
 
-  const onSaveEdit = async (_value: IDatasetCreate | IDatasetUpdate) => {
+  const onSaveEdit = async (_value: IDatasetUpdateModifyItems) => {
     try {
-      const { isDirty, dirtyFields } = formState;
-      const patchParams: IDatasetCreate | IDatasetUpdate = { id: datasetId };
+      const { dirtyFields } = formState;
+      const patchParams: IDatasetUpdateModifyItems = { id: datasetId };
 
       const dirtyFieldsKeys = Object.keys(dirtyFields);
       for (const key of dirtyFieldsKeys) {
@@ -96,7 +116,7 @@ export const DatasetDetail = () => {
 
       const updatedItems = dirtyFields.dataset_items
         ?.map((item, index) => {
-          const newObject: IDatasetItemUpdate = { id: index };
+          const newObject: IDatasetUpdateModifyItems = { id: index };
           const itemKeys = Object.keys(item);
           for (const key of itemKeys) {
             // @ts-ignore
@@ -124,7 +144,7 @@ export const DatasetDetail = () => {
     }
   };
 
-  const { control, handleSubmit, register, setValue, formState, getValues } = useForm<IDatasetCreate | IDatasetUpdate>();
+  const { handleSubmit, register, formState, getValues } = useForm<IDatasetUpdateModifyItems>();
 
   const fields: StrictField<IDatasetItemRecord>[] = [
     {
@@ -229,6 +249,135 @@ export const DatasetDetail = () => {
           </Stack>
         </Box>
       </Dialog>
+
+      <NewPriceItem datasetId={datasetId} fetchDatasets={fetchDatasets} />
     </Box>
   );
 };
+
+type Props = {
+  datasetId: number;
+  fetchDatasets: () => void;
+};
+export const NewPriceItem: React.FC<Props> = ({ datasetId, fetchDatasets }) => {
+  const { control, register, handleSubmit, reset } = useForm<IDatasetUpdateCreateItems>({ defaultValues: { dataset_items: [] } });
+  const {
+    fields: formArrayFields,
+    append,
+    remove,
+  } = useFieldArray({
+    control,
+    name: "dataset_items",
+  });
+
+  const tblFields: StrictField<IDatasetItemCreate>[] = [
+    {
+      header: "Order",
+      fieldKey: "order",
+    },
+    {
+      header: "Symbol",
+      fieldKey: "symbol",
+    },
+    {
+      header: "Ticker_price",
+      fieldKey: "ticker_price",
+    },
+    {
+      header: "Market_price",
+      fieldKey: "market_price",
+    },
+  ];
+
+  const onSaveNewItems = async (value: IDatasetUpdateCreateItems) => {
+    try {
+      console.log("value", value);
+
+      const createdItems = value.dataset_items?.map((item) => {
+        if ("id" in item) {
+          const { id, ...rest } = item;
+          return rest;
+        } else return item;
+      });
+
+      const patchParams: IDatasetUpdateCreateItems = { id: datasetId };
+      if (createdItems) patchParams.dataset_items = createdItems;
+
+      const { id, ...otherParams } = patchParams;
+      const response = await patchApi(`dataset/${datasetId}`, otherParams);
+
+      if (response.success) {
+        toast.success("Update success");
+        fetchDatasets();
+        reset();
+      } else toast.error(response.error.message);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  return (
+    <Box mt={6}>
+      <Typography>Create new item</Typography>
+      <Box component={"form"} onSubmit={handleSubmit(onSaveNewItems)}>
+        <TableContainer>
+          <TableHead>
+            <TableRow>
+              {tblFields.map((field) => (
+                <TableCell
+                  sx={{
+                    padding: {
+                      xs: "8px 8px 8px 12px",
+                      sm: "16px",
+                      verticalAlign: "top",
+                      whiteSpace: "nowrap",
+                    },
+                  }}
+                  width={field.width || DEFAULT_CELL_WIDTH}
+                >
+                  <StyledText sx={{ fontWeight: 700, color: "black" }}>{field.header}</StyledText>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {formArrayFields.map((field, index) => (
+              <TableRow key={field.id}>
+                {tblFields.map(({ fieldKey }: StrictField<IDatasetItemCreate>) => {
+                  return (
+                    <TableCell sx={{ padding: { xs: "12px", sm: "16px" }, whiteSpace: "nowrap" }}>
+                      <BaseInput {...register(`dataset_items.${index}.${fieldKey}`)} />
+                    </TableCell>
+                  );
+                })}
+                <TableCell>
+                  <IconButton onClick={() => remove(index)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </TableContainer>
+
+        <Button type="button" onClick={() => append({ datasets_id: datasetId, order: 0, symbol: "" })} variant="outlined" sx={{ mt: 2 }}>
+          Add New Row
+        </Button>
+
+        <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+          Save Items
+        </Button>
+      </Box>
+    </Box>
+  );
+};
+
+const StyledText = styled(Typography)(({ theme }) => ({
+  textAlign: "left",
+  color: "white",
+  fontWeight: 500,
+  fontSize: 15,
+  [theme.breakpoints.up("sm")]: {
+    fontSize: 17,
+  },
+}));

@@ -27,7 +27,7 @@ interface BasicTableProps<TData extends UnknownObj> {
   headerProps?: TableHeadProps;
 }
 
-const DEFAULT_CELL_WIDTH = "20%";
+export const DEFAULT_CELL_WIDTH = "20%";
 
 export function BasicTable<TData extends UnknownObj>({
   data,

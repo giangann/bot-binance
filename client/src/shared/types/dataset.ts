@@ -16,8 +16,15 @@ export interface IDatasetCreate {
   updatedAt?: string;
 }
 
-export interface IDatasetUpdate extends Pick<IDatasetRecord, "id"> {
-  dataset_items?: (IDatasetItemUpdate | IDatasetItemCreate)[];
+export interface IDatasetUpdateModifyItems extends Pick<IDatasetRecord, "id"> {
+  dataset_items?: (IDatasetItemUpdate)[];
+  name?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface IDatasetUpdateCreateItems extends Pick<IDatasetRecord, "id"> {
+  dataset_items?: (IDatasetItemCreate)[];
   name?: string;
   createdAt?: string;
   updatedAt?: string;
