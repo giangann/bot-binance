@@ -4,8 +4,8 @@ import { Layout } from "../Layout";
 import { ChainLog } from "../pages/account/ChainLog";
 import { ListOrderChain } from "../pages/account/ListOrderChain";
 import { CoinMixTable } from "../pages/coin/CoinMixTable";
-import { Test } from "../pages/test/Test";
 import { Dataset } from "../pages/dataset/Dataset";
+import { DatasetDetail } from "../pages/dataset/DatasetDetail";
 
 const routes: RouteObject[] = [
   {
@@ -27,6 +27,10 @@ const routes: RouteObject[] = [
       {
         path: "/dataset",
         element: <Dataset />,
+      },
+      {
+        path: "/dataset/:id",
+        element: <DatasetDetail />,
       },
       {
         path: "/mix-table",
