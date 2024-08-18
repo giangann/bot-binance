@@ -3,7 +3,6 @@ import { createContext, useEffect, useState } from "react";
 import { getApi } from "../../request/request";
 import { ICoinPrice, TCoinPriceMap } from "../../shared/types/coin";
 import { CoinPriceFixedTime } from "./CoinPriceFIxedTime";
-import { CoinPriceRealTime } from "./CoinPriceRealTime";
 import data from "./data.json";
 
 export const CoinContext = createContext<{
@@ -42,7 +41,6 @@ export const Coin = () => {
       <GoToFullTable />
       <Grid container columnSpacing={{ xs: 3, sm: 6 }}>
         <CoinPriceFixedTime />
-        <CoinPriceRealTime />
       </Grid>
     </CoinContext.Provider>
   );

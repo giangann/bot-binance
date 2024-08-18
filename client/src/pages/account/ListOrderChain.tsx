@@ -10,6 +10,7 @@ import { NewOrderChain } from "./NewOrderChain";
 import { OrderChains } from "./OrderChains";
 import { Position } from "./Position";
 import { AutoActive } from "./AutoActive";
+import { BackToHomePage } from "../../components/BackHome/BackToHomePage";
 
 export const ListOrderChain = () => {
   const [orderChains, setOrderChains] = useState<
@@ -39,6 +40,7 @@ export const ListOrderChain = () => {
   return (
     <OrderChainContext.Provider value={{ fetchOrderChains }}>
       <Box>
+        <BackToHomePage/>
         <BalanceAndPosition />
         <AutoActive/>
         <TitleAndNewChainBtn />

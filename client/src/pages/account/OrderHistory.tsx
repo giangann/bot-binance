@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { CustomTable, StrictField } from "../../components/Table/Customtable";
 import { getApi } from "../../request/request";
-import { OrderCreate } from "./OrderCreate";
 
 type TOrder = {
   id: string;
@@ -87,7 +86,6 @@ export const OrderHistory = () => {
     <Box my={3}>
       <Stack direction="row" spacing={6} alignItems={"center"} mb={1}>
         <Typography variant="h6">Danh sách lệnh</Typography>
-        <OrderCreate />
       </Stack>
 
       {/* symbol, size, amount */}

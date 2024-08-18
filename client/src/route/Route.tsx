@@ -5,6 +5,7 @@ import { ChainLog } from "../pages/account/ChainLog";
 import { ListOrderChain } from "../pages/account/ListOrderChain";
 import { CoinMixTable } from "../pages/coin/CoinMixTable";
 import { Test } from "../pages/test/Test";
+import { Dataset } from "../pages/dataset/Dataset";
 
 const routes: RouteObject[] = [
   {
@@ -24,8 +25,8 @@ const routes: RouteObject[] = [
         element: <ChainLog />,
       },
       {
-        path: "/test",
-        element: <Test />,
+        path: "/dataset",
+        element: <Dataset />,
       },
       {
         path: "/mix-table",
