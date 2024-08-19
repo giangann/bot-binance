@@ -33,6 +33,7 @@ import {
   IDatasetUpdateCreateItems,
   IDatasetUpdateModifyItems,
 } from "../../shared/types/dataset";
+import { RssFeedTwoTone } from "@mui/icons-material";
 
 export const DatasetDetail = () => {
   const [dataset, setDataset] = useState<IDatasetEntity | null>(null);
@@ -294,6 +295,9 @@ export const NewPriceItem: React.FC<Props> = ({ datasetId, fetchDatasets }) => {
   const onSaveNewItems = async (value: IDatasetUpdateCreateItems) => {
     try {
       const createdItems = value.dataset_items?.map((item) => {
+        item.ticker_price = item.ticker_price || undefined;
+        item.market_price = item.market_price || undefined;
+
         if ("id" in item) {
           const { id, ...rest } = item;
           return rest;
