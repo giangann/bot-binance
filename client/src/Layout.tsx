@@ -29,13 +29,13 @@ export const Layout = () => {
 
   useEffect(() => {
     async function checkIsBotActive() {
-      const response = await getApi<boolean>("order-chain/is-bot-active");
-      if (response.success) setBotActive(response.data);
+      const response = await getApi<{ isActive: boolean }>("bot/status");
+      if (response.success) setBotActive(response.data.isActive);
       else {
         toast.error(response.error.message);
       }
     }
-    checkIsBotActive()
+    checkIsBotActive();
   }, []);
   return (
     <SocketContext.Provider value={wsServer}>

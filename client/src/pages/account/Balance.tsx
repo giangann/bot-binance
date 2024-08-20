@@ -13,7 +13,7 @@ export const Balance = () => {
   const socket = useContext(SocketContext);
 
   const fetchBalance = async () => {
-    const response = await getApi("user/acc-info-axios");
+    const response = await getApi("my-binance/account-info");
     if (response.success) {
       const { totalWalletBalance, availableBalance } = response.data;
       setBalance({

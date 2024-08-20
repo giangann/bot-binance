@@ -24,7 +24,7 @@ export const Position = () => {
 
   const fetchPosition = useCallback(async () => {
     setIsLoading(true);
-    const response = await getApi<TPosition[]>("user/position-info");
+    const response = await getApi<TPosition[]>("my-binance/position-info");
     if (response.success) {
       setPositions(response.data);
     } else toast.error(response.error.message);
