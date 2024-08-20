@@ -33,7 +33,6 @@ import {
   IDatasetUpdateCreateItems,
   IDatasetUpdateModifyItems,
 } from "../../shared/types/dataset";
-import { RssFeedTwoTone } from "@mui/icons-material";
 
 export const DatasetDetail = () => {
   const [dataset, setDataset] = useState<IDatasetEntity | null>(null);

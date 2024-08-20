@@ -1,4 +1,3 @@
-import ArticleIcon from "@mui/icons-material/Article";
 import { Box, IconButton, Stack, Typography, styled } from "@mui/material";
 import { blue, grey } from "@mui/material/colors";
 import dayjs from "dayjs";
@@ -8,7 +7,6 @@ import { BaseInput } from "../../components/Input";
 import { IcOutlineKeyboardReturn, IcSharpFileDownloadDone } from "../../icons/Icons";
 import { putApi } from "../../request/request";
 import { TMarketOrderChainWithPiecesPagi } from "../../shared/types/order";
-import { CenterBox } from "../../styled/styled";
 import { ListOrderPiece } from "./ListOrderPiece";
 
 // take orderChains array as props, render many OrderChain
@@ -207,10 +205,3 @@ const ChainBox = styled(Box, {
     padding: 0,
   },
 }));
-
-const ViewLogButton = styled(Box)({
-  margin: "auto",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-});
