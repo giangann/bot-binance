@@ -4,13 +4,12 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { BaseInput } from "../../components/Input";
 import { BotContext } from "../../context/BotContext";
 import { OrderChainContext } from "../../context/OrderChainContext";
-import { SocketContext } from "../../context/SocketContext";
 import { postApi } from "../../request/request";
 import { TOrderChainPriceType } from "../../shared/types/order";
 
@@ -39,7 +38,8 @@ const defaultValue: TNewOrderChain = {
 export const NewOrderChain = () => {
   const [open, setOpen] = useState(false);
   const [priceType, setPriceType] = useState<TOrderChainPriceType>("market");
-  const socket = useContext(SocketContext);
+  const [isDeactivating, setIsDeactivating] = useState(false);
+
   const bot = useContext(BotContext);
 
   const { fetchOrderChains } = useContext(OrderChainContext);
@@ -68,31 +68,21 @@ export const NewOrderChain = () => {
   };
 
   const onQuit = async () => {
-    const response = await postApi<{ message: string }>("bot/deactivate", {});
-    if (response.success) {
-      toast.success(response.data.message);
-      bot.onToggle(false);
-      fetchOrderChains();
-    } else toast.error(response.error.message);
+    setIsDeactivating(true);
+    try {
+      const response = await postApi<{ message: string }>("bot/deactivate", {});
+      // if (response.success) {
+      //   toast.success(response.data.message);
+      //   bot.onToggle(false);
+      //   fetchOrderChains();
+      // } else toast.error(response.error.message);
+      if (!response.success) toast.error(response.error.message);
+    } catch (error: any) {
+    } finally {
+      setIsDeactivating(false);
+    }
   };
 
-  useEffect(() => {
-    socket?.on("bot-running", (msg) => {
-      toast.info(msg);
-    });
-    return () => {
-      socket?.off("bot-running");
-    };
-  }, []);
-
-  useEffect(() => {
-    socket?.on("bot-err", (errMsg) => {
-      toast.error(errMsg);
-    });
-    return () => {
-      socket?.off("bot-ert");
-    };
-  }, []);
   return (
     <Box>
       <Button
@@ -104,7 +94,7 @@ export const NewOrderChain = () => {
         + Kích hoạt BOT
       </Button>
 
-      <Button disabled={!bot.active} variant="outlined" color="error" onClick={onQuit}>
+      <Button disabled={!bot.active || isDeactivating} variant="outlined" color="error" onClick={onQuit}>
         x Quit
       </Button>
 
