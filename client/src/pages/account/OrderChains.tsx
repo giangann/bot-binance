@@ -5,10 +5,7 @@ import dayjs from "dayjs";
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { BaseInput } from "../../components/Input";
-import {
-  IcOutlineKeyboardReturn,
-  IcSharpFileDownloadDone,
-} from "../../icons/Icons";
+import { IcOutlineKeyboardReturn, IcSharpFileDownloadDone } from "../../icons/Icons";
 import { putApi } from "../../request/request";
 import { TMarketOrderChainWithPiecesPagi } from "../../shared/types/order";
 import { CenterBox } from "../../styled/styled";
@@ -44,34 +41,13 @@ const OrderChain = (props: TMarketOrderChainWithPiecesPagi) => {
 
   return (
     <Box mb={4}>
-      <ViewChainLog id={id} />
       <ChainBox open={status === "open"}>
         <Box>
           <ChainInfo chainInfo={props} />
-          <ListOrderPiece
-            status={status}
-            chainId={id}
-            orderPieces={data}
-            pagi={pagi}
-          />
+          <ListOrderPiece status={status} chainId={id} orderPieces={data} pagi={pagi} />
         </Box>
       </ChainBox>
     </Box>
-  );
-};
-
-const ViewChainLog = ({ id }: Pick<TMarketOrderChainWithPiecesPagi, "id">) => {
-  return (
-    <CenterBox mb={0.5}>
-      <a href={`/log/${id}`} target="_blank">
-        <ViewLogButton>
-          <Typography display={"inline"} mr={1}>
-            View log
-          </Typography>
-          <ArticleIcon />
-        </ViewLogButton>
-      </a>
-    </CenterBox>
   );
 };
 
@@ -179,10 +155,7 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
           </Typography>
 
           {!isEdit && (
-            <div
-              onClick={() => setIsEdit(true)}
-              onMouseOut={() => console.log("mouse out")}
-            >
+            <div onClick={() => setIsEdit(true)} onMouseOut={() => console.log("mouse out")}>
               <Typography>
                 pnl_to_stop:{" "}
                 <Typography sx={{ fontWeight: 600 }} component={"span"}>
@@ -194,21 +167,11 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
 
           {isEdit && (
             <Stack direction={"row"} alignItems={"center"}>
-              <IconButton
-                sx={{ padding: "4px", height: "32px" }}
-                onClick={() => setIsEdit(false)}
-              >
+              <IconButton sx={{ padding: "4px", height: "32px" }} onClick={() => setIsEdit(false)}>
                 <IcOutlineKeyboardReturn color={"blue"} fontSize={24} />
               </IconButton>
-              <BaseInput
-                sx={{ minWidth: "unset", width: "70px" }}
-                ref={inputRef}
-                defaultValue={pnl_to_stop}
-              />
-              <IconButton
-                sx={{ padding: "4px", height: "32px" }}
-                onClick={updatePnlToStop}
-              >
+              <BaseInput sx={{ minWidth: "unset", width: "70px" }} ref={inputRef} defaultValue={pnl_to_stop} />
+              <IconButton sx={{ padding: "4px", height: "32px" }} onClick={updatePnlToStop}>
                 <IcSharpFileDownloadDone color={"green"} fontSize={24} />
               </IconButton>
             </Stack>

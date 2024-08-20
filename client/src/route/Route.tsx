@@ -1,7 +1,6 @@
 import { RouteObject, createBrowserRouter } from "react-router-dom";
 import { Home } from "../Home";
 import { Layout } from "../Layout";
-import { ChainLog } from "../pages/account/ChainLog";
 import { ListOrderChain } from "../pages/account/ListOrderChain";
 import { CoinMixTable } from "../pages/coin/CoinMixTable";
 import { Dataset } from "../pages/dataset/Dataset";
@@ -19,10 +18,6 @@ const routes: RouteObject[] = [
       {
         path: "/chuoi-lenh",
         element: <ListOrderChain />,
-      },
-      {
-        path: "/log/:chainId",
-        element: <ChainLog />,
       },
       {
         path: "/dataset",
