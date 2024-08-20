@@ -1,8 +1,5 @@
 import { TPosition } from "../shared/types/position";
-import {
-  TSymbolMarkPriceWs,
-  TSymbolTickerPriceWs,
-} from "../shared/types/socket";
+import { TSymbolMarkPriceWs, TSymbolTickerPriceWs } from "../shared/types/socket";
 import { ISymbolAllPriceDBRow } from "../shared/types/symbol-all-price";
 import { ISymbolMarketPriceAPI } from "../shared/types/symbol-mark-price";
 import { ISymbolTickerPriceAPI } from "../shared/types/symbol-ticker-price";
@@ -44,14 +41,8 @@ export function mix(
           mark_price_1AM: symbolPrice1AM.mark_price,
           price: symbolTickerPrice.price,
           mark_price: symbolMarketPrice.markPrice,
-          percentMarkPriceChange: priceToPercent(
-            symbolPrice1AM.mark_price,
-            symbolMarketPrice.markPrice
-          ),
-          percentPriceChange: priceToPercent(
-            symbolPrice1AM.price,
-            symbolTickerPrice.price
-          ),
+          percentMarkPriceChange: priceToPercent(symbolPrice1AM.mark_price, symbolMarketPrice.markPrice),
+          percentPriceChange: priceToPercent(symbolPrice1AM.price, symbolTickerPrice.price),
         };
         dataArray.push(data);
       }
@@ -62,9 +53,7 @@ export function mix(
 }
 
 // array object that have symbol properties to map with key is symbol and value is correspond element object
-export function symbolPriceToMap<T extends { symbol: string }>(
-  symbolPriceDatas: T[]
-) {
+export function symbolPriceToMap<T extends { symbol: string }>(symbolPriceDatas: T[]) {
   let res: Record<string, T> = {};
 
   for (let symbolPrice of symbolPriceDatas) {
@@ -84,20 +73,14 @@ export function isObjValueNotNull(obj: Record<string, unknown>) {
   return true;
 }
 
-export function priceToPercent(
-  before: string | number,
-  after: string | number
-) {
+export function priceToPercent(before: string | number, after: string | number) {
   const p1 = parseFloat(before as unknown as string);
   const p2 = parseFloat(after as unknown as string);
 
   return (p2 / p1 - 1) * 100;
 }
 
-export function filterDataTable(
-  keys: (keyof Pick<TData, "percentMarkPriceChange" | "percentPriceChange">)[],
-  tableDatas: TData[]
-) {
+export function filterDataTable(keys: (keyof Pick<TData, "percentMarkPriceChange" | "percentPriceChange">)[], tableDatas: TData[]) {
   let result: TData[] = [...tableDatas];
 
   for (let key of keys) {
@@ -106,10 +89,7 @@ export function filterDataTable(
   return result;
 }
 
-export function filterDataTableSingleKey(
-  key: keyof Pick<TData, "percentMarkPriceChange" | "percentPriceChange">,
-  tableDatas: TData[]
-) {
+export function filterDataTableSingleKey(key: keyof Pick<TData, "percentMarkPriceChange" | "percentPriceChange">, tableDatas: TData[]) {
   const thresholdPercent = 5;
 
   return tableDatas.filter((data) => {
@@ -121,10 +101,7 @@ export function filterDataTableSingleKey(
 
 // export function sortDataTable(){}
 
-export function sortDataTableSingleKey(
-  keys: (keyof Pick<TData, "percentMarkPriceChange" | "percentPriceChange">)[],
-  tableDatas: TData[]
-) {
+export function sortDataTableSingleKey(keys: (keyof Pick<TData, "percentMarkPriceChange" | "percentPriceChange">)[], tableDatas: TData[]) {
   if (keys.length === 1) {
     let key = keys[0];
     return tableDatas.sort((a, b) => {
@@ -150,10 +127,7 @@ export function sortDataTableSingleKey(
   return tableDatas;
 }
 
-export function newMarkPrices(
-  bStreamFowardMarkPrices: TSymbolMarkPriceWs[],
-  markPrices: ISymbolMarketPriceAPI[]
-) {
+export function newMarkPrices(bStreamFowardMarkPrices: TSymbolMarkPriceWs[], markPrices: ISymbolMarketPriceAPI[]) {
   const bStreamFowardMarkPricesMap = symbolPriceToMap(bStreamFowardMarkPrices);
   console.log("markprices", markPrices);
   let newMarkPricesArr = markPrices.map((markPrice) => {
@@ -171,13 +145,8 @@ export function newMarkPrices(
   return newMarkPricesArr;
 }
 
-export function newTickerPrices(
-  bStreamFowardTickerPrices: TSymbolTickerPriceWs[],
-  tickerPrices: ISymbolTickerPriceAPI[]
-): ISymbolTickerPriceAPI[] {
-  const bStreamFowardTickerPricesMap = symbolPriceToMap(
-    bStreamFowardTickerPrices
-  );
+export function newTickerPrices(bStreamFowardTickerPrices: TSymbolTickerPriceWs[], tickerPrices: ISymbolTickerPriceAPI[]): ISymbolTickerPriceAPI[] {
+  const bStreamFowardTickerPricesMap = symbolPriceToMap(bStreamFowardTickerPrices);
 
   let newTickerPricesArr = tickerPrices.map((tickerPrice) => {
     let symbolKey = tickerPrice.symbol;
@@ -201,9 +170,11 @@ export function sortValueInStringFormat(val1: string, val2: string) {
 }
 
 export function sortPositionByPnl(positions: TPosition[]) {
-  return positions.sort((a, b) =>
-    sortValueInStringFormat(b.unRealizedProfit, a.unRealizedProfit)
-  );
+  return positions.sort((a, b) => sortValueInStringFormat(b.unRealizedProfit, a.unRealizedProfit));
+}
+
+export function filterPositionsNotZero(positions: TPosition[]) {
+  return positions.filter((position) => parseFloat(position.positionAmt) !== 0);
 }
 
 export function totalUnrealizedPnl(positions: TPosition[]) {
@@ -213,11 +184,7 @@ export function totalUnrealizedPnl(positions: TPosition[]) {
   }
   return result;
 }
-export function arraySliceByPagi(
-  array: any[],
-  currPage: number,
-  perpage: number
-) {
+export function arraySliceByPagi(array: any[], currPage: number, perpage: number) {
   const startIndex = currPage * perpage - perpage;
   const endIndex = currPage * perpage;
   return array.slice(startIndex, endIndex);

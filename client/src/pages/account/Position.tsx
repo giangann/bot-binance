@@ -4,22 +4,18 @@ import { getApi } from "../../request/request";
 import { TPosition } from "../../shared/types/position";
 import { toast } from "react-toastify";
 import { SocketContext } from "../../context/SocketContext";
-import {
-  Box,
-  IconButton,
-  Skeleton,
-  Stack,
-  Typography,
-  styled,
-} from "@mui/material";
+import { Box, IconButton, Skeleton, Stack, Typography, styled } from "@mui/material";
 import { StrictField } from "../../components/Table/Customtable";
 import { CustomTable } from "../../components/Table/Customtable";
-import { sortPositionByPnl, totalUnrealizedPnl } from "../../ultils/helper";
+import { filterPositionsNotZero, sortPositionByPnl, totalUnrealizedPnl } from "../../ultils/helper";
 
 export const Position = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [positions, setPositions] = useState<TPosition[]>([]);
-  const sortedPositions = sortPositionByPnl(positions);
+
+  const filterZeroPositions = filterPositionsNotZero(positions);
+  const sortedPositions = sortPositionByPnl(filterZeroPositions);
+
   const socket = useContext(SocketContext);
 
   const fetchPosition = useCallback(async () => {
@@ -32,11 +28,11 @@ export const Position = () => {
   }, []);
 
   useEffect(() => {
-    socket?.on("ws-position", (positions: TPosition[]) => {
+    socket?.on("ws-position-info", (positions: TPosition[]) => {
       setPositions(positions);
     });
     return () => {
-      socket?.off("ws-position");
+      socket?.off("ws-position-info");
     };
   }, []);
 
@@ -55,17 +51,13 @@ export const Position = () => {
       header: "Entry Price",
       fieldKey: "entryPrice",
       width: 300,
-      render: ({ entryPrice }) => (
-        <StyledText>{parseFloat(entryPrice).toFixed(5)}</StyledText>
-      ),
+      render: ({ entryPrice }) => <StyledText>{parseFloat(entryPrice).toFixed(5)}</StyledText>,
     },
     {
       header: "Mark Price",
       fieldKey: "markPrice",
       width: 300,
-      render: ({ markPrice }) => (
-        <StyledText>{parseFloat(markPrice).toFixed(5)}</StyledText>
-      ),
+      render: ({ markPrice }) => <StyledText>{parseFloat(markPrice).toFixed(5)}</StyledText>,
     },
     {
       header: "Unrealized PNL",
@@ -93,14 +85,10 @@ export const Position = () => {
           <CachedIcon />
         </IconButton>
       </Stack>
-      {isLoading && (
-        <Skeleton variant="rectangular" width={"100%"} height={"200px"} />
-      )}
+      {isLoading && <Skeleton variant="rectangular" width={"100%"} height={"200px"} />}
       {!isLoading && (
         <>
-          <Typography>
-            Total Unrealized PNL: {totalUnrealizedPnl(positions).toFixed(3)}
-          </Typography>
+          <Typography>Total Unrealized PNL: {totalUnrealizedPnl(positions).toFixed(3)}</Typography>
           <CustomTable fields={fields} data={sortedPositions} />
         </>
       )}
