@@ -1,4 +1,3 @@
-import ArticleIcon from "@mui/icons-material/Article";
 import { Box, IconButton, Stack, Typography, styled } from "@mui/material";
 import { blue, grey } from "@mui/material/colors";
 import dayjs from "dayjs";
@@ -7,17 +6,16 @@ import { toast } from "react-toastify";
 import { BaseInput } from "../../components/Input";
 import { IcOutlineKeyboardReturn, IcSharpFileDownloadDone } from "../../icons/Icons";
 import { putApi } from "../../request/request";
-import { TMarketOrderChainWithPiecesPagi } from "../../shared/types/order";
-import { CenterBox } from "../../styled/styled";
-import { ListOrderPiece } from "./ListOrderPiece";
+import { TMarketOrderChainTestWithPiecesPagi } from "../../shared/types/order-test";
+import { ListOrderPieceTest } from "./ListOrderPieceTest";
 
 // take orderChains array as props, render many OrderChain
 // OrderChain: take orderChain as props, render orderChain detail and ListOrderPiece
 
 type Props = {
-  orderChains: TMarketOrderChainWithPiecesPagi[];
+  orderChains: TMarketOrderChainTestWithPiecesPagi[];
 };
-export const OrderChains: React.FC<Props> = ({ orderChains }) => {
+export const OrderChainsTest: React.FC<Props> = ({ orderChains }) => {
   return (
     <>
       {!orderChains.length ? (
@@ -27,7 +25,7 @@ export const OrderChains: React.FC<Props> = ({ orderChains }) => {
       ) : (
         <>
           {orderChains.map((chain) => (
-            <OrderChain {...chain} key={chain.id} />
+            <OrderChainTest {...chain} key={chain.id} />
           ))}
         </>
       )}
@@ -35,16 +33,16 @@ export const OrderChains: React.FC<Props> = ({ orderChains }) => {
   );
 };
 
-const OrderChain = (props: TMarketOrderChainWithPiecesPagi) => {
-  const { order_pieces, status, id } = props;
-  const { data, pagi } = order_pieces;
+const OrderChainTest = (props: TMarketOrderChainTestWithPiecesPagi) => {
+  const { order_pieces_test, status, id } = props;
+  const { data, pagi } = order_pieces_test;
 
   return (
     <Box mb={4}>
       <ChainBox open={status === "open"}>
         <Box>
           <ChainInfo chainInfo={props} />
-          <ListOrderPiece status={status} chainId={id} orderPieces={data} pagi={pagi} />
+          <ListOrderPieceTest status={status} chainTestId={id} orderPiecesTest={data} pagi={pagi} />
         </Box>
       </ChainBox>
     </Box>
@@ -52,7 +50,7 @@ const OrderChain = (props: TMarketOrderChainWithPiecesPagi) => {
 };
 
 type ChainInfoProps = {
-  chainInfo: Omit<TMarketOrderChainWithPiecesPagi, "order_pieces">;
+  chainInfo: Omit<TMarketOrderChainTestWithPiecesPagi, "order_pieces_test">;
 };
 const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
   const {
@@ -68,6 +66,7 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
     max_pnl_threshold_to_quit,
     price_type,
     start_reason,
+
     updatedAt,
   } = chainInfo;
   const [isEdit, setIsEdit] = useState(false);
@@ -76,7 +75,7 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
   const updatePnlToStop = async () => {
     // @ts-ignore
     const newValue = inputRef.current ? inputRef.current.value : pnl_to_stop;
-    const response = await putApi(`order-chain/${id}`, {
+    const response = await putApi(`order-chain-test/${id}`, {
       pnl_to_stop: newValue,
     });
 
@@ -207,10 +206,3 @@ const ChainBox = styled(Box, {
     padding: 0,
   },
 }));
-
-const ViewLogButton = styled(Box)({
-  margin: "auto",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-});

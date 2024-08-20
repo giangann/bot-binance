@@ -33,7 +33,7 @@ export const BaseInput = forwardRef(
   }
 );
 
-const InputLabelText = styled(Typography)(({ theme }) => ({
+export const InputLabelText = styled(Typography)(({ theme }) => ({
   fontWeight: 400,
   display: "inline",
   fontSize: 14,

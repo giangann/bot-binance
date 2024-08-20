@@ -11,7 +11,11 @@ export const Home = () => {
       <Coin />
       <Balance />
 
+      <div style={{ marginTop: 36 }} />
       <GoToOrderChainsList />
+
+      <div style={{ marginTop: 36 }} />
+      <GoToBotTest />
 
       <div style={{ marginTop: 36 }} />
       <GoToDatasetList />
@@ -29,7 +33,19 @@ const GoToOrderChainsList = () => {
   return (
     <Box>
       <Button variant="contained" onClick={() => navigate("/chuoi-lenh")}>
-        + Tới lịch sử hoạt động - Bot
+        + Tới lịch sử hoạt động - BOT_PROD
+      </Button>
+    </Box>
+  );
+};
+
+const GoToBotTest = () => {
+  const navigate = useNavigate();
+
+  return (
+    <Box>
+      <Button variant="outlined" color="error" onClick={() => navigate("/bot-test")}>
+        + Tới thử nghiệm - BOT_TEST
       </Button>
     </Box>
   );
