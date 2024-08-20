@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Stack, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { OrderChainContext } from "../../context/OrderChainContext";
@@ -11,16 +11,13 @@ import { OrderChains } from "./OrderChains";
 import { Position } from "./Position";
 import { AutoActive } from "./AutoActive";
 import { BackToHomePage } from "../../components/BackHome/BackToHomePage";
+import { MarkAllChainsAsClosed } from "./MarkAllChainsAsClosed";
 
 export const ListOrderChain = () => {
-  const [orderChains, setOrderChains] = useState<
-    TMarketOrderChainWithPiecesPagi[]
-  >([]);
+  const [orderChains, setOrderChains] = useState<TMarketOrderChainWithPiecesPagi[]>([]);
   const socket = useContext(SocketContext);
   const fetchOrderChains = useCallback(async () => {
-    const response = await getApi<TMarketOrderChainWithPiecesPagi[]>(
-      "order-chain"
-    );
+    const response = await getApi<TMarketOrderChainWithPiecesPagi[]>("order-chain");
     if (response.success) setOrderChains(response.data);
   }, []);
 
@@ -40,10 +37,13 @@ export const ListOrderChain = () => {
   return (
     <OrderChainContext.Provider value={{ fetchOrderChains }}>
       <Box>
-        <BackToHomePage/>
+        <BackToHomePage />
         <BalanceAndPosition />
-        <AutoActive/>
-        <TitleAndNewChainBtn />
+        <AutoActive />
+        <Stack direction="row" alignItems={"flex-end"} justifyContent={"space-between"}>
+          <TitleAndNewChainBtn />
+          <MarkAsClosedBtn />
+        </Stack>
         <OrderChains orderChains={orderChains} />
       </Box>
     </OrderChainContext.Provider>
@@ -70,6 +70,14 @@ const TitleAndNewChainBtn = () => {
         BOT - danh sách hoạt động
       </Typography>
       <NewOrderChain />
+    </Box>
+  );
+};
+
+const MarkAsClosedBtn = () => {
+  return (
+    <Box my={4}>
+      <MarkAllChainsAsClosed />
     </Box>
   );
 };

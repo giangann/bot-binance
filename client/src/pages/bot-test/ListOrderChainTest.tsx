@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { BackToHomePage } from "../../components/BackHome/BackToHomePage";
@@ -6,18 +6,15 @@ import { OrderChainContext } from "../../context/OrderChainContext";
 import { SocketContext } from "../../context/SocketContext";
 import { getApi } from "../../request/request";
 import { TMarketOrderChainTestWithPiecesPagi } from "../../shared/types/order-test";
+import { MarkAllChainsTestAsClosed } from "./MarkAllChainsTestAsClosed";
 import { NewOrderChainTest } from "./NewOrderChainTest";
 import { OrderChainsTest } from "./OrderChainsTest";
 
 export const ListOrderChainTest = () => {
-  const [orderChains, setOrderChains] = useState<
-  TMarketOrderChainTestWithPiecesPagi[]
-  >([]);
+  const [orderChains, setOrderChains] = useState<TMarketOrderChainTestWithPiecesPagi[]>([]);
   const socket = useContext(SocketContext);
   const fetchOrderChains = useCallback(async () => {
-    const response = await getApi<TMarketOrderChainTestWithPiecesPagi[]>(
-      "order-chain-test"
-    );
+    const response = await getApi<TMarketOrderChainTestWithPiecesPagi[]>("order-chain-test");
     if (response.success) setOrderChains(response.data);
   }, []);
 
@@ -37,14 +34,16 @@ export const ListOrderChainTest = () => {
   return (
     <OrderChainContext.Provider value={{ fetchOrderChains }}>
       <Box>
-        <BackToHomePage/>
-        <TitleAndNewChainBtn />
+        <BackToHomePage />
+        <Stack direction="row" alignItems={"flex-end"} justifyContent={"space-between"}>
+          <TitleAndNewChainBtn />
+          <MarkAsClosedBtn />
+        </Stack>
         <OrderChainsTest orderChains={orderChains} />
       </Box>
     </OrderChainContext.Provider>
   );
 };
-
 
 const TitleAndNewChainBtn = () => {
   return (
@@ -53,6 +52,14 @@ const TitleAndNewChainBtn = () => {
         BOT - danh sách test
       </Typography>
       <NewOrderChainTest />
+    </Box>
+  );
+};
+
+const MarkAsClosedBtn = () => {
+  return (
+    <Box my={4}>
+      <MarkAllChainsTestAsClosed />
     </Box>
   );
 };

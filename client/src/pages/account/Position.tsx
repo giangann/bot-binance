@@ -144,7 +144,7 @@ export const Position = () => {
       )}
       <Dialog open={openCfDialog} onClose={dialogHandlers.onCancel}>
         <Box p={4}>
-          <Typography variant="h6">Xác nhận đóng các Long Positions?</Typography>
+          <Typography variant="h6">Xác nhận đóng tất cả Positions?</Typography>
           <Box mb={2} />
 
           <Stack direction="row" spacing={1} justifyContent={"flex-end"} alignItems={"center"}>
