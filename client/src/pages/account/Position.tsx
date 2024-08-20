@@ -77,6 +77,16 @@ export const Position = () => {
     };
   }, []);
 
+  // useEffect(() => {
+  //   socket?.on("bot-quit", async (_msg: string) => {
+  //     console.log("bot-quit-event-received", _msg);
+  //     await fetchPosition();
+  //   });
+  //   return () => {
+  //     socket?.off("bot-quit");
+  //   };
+  // }, []);
+
   useEffect(() => {
     fetchPosition();
   }, []);
