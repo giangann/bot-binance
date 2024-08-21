@@ -145,16 +145,21 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
   const inputRef = useRef(null);
 
   const updatePnlToStop = async () => {
-    // @ts-ignore
-    const newValue = inputRef.current ? inputRef.current.value : pnl_to_stop;
-    const response = await putApi(`order-chain/${id}`, {
-      pnl_to_stop: newValue,
-    });
+    try {
+      // @ts-ignore
+      const newValue = inputRef.current ? inputRef.current.value : pnl_to_stop;
+      const response = await putApi(`order-chain/${id}`, {
+        pnl_to_stop: newValue,
+      });
 
-    if (response.success) {
-      toast.success("Update success");
-    } else {
-      toast.error(response.error.message);
+      if (response.success) {
+        toast.success("Update success");
+      } else {
+        toast.error(response.error.message);
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
     }
   };
   return (
@@ -242,7 +247,7 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
                 <IcOutlineKeyboardReturn color={"blue"} fontSize={24} />
               </IconButton>
               <BaseInput sx={{ minWidth: "unset", width: "70px" }} ref={inputRef} defaultValue={pnl_to_stop} />
-              <IconButton sx={{ padding: "4px", height: "32px" }} onClick={updatePnlToStop} disabled>
+              <IconButton sx={{ padding: "4px", height: "32px" }} onClick={updatePnlToStop} disabled={status === "closed"}>
                 <IcSharpFileDownloadDone color={"green"} fontSize={24} />
               </IconButton>
             </Stack>
