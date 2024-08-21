@@ -1,21 +1,63 @@
-import { Box, IconButton, Stack, Typography, styled } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Box, Button, CircularProgress, Dialog, IconButton, Stack, Typography, styled } from "@mui/material";
 import { blue, grey } from "@mui/material/colors";
 import dayjs from "dayjs";
-import { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { BaseInput } from "../../components/Input";
 import { IcOutlineKeyboardReturn, IcSharpFileDownloadDone } from "../../icons/Icons";
-import { putApi } from "../../request/request";
+import { deleteApi, putApi } from "../../request/request";
 import { TMarketOrderChainWithPiecesPagi } from "../../shared/types/order";
 import { ListOrderPiece } from "./ListOrderPiece";
-
-// take orderChains array as props, render many OrderChain
-// OrderChain: take orderChain as props, render orderChain detail and ListOrderPiece
+import { OrderChainContext } from "../../context/OrderChainContext";
 
 type Props = {
   orderChains: TMarketOrderChainWithPiecesPagi[];
 };
 export const OrderChains: React.FC<Props> = ({ orderChains }) => {
+  const [openCfDialog, setOpenCfDialg] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const [dialogHandlers, setDialogHandlers] = useState<{ onConfirm: () => void; onCancel: () => void }>({
+    onConfirm: () => {},
+    onCancel: () => {},
+  });
+
+  const { fetchOrderChains } = useContext(OrderChainContext);
+
+  const onDeleteItem = async (itemId: number): Promise<boolean> => {
+    return new Promise((resolve) => {
+      setOpenCfDialg(true);
+
+      const handleConfirmDelete = async () => {
+        try {
+          setIsDeleting(true);
+
+          const response = await deleteApi(`order-chain/${itemId}`);
+          if (response.success) {
+            toast.success("Delete succeeded!");
+            fetchOrderChains();
+            resolve(true);
+          } else {
+            toast.error(response.error.message);
+            resolve(false);
+          }
+        } catch (error: any) {
+          toast.error(error.message);
+        } finally {
+          setIsDeleting(false);
+          setOpenCfDialg(false);
+        }
+      };
+
+      const handleCancelDelete = () => {
+        setOpenCfDialg(false);
+        resolve(false);
+      };
+
+      setDialogHandlers({ onConfirm: handleConfirmDelete, onCancel: handleCancelDelete });
+    });
+  };
   return (
     <>
       {!orderChains.length ? (
@@ -25,23 +67,54 @@ export const OrderChains: React.FC<Props> = ({ orderChains }) => {
       ) : (
         <>
           {orderChains.map((chain) => (
-            <OrderChain {...chain} key={chain.id} />
+            <Box>
+              <OrderChain chain={chain} onDelete={onDeleteItem} key={chain.id} />
+            </Box>
           ))}
+
+          <Dialog open={openCfDialog} onClose={dialogHandlers.onCancel}>
+            <Box p={4}>
+              <Typography variant="h6">Xác nhận xóa?</Typography>
+              <Box mb={2} />
+
+              <Stack direction="row" spacing={1} justifyContent={"flex-end"} alignItems={"center"}>
+                <Button onClick={dialogHandlers.onCancel} variant="outlined">
+                  Close
+                </Button>
+                <Button
+                  onClick={dialogHandlers.onConfirm}
+                  startIcon={isDeleting && <CircularProgress color="inherit" size={14} />}
+                  variant="contained"
+                  color="error"
+                >
+                  Xóa
+                </Button>
+              </Stack>
+            </Box>
+          </Dialog>
         </>
       )}
     </>
   );
 };
 
-const OrderChain = (props: TMarketOrderChainWithPiecesPagi) => {
-  const { order_pieces, status, id } = props;
+type ChainProps = {
+  chain: TMarketOrderChainWithPiecesPagi;
+  onDelete: (id: number) => Promise<boolean>;
+};
+
+const OrderChain: React.FC<ChainProps> = ({ chain, onDelete }) => {
+  const { order_pieces, status, id } = chain;
   const { data, pagi } = order_pieces;
 
   return (
     <Box mb={4}>
+      <IconButton onClick={() => onDelete(id)} disabled={status === "open"}>
+        <DeleteIcon color="error" />
+      </IconButton>{" "}
       <ChainBox open={status === "open"}>
         <Box>
-          <ChainInfo chainInfo={props} />
+          <ChainInfo chainInfo={chain} />
           <ListOrderPiece status={status} chainId={id} orderPieces={data} pagi={pagi} />
         </Box>
       </ChainBox>
