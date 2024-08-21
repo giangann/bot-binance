@@ -8,7 +8,7 @@ import React, { Dispatch, SetStateAction, useCallback, useContext, useEffect, us
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { BaseInput, InputLabelText } from "../../components/Input";
-import { BotContext } from "../../context/BotContext";
+import { BotTestContext } from "../../context/BotTestContext";
 import { OrderChainContext } from "../../context/OrderChainContext";
 import { getApi, postApi } from "../../request/request";
 import { IDatasetRecord } from "../../shared/types/dataset";
@@ -18,7 +18,7 @@ export const NewOrderChainTest = () => {
   const [open, setOpen] = useState(false);
   const [isDeactivating, setIsDeactivating] = useState(false);
 
-  const bot = useContext(BotContext);
+  const botTest = useContext(BotTestContext);
 
   const onQuit = async () => {
     setIsDeactivating(true);
@@ -41,13 +41,13 @@ export const NewOrderChainTest = () => {
       <Button
         variant="contained"
         onClick={() => setOpen(true)}
-        disabled={bot.active}
-        endIcon={bot.active ? <CircularProgress color="inherit" size={14} /> : ""}
+        disabled={botTest.active}
+        endIcon={botTest.active ? <CircularProgress color="inherit" size={14} /> : ""}
       >
         + Kích hoạt BOT
       </Button>
 
-      <Button disabled={!bot.active || isDeactivating} variant="outlined" color="error" onClick={onQuit}>
+      <Button disabled={!botTest.active || isDeactivating} variant="outlined" color="error" onClick={onQuit}>
         x Quit
       </Button>
 
@@ -94,7 +94,7 @@ const NewOrderChainTestDialog: React.FC<Props> = ({ open, setOpen }) => {
   };
 
   const [priceType, setPriceType] = useState<TOrderChainPriceType>("market");
-  const bot = useContext(BotContext);
+  const botTest = useContext(BotTestContext);
 
   const { fetchOrderChains } = useContext(OrderChainContext);
   const {
@@ -121,7 +121,7 @@ const NewOrderChainTestDialog: React.FC<Props> = ({ open, setOpen }) => {
       const response = await postApi<{ message: string }>("bot/test/activate", values);
       if (response.success) {
         toast.success(response.data.message);
-        bot.onToggle(true);
+        botTest.onToggle(true);
         fetchOrderChains();
       } else toast.error(response.error.message);
     } catch (err) {

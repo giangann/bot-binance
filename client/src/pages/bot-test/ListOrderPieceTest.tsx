@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { BasicTable } from "../../components/Table/BasicTable";
 import { CustomPagi } from "../../components/Table/CustomPagi";
 import { StrictField } from "../../components/Table/Customtable";
-import { BotContext } from "../../context/BotContext";
+import { BotTestContext } from "../../context/BotTestContext";
 import { OrderChainContext } from "../../context/OrderChainContext";
 import { SocketContext } from "../../context/SocketContext";
 import { usePagination } from "../../hooks/usePagination";
@@ -45,7 +45,7 @@ export const ListOrderPieceTest: React.FC<Props> = ({ status, chainTestId, order
   // }
 
   const socket = useContext(SocketContext);
-  const bot = useContext(BotContext);
+  const botTest = useContext(BotTestContext);
   const { fetchOrderChains } = useContext(OrderChainContext);
 
   const isInitialRender = useRef(true);
@@ -149,7 +149,7 @@ export const ListOrderPieceTest: React.FC<Props> = ({ status, chainTestId, order
     if (status === "open") {
       socket?.on("bot-quit-test", (msg) => {
         toast.info(msg);
-        bot.onToggle(false);
+        botTest.onToggle(false);
         fetchOrderChains();
       });
       return () => {
