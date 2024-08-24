@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Dialog,
-  Grid,
-  Stack,
-} from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, Grid, Stack, Switch } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
@@ -15,24 +8,16 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { BaseInput } from "../../components/Input";
-import { getApi, putApi } from "../../request/request";
-import {
-  IAutoActiveConfigEntitywithoutId,
-  IAutoActiveConfigUpdateOne,
-  TAutoActiveStatus,
-} from "../../shared/types/auto-active-config";
+import { getApi, postApi, putApi } from "../../request/request";
+import { IAutoActiveConfigEntitywithoutId, IAutoActiveConfigUpdateOne } from "../../shared/types/auto-active-config";
 import { TOrderChainPriceType } from "../../shared/types/order";
 
 export const AutoActiveConfig = () => {
   const [open, setOpen] = useState(false);
-  
+
   return (
     <>
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={() => setOpen(true)}
-      >
+      <Button variant="contained" color="secondary" onClick={() => setOpen(true)}>
         Auto Active
       </Button>
       {open && <AutoActiveConfigDialog open={open} setOpen={setOpen} />}
@@ -45,9 +30,10 @@ type Props = {
   setOpen: Dispatch<SetStateAction<boolean>>;
 };
 export const AutoActiveConfigDialog: React.FC<Props> = ({ open, setOpen }) => {
-  const [priceType, setPriceType] = useState<TOrderChainPriceType>("ticker");
-  const [autoActive, setAutoActive] = useState<TAutoActiveStatus>("off");
+  const [priceType, setPriceType] = useState<TOrderChainPriceType>("market");
   const [isLoading, setIsLoading] = useState(false);
+  const [isAutoActiveOn, setIsAutoActiveOn] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const {
     register,
     handleSubmit,
@@ -60,7 +46,7 @@ export const AutoActiveConfigDialog: React.FC<Props> = ({ open, setOpen }) => {
       const params: IAutoActiveConfigUpdateOne = {
         ...values,
         price_type: priceType,
-        auto_active: autoActive,
+        auto_active: "off", // not relate anymore
       };
 
       const response = await putApi("config/update-one", params);
@@ -76,15 +62,43 @@ export const AutoActiveConfigDialog: React.FC<Props> = ({ open, setOpen }) => {
     }
   };
 
+  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    await onToggleAutoActiveStatus(event.target.checked);
+  };
+  const onToggleAutoActiveStatus = async (isTurnOn: boolean) => {
+    setIsUpdatingStatus(true);
+    try {
+      if (isTurnOn === true) {
+        const response = await postApi<{ message: string }>("bot/turn-on-auto-active", {});
+        if (response.success) {
+          setIsAutoActiveOn(true);
+          toast.success(response.data.message);
+        } else {
+          toast.error(response.error.message);
+        }
+      }
+
+      if (isTurnOn === false) {
+        const response = await postApi<{ message: string }>("bot/turn-off-auto-active", {});
+        if (response.success) {
+          setIsAutoActiveOn(false);
+          toast.success(response.data.message);
+        } else {
+          toast.error(response.error.message);
+        }
+      }
+    } catch (error) {
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
   useEffect(() => {
     async function fetchConfig() {
       setIsLoading(true);
-      const response = await getApi<IAutoActiveConfigEntitywithoutId>(
-        "config/get-one"
-      );
+      const response = await getApi<IAutoActiveConfigEntitywithoutId>("config/get-one");
       if (response.success) {
         const {
-          auto_active,
           auto_active_decrease_price,
           max_pnl_start,
           max_pnl_threshold_to_quit,
@@ -105,7 +119,6 @@ export const AutoActiveConfigDialog: React.FC<Props> = ({ open, setOpen }) => {
         setValue("transaction_size_start", transaction_size_start);
 
         setPriceType(price_type);
-        setAutoActive(auto_active);
       } else {
         toast.error(response.error.message);
       }
@@ -113,67 +126,44 @@ export const AutoActiveConfigDialog: React.FC<Props> = ({ open, setOpen }) => {
     }
     fetchConfig();
   }, []);
+
+  useEffect(() => {
+    async function getAutoActiveStatus() {
+      const response = await getApi<{ isAutoActiveOn: boolean }>("bot/auto-active-status");
+      if (response.success) setIsAutoActiveOn(response.data.isAutoActiveOn);
+      else toast.error(response.error.message);
+    }
+
+    getAutoActiveStatus();
+  }, []);
   return (
     <Box>
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        component={"form"}
-        onSubmit={handleSubmit(onUpdate)}
-      >
+      <Dialog open={open} onClose={() => setOpen(false)} component={"form"} onSubmit={handleSubmit(onUpdate)}>
         <Box p={4}>
           {isLoading && "Loading..."}
           {!isLoading && (
             <Grid container spacing={2} mb={2}>
               <Grid item xs={12} sm={6}>
-                <BaseInput
-                  {...register("auto_active_decrease_price")}
-                  label="Điều kiện kích hoạt (USD)"
-                  placeholder="Nhập số"
-                />
+                <BaseInput {...register("auto_active_decrease_price")} label="Điều kiện kích hoạt (USD)" placeholder="Nhập số" />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <BaseInput
-                  {...register("transaction_size_start")}
-                  label="Giá trị lệnh (USD)"
-                  placeholder="Nhập số"
-                />
+                <BaseInput {...register("transaction_size_start")} label="Giá trị lệnh (USD)" placeholder="Nhập số" />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <BaseInput
-                  {...register("percent_to_first_buy")}
-                  label="Mua lần đầu khi lãi lớn hơn: (%)"
-                  placeholder="vd: 1 hoặc 2 hoặc 3 ..."
-                />
+                <BaseInput {...register("percent_to_first_buy")} label="Mua lần đầu khi lãi lớn hơn: (%)" placeholder="vd: 1 hoặc 2 hoặc 3 ..." />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <BaseInput
-                  {...register("percent_to_buy")}
-                  label="Mua khi lãi lớn hơn: (%)"
-                  placeholder="vd: 5 hoặc 10 hoặc 15 ..."
-                />
+                <BaseInput {...register("percent_to_buy")} label="Mua khi lãi lớn hơn: (%)" placeholder="vd: 5 hoặc 10 hoặc 15 ..." />
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <BaseInput
-                  {...register("percent_to_sell")}
-                  label="Bán khi lỗ thấp hơn: (%)"
-                  placeholder="vd: -5 ... (nhỏ hơn 0)"
-                />
+                <BaseInput {...register("percent_to_sell")} label="Bán khi lỗ thấp hơn: (%)" placeholder="vd: -5 ... (nhỏ hơn 0)" />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <BaseInput
-                  {...register("pnl_to_stop")}
-                  label="Đóng lệnh khi pnl nhỏ hơn: ($)"
-                  placeholder="vd: 20, -10, ..."
-                />
+                <BaseInput {...register("pnl_to_stop")} label="Đóng lệnh khi pnl nhỏ hơn: ($)" placeholder="vd: 20, -10, ..." />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <BaseInput
-                  {...register("max_pnl_start")}
-                  label="Max Pnl start ($)"
-                  placeholder="vd: 20, 30,... (greater than 0)"
-                />
+                <BaseInput {...register("max_pnl_start")} label="Max Pnl start ($)" placeholder="vd: 20, 30,... (greater than 0)" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <BaseInput
@@ -188,46 +178,19 @@ export const AutoActiveConfigDialog: React.FC<Props> = ({ open, setOpen }) => {
                   <RadioGroup
                     row
                     aria-labelledby="price_type"
-                    onChange={(ev) =>
-                      setPriceType(ev.target.value as TOrderChainPriceType)
-                    }
+                    onChange={(ev) => setPriceType(ev.target.value as TOrderChainPriceType)}
                     value={priceType}
                   >
-                    <FormControlLabel
-                      control={<Radio />}
-                      label="Ticker"
-                      value={"ticker"}
-                    />
-                    <FormControlLabel
-                      control={<Radio />}
-                      label="Market"
-                      value={"market"}
-                    />
+                    {/* <FormControlLabel control={<Radio />} label="Ticker" value={"ticker"} /> */}
+                    <FormControlLabel control={<Radio />} label="Market" value={"market"} />
                   </RadioGroup>
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <FormControl>
-                  <FormLabel id="auto_active">Tự động kích hoạt</FormLabel>
-                  <RadioGroup
-                    row
-                    aria-labelledby="auto_active"
-                    onChange={(ev) =>
-                      setAutoActive(ev.target.value as TAutoActiveStatus)
-                    }
-                    value={autoActive}
-                  >
-                    <FormControlLabel
-                      control={<Radio />}
-                      label="Off"
-                      value={"off"}
-                    />
-                    <FormControlLabel
-                      control={<Radio />}
-                      label="On"
-                      value={"on"}
-                    />
-                  </RadioGroup>
+                  <FormLabel id="auto_active_toggle">Bật / tắt Auto Active</FormLabel>
+                  <Switch checked={isAutoActiveOn} onChange={handleChange} disabled={isUpdatingStatus} inputProps={{ "aria-label": "controlled" }} />
+                  {isUpdatingStatus && <CircularProgress color="inherit" size={14} />}
                 </FormControl>
               </Grid>
             </Grid>
@@ -241,9 +204,7 @@ export const AutoActiveConfigDialog: React.FC<Props> = ({ open, setOpen }) => {
               variant="contained"
               type="submit"
               disabled={isSubmitting}
-              endIcon={
-                isSubmitting && <CircularProgress color="inherit" size={14} />
-              }
+              endIcon={isSubmitting && <CircularProgress color="inherit" size={14} />}
             >
               Submit
             </Button>

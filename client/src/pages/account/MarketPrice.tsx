@@ -10,6 +10,7 @@ export const MarketPrice = () => {
 
   useEffect(() => {
     socket?.on("auto-active-check", (price: TPrice) => {
+      console.log('price received:',price)
       setPrice(price);
     });
 
