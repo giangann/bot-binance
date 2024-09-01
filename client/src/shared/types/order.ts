@@ -17,6 +17,9 @@ export interface IMarketOrderChainRecord {
   stop_reason?: string;
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
+  symbol_max_pnl_start: string;
+  symbol_max_pnl_threshold: string;
+  symbol_pnl_to_cutloss: string;
   price_type: TOrderChainPriceType;
   start_reason?: string;
   order_pieces: IMarketOrderPieceRecord[];
@@ -34,15 +37,15 @@ export interface IMarketOrderPieceRecord {
   percent_change: string;
   quantity: string;
   transaction_size: string;
+  reason: string | null;
   order_chain: IMarketOrderChainRecord;
+  
   timestamp: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export type TMarketOrderPiecesWithPagi = TResponseWithPagiSimple<
-  IMarketOrderPieceRecord[]
->;
+export type TMarketOrderPiecesWithPagi = TResponseWithPagiSimple<IMarketOrderPieceRecord[]>;
 
 export type TMarketOrderChainWithPiecesPagi = Modify<
   IMarketOrderChainRecord,

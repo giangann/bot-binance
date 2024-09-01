@@ -111,6 +111,11 @@ export const ListOrderPieceTest: React.FC<Props> = ({ status, chainTestId, order
       width: 200,
     },
     {
+      header: "Reason",
+      fieldKey: "reason",
+      width: 200,
+    },
+    {
       header: "Created At",
       fieldKey: "createdAt",
       render: ({ createdAt }) => <StyledText>{dayjs(createdAt).format("DD/MM/YYYY HH:mm:ss")}</StyledText>,

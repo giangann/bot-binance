@@ -4,14 +4,7 @@
 import { Typography, styled } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 import dayjs from "dayjs";
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { BasicTable } from "../../components/Table/BasicTable";
 import { CustomPagi } from "../../components/Table/CustomPagi";
@@ -21,11 +14,7 @@ import { OrderChainContext } from "../../context/OrderChainContext";
 import { SocketContext } from "../../context/SocketContext";
 import { usePagination } from "../../hooks/usePagination";
 import { TPagiApiShort, getApi } from "../../request/request";
-import {
-  IMarketOrderPieceRecord,
-  TMarketOrderChainWithPiecesPagi,
-  TOrderChainStatus,
-} from "../../shared/types/order";
+import { IMarketOrderPieceRecord, TMarketOrderChainWithPiecesPagi, TOrderChainStatus } from "../../shared/types/order";
 import { arraySliceByPagi } from "../../ultils/helper";
 
 type Props = {
@@ -40,29 +29,12 @@ type TFetchOrderPiecesParams = {
   currPage: number;
   perpage: number;
 };
-export const ListOrderPiece: React.FC<Props> = ({
-  status,
-  chainId,
-  orderPieces,
-  pagi,
-}) => {
+export const ListOrderPiece: React.FC<Props> = ({ status, chainId, orderPieces, pagi }) => {
   const { totalItems: totalItemsInit } = pagi;
   const [totalItems, setTotalItems] = useState(totalItemsInit);
-  const {
-    currPage,
-    onGoToStart,
-    onGoToEnd,
-    onPerPageChange,
-    perpage,
-    totalPage,
-    onNextPage,
-    onPrevPage,
-  } = usePagination({ rows: totalItems });
+  const { currPage, onGoToStart, onGoToEnd, onPerPageChange, perpage, totalPage, onNextPage, onPrevPage } = usePagination({ rows: totalItems });
   const [pieces, setPieces] = useState<IMarketOrderPieceRecord[]>(orderPieces);
-  const slicePieces = useMemo(
-    () => arraySliceByPagi(pieces, currPage, perpage),
-    [pieces, currPage, perpage]
-  );
+  const slicePieces = useMemo(() => arraySliceByPagi(pieces, currPage, perpage), [pieces, currPage, perpage]);
 
   // if (pieces !== orderPieces) {
   //   setPieces(orderPieces);
@@ -87,10 +59,7 @@ export const ListOrderPiece: React.FC<Props> = ({
         page: `${currPage}`,
         perpage: `${perpage}`,
       };
-      const response = await getApi<TMarketOrderChainWithPiecesPagi>(
-        url,
-        params
-      );
+      const response = await getApi<TMarketOrderChainWithPiecesPagi>(url, params);
       // Update state data
       if (response.success) {
         const orderChainWithPiecesPagi = response.data;
@@ -121,9 +90,7 @@ export const ListOrderPiece: React.FC<Props> = ({
     {
       header: "Transaction Size",
       fieldKey: "transaction_size",
-      render: ({ transaction_size }) => (
-        <StyledText>{parseFloat(transaction_size).toFixed(3)}</StyledText>
-      ),
+      render: ({ transaction_size }) => <StyledText>{parseFloat(transaction_size).toFixed(3)}</StyledText>,
       width: 300,
     },
     {
@@ -134,9 +101,7 @@ export const ListOrderPiece: React.FC<Props> = ({
     {
       header: "Percent Change",
       fieldKey: "percent_change",
-      render: ({ percent_change }) => (
-        <StyledText>{parseFloat(percent_change).toFixed(2)}%,</StyledText>
-      ),
+      render: ({ percent_change }) => <StyledText>{parseFloat(percent_change).toFixed(2)}%,</StyledText>,
       width: 350,
     },
     {
@@ -145,13 +110,14 @@ export const ListOrderPiece: React.FC<Props> = ({
       width: 200,
     },
     {
+      header: "Reason",
+      fieldKey: "reason",
+      width: 200,
+    },
+    {
       header: "Created At",
       fieldKey: "createdAt",
-      render: ({ createdAt }) => (
-        <StyledText>
-          {dayjs(createdAt).format("DD/MM/YYYY HH:mm:ss")}
-        </StyledText>
-      ),
+      render: ({ createdAt }) => <StyledText>{dayjs(createdAt).format("DD/MM/YYYY HH:mm:ss")}</StyledText>,
       width: 400,
     },
   ];

@@ -18,6 +18,9 @@ export interface IMarketOrderChainTestRecord {
   stop_reason?: string;
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
+  symbol_max_pnl_start: string;
+  symbol_max_pnl_threshold: string;
+  symbol_pnl_to_cutloss: string;
   price_type: TOrderChainPriceType;
   start_reason?: string;
   order_pieces: IMarketOrderPieceTestRecord[];
@@ -38,6 +41,7 @@ export interface IMarketOrderPieceTestRecord {
   percent_change: string;
   quantity: string;
   transaction_size: string;
+  reason: string | null;
   order_chain_test: IMarketOrderChainTestRecord;
 
   timestamp: string;

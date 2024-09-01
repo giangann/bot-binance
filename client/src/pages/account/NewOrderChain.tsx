@@ -21,6 +21,9 @@ type TNewOrderChain = {
   pnl_to_stop: string;
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
+  symbol_max_pnl_start: string;
+  symbol_max_pnl_threshold: string;
+  symbol_pnl_to_cutloss: string;
   price_type: TOrderChainPriceType;
 };
 
@@ -32,6 +35,9 @@ const defaultValue: TNewOrderChain = {
   pnl_to_stop: "-10",
   max_pnl_start: "20",
   max_pnl_threshold_to_quit: "0.6",
+  symbol_max_pnl_start: "5",
+  symbol_max_pnl_threshold: "0.8",
+  symbol_pnl_to_cutloss: "-5",
   price_type: "market",
 };
 
@@ -115,18 +121,29 @@ export const NewOrderChain = () => {
               <BaseInput {...register("percent_to_sell")} label="Bán khi lỗ thấp hơn: (%)" placeholder="vd: -5 ... (nhỏ hơn 0)" />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <BaseInput {...register("pnl_to_stop")} label="Đóng lệnh khi pnl nhỏ hơn: ($)" placeholder="vd: 20, -10, ..." />
+              <BaseInput {...register("pnl_to_stop")} label="Dừng bot khi total pnl nhỏ hơn: ($)" placeholder="vd: 20, -10, ..." />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <BaseInput {...register("max_pnl_start")} label="Max Pnl start ($)" placeholder="vd: 20, 30,... (greater than 0)" />
+              <BaseInput {...register("max_pnl_start")} label="Max Total Pnl start ($)" placeholder="vd: 20, 30,... (greater than 0)" />
             </Grid>
             <Grid item xs={12} sm={6}>
               <BaseInput
                 {...register("max_pnl_threshold_to_quit")}
-                label="Max Pnl Threshold To Quit"
+                label="Max Total Pnl Threshold To Quit"
                 placeholder="vd: 0.5, 0.6, 0.7... (>0 and <1)"
               />
             </Grid>
+            <Grid item xs={12} sm={6} />
+            <Grid item xs={12} sm={6}>
+              <BaseInput {...register("symbol_pnl_to_cutloss")} label="Cắt lỗ vị thế khi pnl nhỏ hơn: ($)" placeholder="vd: 20, -10, ..." />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <BaseInput {...register("symbol_max_pnl_start")} label="Max Pnl Start vị thế ($)" placeholder="vd: 20, 30,... (greater than 0)" />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <BaseInput {...register("symbol_max_pnl_threshold")} label="Chốt lãi vị thế threshold" placeholder="vd: 0.5, 0.6, 0.7... (>0 and <1)" />
+            </Grid>
+
             <Grid item xs={12} sm={6}>
               <FormControl>
                 <FormLabel id="demo-row-radio-buttons-group-label">Chọn kiểu giá</FormLabel>

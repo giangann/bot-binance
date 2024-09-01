@@ -108,6 +108,9 @@ export const AutoActiveConfigDialog: React.FC<Props> = ({ open, setOpen }) => {
           pnl_to_stop,
           price_type,
           transaction_size_start,
+          symbol_max_pnl_start,
+          symbol_max_pnl_threshold,
+          symbol_pnl_to_cutloss,
         } = response.data;
         setValue("auto_active_decrease_price", auto_active_decrease_price);
         setValue("max_pnl_start", max_pnl_start);
@@ -117,6 +120,9 @@ export const AutoActiveConfigDialog: React.FC<Props> = ({ open, setOpen }) => {
         setValue("percent_to_sell", percent_to_sell);
         setValue("pnl_to_stop", pnl_to_stop);
         setValue("transaction_size_start", transaction_size_start);
+        setValue("symbol_max_pnl_start", symbol_max_pnl_start);
+        setValue("symbol_max_pnl_threshold", symbol_max_pnl_threshold);
+        setValue("symbol_pnl_to_cutloss", symbol_pnl_to_cutloss);
 
         setPriceType(price_type);
       } else {
@@ -172,6 +178,20 @@ export const AutoActiveConfigDialog: React.FC<Props> = ({ open, setOpen }) => {
                   placeholder="vd: 0.5, 0.6, 0.7... (>0 and <1)"
                 />
               </Grid>
+              <Grid item xs={12} sm={6}>
+                <BaseInput {...register("symbol_pnl_to_cutloss")} label="Cắt lỗ vị thế khi pnl nhỏ hơn: ($)" placeholder="vd: 20, -10, ..." />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <BaseInput {...register("symbol_max_pnl_start")} label="Max Pnl Start vị thế ($)" placeholder="vd: 20, 30,... (greater than 0)" />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <BaseInput
+                  {...register("symbol_max_pnl_threshold")}
+                  label="Chốt lãi vị thế threshold"
+                  placeholder="vd: 0.5, 0.6, 0.7... (>0 and <1)"
+                />
+              </Grid>
+
               <Grid item xs={12} sm={6}>
                 <FormControl>
                   <FormLabel id="price_type">Chọn kiểu giá</FormLabel>

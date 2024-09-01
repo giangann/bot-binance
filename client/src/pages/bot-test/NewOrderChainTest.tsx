@@ -64,6 +64,9 @@ type TNewOrderChainTest = {
   pnl_to_stop: string;
   max_pnl_start: string;
   max_pnl_threshold_to_quit: string;
+  symbol_max_pnl_start: string;
+  symbol_max_pnl_threshold: string;
+  symbol_pnl_to_cutloss: string;
   price_type: TOrderChainPriceType;
   datasets_id: number;
 };
@@ -76,6 +79,9 @@ const defaultValue: TNewOrderChainTest = {
   pnl_to_stop: "-100",
   max_pnl_start: "1000",
   max_pnl_threshold_to_quit: "0.6",
+  symbol_max_pnl_start: "1000",
+  symbol_max_pnl_threshold: "0.8",
+  symbol_pnl_to_cutloss: "-1000",
   price_type: "market",
   datasets_id: 0,
 };
@@ -161,6 +167,17 @@ const NewOrderChainTestDialog: React.FC<Props> = ({ open, setOpen }) => {
           <Grid item xs={12} sm={6}>
             <BaseInput {...register("max_pnl_threshold_to_quit")} label="Max Pnl Threshold To Quit" placeholder="vd: 0.5, 0.6, 0.7... (>0 and <1)" />
           </Grid>
+          <Grid item xs={12} sm={6} />
+          <Grid item xs={12} sm={6}>
+            <BaseInput {...register("symbol_pnl_to_cutloss")} label="Cắt lỗ vị thế khi pnl nhỏ hơn: ($)" placeholder="vd: 20, -10, ..." />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <BaseInput {...register("symbol_max_pnl_start")} label="Max Pnl Start vị thế ($)" placeholder="vd: 20, 30,... (greater than 0)" />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <BaseInput {...register("symbol_max_pnl_threshold")} label="Chốt lãi vị thế threshold" placeholder="vd: 0.5, 0.6, 0.7... (>0 and <1)" />
+          </Grid>
+
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <InputLabelText id="demo-simple-select-label">Choose dataset</InputLabelText>

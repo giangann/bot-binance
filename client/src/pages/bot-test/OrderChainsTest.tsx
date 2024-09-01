@@ -137,6 +137,9 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
     stop_reason,
     max_pnl_start,
     max_pnl_threshold_to_quit,
+    symbol_max_pnl_start,
+    symbol_max_pnl_threshold,
+    symbol_pnl_to_cutloss,
     price_type,
     start_reason,
 
@@ -248,6 +251,28 @@ const ChainInfo = ({ chainInfo }: ChainInfoProps) => {
               </IconButton>
             </Stack>
           )}
+
+          <Typography>
+            symbol_max_pnl_start:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {symbol_max_pnl_start}$
+            </Typography>
+          </Typography>
+
+          <Typography>
+            symbol_max_pnl_threshold:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {symbol_max_pnl_threshold}
+            </Typography>
+          </Typography>
+
+          <Typography>
+            symbol_pnl_to_cutloss:{" "}
+            <Typography sx={{ fontWeight: 600 }} component={"span"}>
+              {symbol_pnl_to_cutloss}$
+            </Typography>
+          </Typography>
+
           {status === "closed" && (
             <>
               <Typography>

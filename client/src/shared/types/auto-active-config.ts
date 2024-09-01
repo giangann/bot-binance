@@ -12,6 +12,9 @@ export interface IAutoActiveConfigRecord {
   percent_to_first_buy: string;
   percent_to_sell: string;
   pnl_to_stop: string;
+  symbol_max_pnl_start: string;
+  symbol_max_pnl_threshold: string;
+  symbol_pnl_to_cutloss: string;
   price_type: TOrderChainPriceType;
   transaction_size_start: number;
 
@@ -37,6 +40,9 @@ export interface IAutoActiveConfigCreate {
   pnl_to_stop: string;
   price_type: TOrderChainPriceType;
   transaction_size_start: number;
+  symbol_max_pnl_start: string;
+  symbol_max_pnl_threshold: string;
+  symbol_pnl_to_cutloss: string;
 
   createdAt?: string;
   updatedAt?: string;
@@ -52,6 +58,9 @@ export interface IAutoActiveConfigUpdate {
   percent_to_first_buy?: string;
   percent_to_sell?: string;
   pnl_to_stop?: string;
+  symbol_max_pnl_start?: string;
+  symbol_max_pnl_threshold?: string;
+  symbol_pnl_to_cutloss?: string;
   price_type?: TOrderChainPriceType;
   transaction_size_start?: number;
 
