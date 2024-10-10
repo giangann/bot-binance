@@ -7,9 +7,11 @@ import cors from "cors";
 import Express from "express";
 import indexRoute from "../router/index.route";
 import loggerService from "../services/logger.service";
+import dotenv from "dotenv";
+dotenv.config();
 
 const constructHttpServer = () => {
-  const port = 5000;
+  const port = process.env.PORT ?? 5000;
   const app = Express();
 
   // dont understand this block :((
@@ -22,7 +24,7 @@ const constructHttpServer = () => {
     res.header("Access-Control-Allow-Methods", "GET,POST,HEAD,OPTIONS,PUT,PATCH,DELETE");
     res.header(
       "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, Access-Control-Request-Method, Access-Control-Allow-Headers, Access-Control-Request-Headers"
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, Access-Control-Request-Method, Access-Control-Allow-Headers, Access-Control-Request-Headers, ngrok-skip-browser-warning"
     );
 
     if (req.method === "OPTIONS") {

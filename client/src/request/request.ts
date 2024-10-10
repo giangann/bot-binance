@@ -27,18 +27,14 @@ export type TResponseFailure = {
 };
 export type TResponse<T> = TResponseSuccess<T> | TResponseFailure;
 
-export const getApi = async <T>(
-  endpoint: string,
-  searchParams?: Record<string, string>
-): Promise<TResponse<T>> => {
-  const queryParams = searchParams
-    ? "?" + new URLSearchParams(searchParams)
-    : "";
+export const getApi = async <T>(endpoint: string, searchParams?: Record<string, string>): Promise<TResponse<T>> => {
+  const queryParams = searchParams ? "?" + new URLSearchParams(searchParams) : "";
   const fullUrl = baseURL + "/" + endpoint + queryParams;
   const respond = await fetch(fullUrl, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420",
     },
     credentials: "include",
   });
@@ -46,10 +42,7 @@ export const getApi = async <T>(
   return respond.json();
 };
 
-export const postApi = async <T>(
-  endpoint: string,
-  data: any
-): Promise<TResponse<T>> => {
+export const postApi = async <T>(endpoint: string, data: any): Promise<TResponse<T>> => {
   const fullUrl = baseURL + "/" + endpoint;
   const respond = await fetch(fullUrl, {
     method: "POST", // or 'PUT'
@@ -63,10 +56,7 @@ export const postApi = async <T>(
   return respond.json();
 };
 
-export const putApi = async <T>(
-  endpoint: string,
-  data: any
-): Promise<TResponse<T>> => {
+export const putApi = async <T>(endpoint: string, data: any): Promise<TResponse<T>> => {
   const fullUrl = baseURL + "/" + endpoint;
   const respond = await fetch(fullUrl, {
     method: "PUT", // or 'PUT'
@@ -80,10 +70,7 @@ export const putApi = async <T>(
   return respond.json();
 };
 
-export const patchApi = async <T>(
-  endpoint: string,
-  data: any
-): Promise<TResponse<T>> => {
+export const patchApi = async <T>(endpoint: string, data: any): Promise<TResponse<T>> => {
   const fullUrl = baseURL + "/" + endpoint;
   const respond = await fetch(fullUrl, {
     method: "PATCH", // or 'PUT'

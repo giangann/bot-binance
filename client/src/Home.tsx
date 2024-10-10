@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Balance } from "./pages/account/Balance";
 import { Coin } from "./pages/coin/Coin";
@@ -23,6 +23,11 @@ export const Home = () => {
       <UpdateCoinPrice />
       {/* <OrderHistory /> */}
       {/* <TradeHistory />  */}
+
+      <div style={{ marginTop: 36 }} />
+      <VersionConfirm />
+
+      <div style={{ marginTop: 36 }} />
     </Box>
   );
 };
@@ -61,4 +66,8 @@ const GoToDatasetList = () => {
       </Button>
     </Box>
   );
+};
+
+const VersionConfirm = () => {
+  return <Typography sx={{ color: "black" }}>Last update: Prepare deploy ec2, add ngrok-skip-browser-warning header </Typography>;
 };
