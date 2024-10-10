@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const bot_controller_1 = require("../controllers/bot-controller");
+const bot_test_controller_1 = require("../controllers/bot-test-controller");
+const botRoute = (0, express_1.Router)();
+botRoute.post("/activate", bot_controller_1.BotController.activateBot);
+botRoute.post("/deactivate", bot_controller_1.BotController.deactivateBot);
+botRoute.get("/status", bot_controller_1.BotController.getBotStatus);
+botRoute.post("/turn-on-auto-active", bot_controller_1.BotController.turnOnAutoActive);
+botRoute.post("/turn-off-auto-active", bot_controller_1.BotController.turnOffAutoActive);
+botRoute.get("/auto-active-status", bot_controller_1.BotController.getAutoActiveStatus);
+botRoute.post("/test/activate", bot_test_controller_1.BotTestController.activateBotTest);
+botRoute.post("/test/deactivate", bot_test_controller_1.BotTestController.deactivateBotTest);
+botRoute.get("/test/status", bot_test_controller_1.BotTestController.getBotTestStatus);
+exports.default = botRoute;
